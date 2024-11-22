@@ -1,0 +1,30 @@
+{
+  "kind": "collectionType",
+  "collectionName": "bidusers",
+  "info": {
+    "singularName": "biduser",
+    "pluralName": "bidusers",
+    "displayName": "biduser",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "email": {
+      "type": "email",
+      "required": true,
+      "unique": true
+    },
+    "Name": {
+      "type": "string"
+    },
+    "bids": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::bid.bid",
+      "mappedBy": "biduser"
+    }
+  }
+}
