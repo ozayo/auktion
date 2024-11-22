@@ -1,36 +1,33 @@
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
 # Node.js
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
 # Environment Variables
 # .env
 # .env.*
-
-# Logs
-logs/
-*.log
-debug.log
-error.log
-
-# Strapi specific
-.backups/
-.cache/
-.build/
-public/uploads/
-
-# Next.js specific
-.next/
-out/
-
-# Database backups
-git rm -r --cached .
-
-# System Files
-.DS_Store
-Thumbs.db
-
-# Temporary Files
-*.tmp
-*.swp
+# Backend (Strapi)
+backend/.tmp/
+backend/.cache/
+# backend/public/uploads/
+backend/build/
+# backend/.env
+backend/node_modules/
+backend/.backups/
+backend/.env
+# Frontend (Next.js)
+frontend/.next/
+frontend/out/
+frontend/node_modules/
+# Database
+# db/*.sql
+db/*.sqlite
+db/.env
+# Git
+.git/
+.gitignore
