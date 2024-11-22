@@ -17,6 +17,7 @@ backend/.cache/
 # backend/public/uploads/
 backend/build/
 # backend/.env
+backend/dist
 backend/node_modules/
 backend/.backups/
 backend/.env
