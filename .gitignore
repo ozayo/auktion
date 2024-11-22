@@ -1,3 +1,10 @@
+# Genel Ayarlar
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+
 # Node.js
 node_modules/
 npm-debug.log*
@@ -8,29 +15,25 @@ yarn-error.log*
 # .env
 # .env.*
 
-# Logs
-logs/
-*.log
-debug.log
-error.log
+# Backend (Strapi) Özelleştirmeleri
+backend/.tmp/
+backend/.cache/
+# backend/public/uploads/
+backend/build/
+# backend/.env
+backend/node_modules/
+backend/.backups/
 
-# Strapi specific
-.backups/
-.cache/
-.build/
-public/uploads/
+# Frontend (Next.js)
+frontend/.next/
+frontend/out/
+frontend/node_modules/
 
-# Next.js specific
-.next/
-out/
+# Database
+# db/*.sql
+db/*.sqlite
+db/.env
 
-# Database backups
-git rm -r --cached .
-
-# System Files
-.DS_Store
-Thumbs.db
-
-# Temporary Files
-*.tmp
-*.swp
+# Git'e Özel
+.git/
+.gitignore
