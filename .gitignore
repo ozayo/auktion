@@ -1,4 +1,4 @@
-# Genel Ayarlar
+# General
 .DS_Store
 Thumbs.db
 *.log
@@ -12,15 +12,15 @@ yarn-debug.log*
 yarn-error.log*
 
 # Environment Variables
-# .env
-# .env.*
+.env
+.env.*
 
-# Backend (Strapi) Özelleştirmeleri
+# Backend (Strapi)
 backend/.tmp/
 backend/.cache/
 # backend/public/uploads/
 backend/build/
-# backend/.env
+backend/.env
 backend/node_modules/
 backend/.backups/
 
@@ -34,6 +34,6 @@ frontend/node_modules/
 db/*.sqlite
 db/.env
 
-# Git'e Özel
+# Git
 .git/
 .gitignore
