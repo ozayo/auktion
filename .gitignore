@@ -1,39 +1,36 @@
-# General
+# Genel Ayarlar
 .DS_Store
 Thumbs.db
 *.log
 *.tmp
 *.swp
-
 # Node.js
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
 # Environment Variables
-.env
-.env.*
+# .env
+# .env.*
 
-# Backend (Strapi)
+# Backend (Strapi) Özelleştirmeleri
 backend/.tmp/
 backend/.cache/
 # backend/public/uploads/
 backend/build/
-backend/.env
+# backend/.env
 backend/node_modules/
 backend/.backups/
-
+backend/.env
 # Frontend (Next.js)
 frontend/.next/
 frontend/out/
 frontend/node_modules/
-
 # Database
 # db/*.sql
 db/*.sqlite
 db/.env
 
-# Git
+# Git'e Özel
 .git/
 .gitignore
