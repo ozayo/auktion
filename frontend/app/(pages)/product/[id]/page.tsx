@@ -20,7 +20,7 @@ export default function ProductPage() {
       const response = await fetchAPI(
         `/products/${documentId}?populate=*`
       );
-      const productData = response.data; // İlk (ve tek) ürünü alıyoruz
+      const productData = response.data; // We get the first (and only) product
 
       if (productData) {
         setProduct(productData);
@@ -32,7 +32,7 @@ export default function ProductPage() {
         setProduct(null);
       }
     } catch (error) {
-      console.error('Ürün verileri alınırken hata oluştu:', error);
+      console.error('Error retrieving product data:', error);
       setProduct(null);
     }
   };
@@ -42,13 +42,13 @@ export default function ProductPage() {
 
     const interval = setInterval(() => {
       fetchProductData();
-    }, 3000); // 3 saniyede bir güncelle
+    }, 3000); // Update every 3 seconds
 
     return () => clearInterval(interval);
   }, [documentId]);
 
   if (!product) {
-    return <div>Ürün bulunamadı veya yükleniyor...</div>;
+    return <div>Product not found or loading...</div>;
   }
 
   const { id: productId, title, description, price, main_picture } = product;
@@ -56,7 +56,7 @@ export default function ProductPage() {
   return (
     <main className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">{title}</h1>
-      {/* Ürün Bilgileri */}
+      {/* Product Information*/}
       <img
         src={
           main_picture?.url
@@ -67,24 +67,24 @@ export default function ProductPage() {
         className="w-full h-64 object-cover mb-4"
       />
       <p>{description}</p>
-      <p className="text-gray-700 mt-2">Başlangıç Fiyatı: {price} TL</p>
+      <p className="text-gray-700 mt-2">Utgångspris: {price} SEK</p>
 
-      {/* Teklif Verenlerin Listesi */}
-      <h2 className="text-xl font-semibold mt-8">Teklifler</h2>
+      {/* List of Bidders*/}
+      <h2 className="text-xl font-semibold mt-8">Erbjuder</h2>
       <ul>
         {sortedBids.map((bid: any) => (
           <li key={bid.id} className="border-b py-2">
             <p>
-              <strong>{bid.biduser?.Name || 'Bilinmeyen Kullanıcı'}:</strong> {bid.Amount} TL
+              <strong>{bid.biduser?.Name || 'Unknown User'}:</strong> {bid.Amount} SEK
             </p>
             <p className="text-gray-500 text-sm">
-              Tarih: {new Date(bid.createdAt).toLocaleString()}
+              Datum: {new Date(bid.createdAt).toLocaleString()}
             </p>
           </li>
         ))}
       </ul>
 
-      {/* Teklif Verme Formu */}
+      {/* Bid Submission Form */}
       <BidForm productId={productId} />
     </main>
   );

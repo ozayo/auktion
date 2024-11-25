@@ -7,8 +7,6 @@ import logo from "../public/Bouvet_Logo_Colossus.svg";
 import { FaGithub, FaBars, FaTimes } from "react-icons/fa";
 
 
-// Props ve state türleri TypeScript'te açıkça tanımlandı.
-
 const Header: React.FC = () => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
 
@@ -37,18 +35,18 @@ const Header: React.FC = () => {
             </li>
             <li>
               <Link
-                href="/about"
+                href="/"
                 className="text-gray-800 dark:text-white hover:text-blue-500 dark:hover:text-blue-500 font-bold"
               >
-                About
+                Link
               </Link>
             </li>
             <li>
               <Link
-                href="/projects"
+                href="/"
                 className="text-gray-800 dark:text-white hover:text-blue-500 font-bold"
               >
-                Projects
+                Link3
               </Link>
             </li>
             <li>
@@ -56,14 +54,14 @@ const Header: React.FC = () => {
                 href="/contact"
                 className="text-gray-800 dark:text-white hover:text-blue-500 font-bold"
               >
-                Contact
+                Link4
               </Link>
             </li>
           </ul>
         </div>
         <div className="flex grow md:grow-0 justify-end gap-2 md:gap-1">
           <div className="textchangeflex-none w-24 md:flex justify-center">
-           <Link href="/admin">Admin</Link>
+           <Link href="http://localhost:1337/admin">Admin</Link>
           </div>
         </div>
         <div
@@ -92,26 +90,26 @@ const Header: React.FC = () => {
           </li>
           <li>
             <Link
-              href="/about"
+              href="/"
               className="text-gray-800 dark:text-white hover:text-blue-500 dark:hover:text-blue-500 font-bold"
             >
-              About
+              Link2
             </Link>
           </li>
           <li>
             <Link
-              href="/projects"
+              href="/"
               className="text-gray-800 dark:text-white hover:text-blue-500 font-bold"
             >
-              Projects
+              Link3
             </Link>
           </li>
           <li>
             <Link
-              href="/contact"
+              href="/"
               className="text-gray-800 dark:text-white hover:text-blue-500 font-bold"
             >
-              Contact
+              Link3
             </Link>
           </li>
         </ul>

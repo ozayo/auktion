@@ -9,7 +9,7 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   if (!product) {
     console.error('Product is undefined:', product);
-    return null; // veya uygun bir hata mesajı gösterin
+    return null; // eller visa ett lämpligt felmeddelande
   }
 
   const { id, title, price, main_picture } = product;
@@ -22,9 +22,9 @@ export default function ProductCard({ product }: ProductCardProps) {
     <div className="border p-4 rounded">
       <img src={imageUrl} alt={title} className="w-full h-48 object-cover mb-2" />
       <h2 className="text-xl font-semibold">{title}</h2>
-      <p className="text-gray-700">Fiyat: {price} TL</p>
+      <p className="text-gray-700">Utgångspris: {price} SEK</p>
       <Link href={`/product/${product.documentId}`} className="text-blue-500 mt-2 inline-block">
-        Detayları Gör
+        Se Detaljer
       </Link>
     </div>
   );

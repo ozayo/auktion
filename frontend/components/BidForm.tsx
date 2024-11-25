@@ -16,18 +16,18 @@ export default function BidForm({ productId }: BidFormProps) {
 
   const handleBid = async () => {
     try {
-      // Kullanıcı doğrulaması veya oluşturulması
+      // User authentication or creation
       let biduserId;
 
-      // Kullanıcı email kontrolü
+      // User email control
       const bidusersData = await fetchAPI(
         `/bidusers?filters[email][$eq]=${userEmail}`
       );
       if (bidusersData.data.length > 0) {
-        // Kullanıcı mevcut
+        // If the user exists
         biduserId = bidusersData.data[0].id;
       } else {
-        // Yeni kullanıcı oluştur
+        // Create new user
         const newUser = await fetchAPI('/bidusers', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -41,7 +41,7 @@ export default function BidForm({ productId }: BidFormProps) {
         biduserId = newUser.data.id;
       }
 
-      // Teklif oluşturma
+     // Creating an offer
       await fetchAPI('/bids', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,20 +54,20 @@ export default function BidForm({ productId }: BidFormProps) {
         }),
       });
 
-      setMessage('Teklifiniz başarıyla kaydedildi!');
+      setMessage('Ditt bud har registrerats!');
       setAmount('');
     } catch (error) {
       console.error(error);
-      setMessage('Bir hata oluştu.');
+      setMessage('Ett fel har uppstått.');
     }
   };
 
   return (
     <div className="mt-8">
-      <h2 className="text-xl font-semibold">Teklif Ver</h2>
+      <h2 className="text-xl font-semibold">Lägg ett bud</h2>
       {!userEmail ? (
         <div>
-          <p>Teklif vermek için email adresinizi girin:</p>
+          <p>Ange din e-postadress för att bjuda:</p>
           <input
             type="email"
             placeholder="Email"
@@ -77,27 +77,27 @@ export default function BidForm({ productId }: BidFormProps) {
           />
           <input
             type="text"
-            placeholder="İsim"
+            placeholder="Namn"
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
             className="border p-2 mr-2"
           />
           <button onClick={() => {}} className="bg-blue-500 text-white px-4 py-2">
-            Başla
+            Börja
           </button>
         </div>
       ) : (
         <div>
-          <p>Teklif Tutarı:</p>
+          <p>Budbelopp:</p>
           <input
             type="number"
-            placeholder="Teklif Tutarı"
+            placeholder="Budbelopp:"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             className="border p-2 mr-2"
           />
           <button onClick={handleBid} className="bg-green-500 text-white px-4 py-2">
-            Teklif Ver
+            Lägg ett bud
           </button>
         </div>
       )}
