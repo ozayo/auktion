@@ -24,6 +24,8 @@ backend/node_modules/
 backend/.backups/
 backend/.env
 backend/dist/
+backend/.strapi
+backend/.strapi-updater.json
 
 # Frontend (Next.js)
 frontend/.next/
