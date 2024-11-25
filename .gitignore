@@ -23,6 +23,7 @@ backend/build/
 backend/node_modules/
 backend/.backups/
 backend/.env
+backend/dist/
 
 # Frontend (Next.js)
 frontend/.next/
