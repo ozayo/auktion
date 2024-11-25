@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { fetchAPI, API_URL } from '@/lib/api';
 import BidForm from '@/components/BidForm';
+import BidderList from '@/components/BidderList';
 
 export default function ProductPage() {
   const params = useParams();
@@ -18,15 +19,17 @@ export default function ProductPage() {
 
     try {
       const response = await fetchAPI(
-        `/products/${documentId}?populate=*`
+        `/products/${documentId}?populate[0]=bids&populate[1]=bids.biduser&populate[2]=main_picture&populate[3]=gallery&populate[4]=categories`
       );
-      const productData = response.data; // We get the first (and only) product
+      const productData = response.data;
 
       if (productData) {
-        setProduct(productData);
-
         const bids = productData.bids || [];
-        const sorted = [...bids].sort((a: any, b: any) => b.Amount - a.Amount);
+        const sorted = [...bids].sort((a: any, b: any) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+
+        setProduct(productData);
         setSortedBids(sorted);
       } else {
         setProduct(null);
@@ -42,7 +45,7 @@ export default function ProductPage() {
 
     const interval = setInterval(() => {
       fetchProductData();
-    }, 3000); // Update every 3 seconds
+    }, 5000); // Update every 5 seconds
 
     return () => clearInterval(interval);
   }, [documentId]);
@@ -51,7 +54,7 @@ export default function ProductPage() {
     return <div>Product not found or loading...</div>;
   }
 
-  const { id: productId, title, description, price, main_picture } = product;
+  const { id: productId, title, description, price, main_picture, category_name, categories } = product;
 
   return (
     <main className="container mx-auto p-4">
@@ -68,21 +71,12 @@ export default function ProductPage() {
       />
       <p>{description}</p>
       <p className="text-gray-700 mt-2">Utgångspris: {price} SEK</p>
+      <p className="text-gray-700 mt-2">
+        Categories: {categories.map((cat: any) => cat.category_name).join(', ') || 'No categories available'}
+      </p>
 
       {/* List of Bidders*/}
-      <h2 className="text-xl font-semibold mt-8">Erbjuder</h2>
-      <ul>
-        {sortedBids.map((bid: any) => (
-          <li key={bid.id} className="border-b py-2">
-            <p>
-              <strong>{bid.biduser?.Name || 'Unknown User'}:</strong> {bid.Amount} SEK
-            </p>
-            <p className="text-gray-500 text-sm">
-              Datum: {new Date(bid.createdAt).toLocaleString()}
-            </p>
-          </li>
-        ))}
-      </ul>
+      <BidderList bids={sortedBids} />
 
       {/* Bid Submission Form */}
       <BidForm productId={productId} />
