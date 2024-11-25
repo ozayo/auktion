@@ -25,6 +25,10 @@
       "relation": "oneToMany",
       "target": "api::bid.bid",
       "mappedBy": "biduser"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
     }
   }
 }

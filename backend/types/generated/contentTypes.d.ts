@@ -409,6 +409,7 @@ export interface ApiBiduserBiduser extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    active: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     bids: Schema.Attribute.Relation<'oneToMany', 'api::bid.bid'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
