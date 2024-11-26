@@ -5,8 +5,8 @@ import { createContext, useContext, useState, ReactNode } from "react";
 interface AuthContextProps {
   isLoggedIn: boolean;
   userEmail: string;
-  userName: string;
-  logIn: (email: string, name: string) => void;
+  userName: string | null; // Allow name to be optional
+  logIn: (email: string, name?: string) => void; // Make name optional
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -14,20 +14,16 @@ const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState("");
-  const [userName, setUserName] = useState("");
+  const [userName, setUserName] = useState<string | null>(null); // Allow null for name
 
-  const logIn = (email: string, name: string) => {
+  const logIn = (email: string, name?: string) => {
     setIsLoggedIn(true);
     setUserEmail(email);
-    setUserName(name);
+    setUserName(name || null); // Default to null if name is not provided
   };
 
-  
-
   return (
-    <AuthContext.Provider
-      value={{ isLoggedIn, userEmail, userName, logIn }}
-    >
+    <AuthContext.Provider value={{ isLoggedIn, userEmail, userName, logIn }}>
       {children}
     </AuthContext.Provider>
   );

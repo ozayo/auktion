@@ -6,7 +6,7 @@ import logoWhite from "../public/Bouvet_Logo_white.svg";
 import logo from "../public/Bouvet_Logo_Colossus.svg";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { API_URL } from "../lib/api";
-import { useAuth } from "@/contexts/AuthContext"; 
+import { useAuth } from "@/contexts/AuthContext";
 
 const Header: React.FC = () => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
@@ -16,8 +16,6 @@ const Header: React.FC = () => {
   const [localName, setLocalName] = useState<string>("");
 
   const { isLoggedIn, logIn } = useAuth(); // Use context
-
-  
 
   const toggleMobileNav = () => {
     setIsMobileNavOpen((prevState) => !prevState);
@@ -31,22 +29,23 @@ const Header: React.FC = () => {
     setIsLoginModalOpen(false);
   };
 
-  const openSignUpModal = () => {
+  const openSignUpModal = (email: string) => {
+    setLocalEmail(email); // Pre-fill the email field
     setIsLoginModalOpen(false); // Close login modal
-    setIsSignUpModalOpen(true);
+    setIsSignUpModalOpen(true); // Open sign-up modal
   };
 
   const closeSignUpModal = () => {
     setIsSignUpModalOpen(false);
+    setLocalEmail(""); // Clear email field after closing modal
+    setLocalName(""); // Clear name field after closing modal
   };
 
   const handleLogin = async () => {
-    if (localEmail && localName) {
+    if (localEmail) {
       try {
-        // Use Strapi filters to query by email and name
-        const query = `filters[email][$eq]=${encodeURIComponent(
-          localEmail
-        )}&filters[Name][$eq]=${encodeURIComponent(localName)}`;
+        // Use Strapi filters to query by email
+        const query = `filters[email][$eq]=${encodeURIComponent(localEmail)}`;
         const response = await fetch(`${API_URL}/api/bidusers?${query}`);
         if (!response.ok) {
           throw new Error("Failed to fetch bidusers");
@@ -56,13 +55,13 @@ const Header: React.FC = () => {
 
         if (data.data.length > 0) {
           console.log("User found:", data.data[0]);
-          logIn(localEmail, localName); // Update context state
+          logIn(localEmail); // Update context state
           closeLoginModal();
           alert("Successfully logged in!");
         } else {
-          alert("Invalid email or name. Please try again.");
-          setLocalEmail("");
-          setLocalName("");
+          // Open the sign-up modal with pre-filled email
+          alert("Email not found. Please create an account.");
+          openSignUpModal(localEmail);
         }
       } catch (error) {
         console.error("Error logging in:", error);
@@ -71,73 +70,71 @@ const Header: React.FC = () => {
         );
       }
     } else {
-      alert("Please fill in all fields.");
+      alert("Please fill in the email field.");
     }
   };
 
+  const handleSignUp = async () => {
+    if (localEmail && localName) {
+      try {
+        // Step 1: Check if the email already exists in the database
+        const query = `filters[email][$eq]=${encodeURIComponent(localEmail)}`;
+        const checkResponse = await fetch(`${API_URL}/api/bidusers?${query}`);
 
- const handleSignUp = async () => {
-   if (localEmail && localName) {
-     try {
-       // Step 1: Check if the email already exists in the database
-       const query = `filters[email][$eq]=${encodeURIComponent(localEmail)}`;
-       const checkResponse = await fetch(`${API_URL}/api/bidusers?${query}`);
+        if (!checkResponse.ok) {
+          throw new Error("Failed to check existing accounts");
+        }
 
-       if (!checkResponse.ok) {
-         throw new Error("Failed to check existing accounts");
-       }
+        const checkData = await checkResponse.json();
 
-       const checkData = await checkResponse.json();
+        if (checkData.data.length > 0) {
+          // Email already exists
+          alert("This email is already registered.");
+          setLocalEmail("");
+          setLocalName("");
+          return;
+        }
 
-       if (checkData.data.length > 0) {
-         // Email already exists
-         alert("This email is already registered.");
-         setLocalEmail("");
-         setLocalName("");
-         return;
-       }
+        // Step 2: Create a new account
+        const payload = {
+          data: {
+            Name: localName,
+            email: localEmail,
+            active: true,
+            bids: [],
+          },
+        };
 
-       // Step 2: Create a new account
-       const payload = {
-         data: {
-           Name: localName,
-           email: localEmail,
-           active: true,
-           bids: [],
-         },
-       };
+        console.log("Sending payload:", payload);
 
-       console.log("Sending payload:", payload);
+        const response = await fetch(`${API_URL}/api/bidusers`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
 
-       const response = await fetch(`${API_URL}/api/bidusers`, {
-         method: "POST",
-         headers: {
-           "Content-Type": "application/json",
-         },
-         body: JSON.stringify(payload),
-       });
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("API Error Details:", errorData);
+          throw new Error("Failed to create account");
+        }
 
-       if (!response.ok) {
-         const errorData = await response.json();
-         console.error("API Error Details:", errorData);
-         throw new Error("Failed to create account");
-       }
+        const responseData = await response.json();
+        console.log("API Response:", responseData);
 
-       const responseData = await response.json();
-       console.log("API Response:", responseData);
-
-       logIn(localEmail, localName); // Automatically log in the user
-       closeSignUpModal();
-       alert("Account created successfully!");
-     } catch (error) {
-       console.error("Error creating account:", error);
-       alert("Failed to create account. Please check your input.");
-     }
-   } else {
-     alert("Please fill in all fields.");
-   }
- };
-
+        logIn(localEmail, localName); // Automatically log in the user
+        closeSignUpModal();
+        alert("Account created successfully!");
+      } catch (error) {
+        console.error("Error creating account:", error);
+        alert("Failed to create account. Please check your input.");
+      }
+    } else {
+      alert("Please fill in all fields.");
+    }
+  };
 
   return (
     <header className="py-4 md:py-6 px-4 md:px-0">
@@ -170,7 +167,6 @@ const Header: React.FC = () => {
                 Home
               </Link>
             </li>
-            {/* Add other navigation links as needed */}
           </ul>
         </div>
         <div className="flex grow md:grow-0 justify-end gap-2 md:gap-1">
@@ -217,7 +213,6 @@ const Header: React.FC = () => {
               Home
             </Link>
           </li>
-          {/* Add other mobile navigation links as needed */}
         </ul>
       </div>
 
@@ -233,25 +228,12 @@ const Header: React.FC = () => {
               onChange={(e) => setLocalEmail(e.target.value)}
               className="border p-2 mb-2 w-full"
             />
-            <input
-              type="text"
-              placeholder="Namn"
-              value={localName}
-              onChange={(e) => setLocalName(e.target.value)}
-              className="border p-2 mb-4 w-full"
-            />
             <div className="flex justify-end gap-2">
               <button
                 onClick={closeLoginModal}
                 className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded"
               >
                 Avbryt
-              </button>
-              <button
-                onClick={openSignUpModal}
-                className="px-4 py-2 bg-green-500 text-white hover:bg-green-600 rounded"
-              >
-                Skapa konto
               </button>
               <button
                 onClick={handleLogin}
