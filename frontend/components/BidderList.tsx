@@ -21,19 +21,31 @@ interface BidderListProps {
 const BidderList: React.FC<BidderListProps> = ({ bids }) => {
   return (
     <>
-      <h2 className="text-xl font-semibold mt-8">Erbjuder</h2>
-      <ul>
-        {bids.map((bid) => (
-          <li key={bid.id} className="border-b py-2">
-            <p>
-              <strong>{bid.biduser?.Name || 'Unknown User'}:</strong> {bid.Amount} SEK
-            </p>
-            <p className="text-gray-500 text-sm">
-              Datum: {new Date(bid.createdAt).toLocaleString()}
-            </p>
-          </li>
+      <h2 className="text-xl font-semibold mt-8 mb-4">Erbjuder</h2>
+      <div className='overflow-y-auto max-h-44'>
+      <table className="w-full border-collapse text-sm">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="px-4 py-2 text-left">Bid</th>
+            <th className="px-4 py-2 text-left">Datum</th>
+            <th className="px-4 py-2 text-left">User</th>
+          </tr>
+        </thead>
+        <tbody>
+          {bids.map((bid) => (
+          <tr key={bid.id} className="border-b py-2">
+            <td className="px-4 py-1">
+              {bid.Amount} SEK
+            </td>
+            <td className="px-4 py-1">
+              {new Date(bid.createdAt).toLocaleString()}
+            </td>
+            <td className="px-4 py-1">{bid.biduser?.Name || 'Unknown User'}</td>
+          </tr>
         ))}
-      </ul>
+        </tbody>
+      </table>
+      </div>
     </>
   );
 };
