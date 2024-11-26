@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    domains: ["localhost"], // For NextJS image optimization we have to write domain here.
+  },
 };
 
 export default nextConfig;
