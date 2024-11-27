@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import InputField from "./InputField";
 import { API_URL } from "../lib/api";
 import { useAuth } from "@/contexts/AuthContext";
@@ -24,6 +24,47 @@ const AuthModals: React.FC<AuthModalsProps> = ({
   const [localName, setLocalName] = useState<string>("");
   const { logIn } = useAuth();
 
+  // Utility function to set a persistent cookie
+  const setPersistentLogin = (documentId: string) => {
+    document.cookie = `userDocumentId=${documentId}; path=/; max-age=${30 * 24 * 60 * 60};`; // 30 days
+    console.log(`Cookie set: userDocumentId=${documentId}`);
+  };
+
+  // Utility function to get a cookie value by name
+  const getCookie = (name: string): string | null => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
+    return null;
+  };
+
+  // Restore user session on page load
+  useEffect(() => {
+    const restoreSession = async () => {
+      const documentId = getCookie("userDocumentId");
+      if (documentId) {
+        try {
+          const query = `filters[documentId][$eq]=${documentId}`;
+          const response = await fetch(`${API_URL}/api/bidusers?${query}`);
+          if (!response.ok) throw new Error("Failed to fetch user details");
+
+          const data = await response.json();
+          if (data.data.length > 0) {
+            const user = data.data[0];
+            logIn(user.email, user.Name); // Restore user session
+            console.log("User session restored:", user);
+          } else {
+            console.log("User not found. Invalid cookie.");
+          }
+        } catch (error) {
+          console.error("Error restoring user session:", error);
+        }
+      }
+    };
+
+    restoreSession();
+  }, [logIn]);
+
   const handleLogin = async () => {
     if (!localEmail) {
       alert("Vänligen fyll i e-postadress.");
@@ -38,7 +79,9 @@ const AuthModals: React.FC<AuthModalsProps> = ({
       const data = await response.json();
 
       if (data.data.length > 0) {
-        logIn(localEmail);
+        const documentId = data.data[0].documentId; // Retrieve documentId
+        setPersistentLogin(documentId); // Store documentId in cookie
+        logIn(localEmail); // Log in using the email or other method
         closeLoginModal();
         alert("Inloggad!");
       } else {
@@ -87,6 +130,9 @@ const AuthModals: React.FC<AuthModalsProps> = ({
 
       if (!createResponse.ok) throw new Error("Failed to create account");
 
+      const createdUser = await createResponse.json();
+      const documentId = createdUser.data.documentId; // Retrieve documentId
+      setPersistentLogin(documentId); // Store documentId in cookie
       logIn(localEmail, localName);
       closeSignUpModal();
       alert("Kontot skapades framgångsrikt!");
@@ -95,6 +141,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
       alert("Ett fel uppstod vid skapandet av kontot.");
     }
   };
+
 
   return (
     <>

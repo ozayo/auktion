@@ -19,7 +19,7 @@ const Header: React.FC = () => {
   const toggleMobileNav = () => setIsMobileNavOpen(!isMobileNavOpen);
   const openLoginModal = () => setIsLoginModalOpen(true);
   const closeLoginModal = () => setIsLoginModalOpen(false);
-  const openSignUpModal = (email: string) => {
+  const openSignUpModal = () => {
     setIsLoginModalOpen(false);
     setIsSignUpModalOpen(true);
   };
@@ -27,7 +27,7 @@ const Header: React.FC = () => {
 
   return (
     <header className="py-4 md:py-6 px-4 md:px-0">
-      <div className="flex items-center">
+      <div className="flex items-center justify-between">
         <div className="logo flex-none w-28">
           <Link href="/">
             <Image
@@ -46,8 +46,48 @@ const Header: React.FC = () => {
             />
           </Link>
         </div>
-        <div className="desknav grow hidden md:inline-block">
-          <ul className="flex justify-center gap-5">
+
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex grow justify-center gap-8">
+          <Link
+            href="/"
+            className="text-gray-800 dark:text-white hover:text-blue-500 font-bold"
+          >
+            Home
+          </Link>
+          <Link
+            href="http://localhost:1337/admin"
+            className="text-blue-500 hover:text-blue-700 font-bold"
+          >
+            Admin
+          </Link>
+          {isLoggedIn ? (
+            <span className="text-gray-800 dark:text-white font-bold">
+              Min sida
+            </span>
+          ) : (
+            <button
+              onClick={openLoginModal}
+              className="text-blue-500 hover:text-blue-700 font-bold"
+            >
+              Logga in
+            </button>
+          )}
+        </div>
+
+        {/* Hamburger menu for mobile navigation */}
+        <div
+          className="hamburger md:hidden flex w-10 justify-end"
+          onClick={toggleMobileNav}
+        >
+          {isMobileNavOpen ? <FaTimes size="1.5em" /> : <FaBars size="1.5em" />}
+        </div>
+      </div>
+
+      {/* Mobile Navigation */}
+      {isMobileNavOpen && (
+        <div className="flex flex-col items-end mt-4 bg-gray-100 p-4 shadow-md rounded md:hidden">
+          <ul className="flex flex-col gap-4 w-full">
             <li>
               <Link
                 href="/"
@@ -56,31 +96,32 @@ const Header: React.FC = () => {
                 Home
               </Link>
             </li>
-          </ul>
-        </div>
-        <div className="flex grow md:grow-0 justify-end gap-2 md:gap-1">
-          <div className="flex-none w-24 md:flex justify-center">
-            {isLoggedIn ? (
-              <span className="text-gray-800 dark:text-white font-bold">
-                Min sida
-              </span>
-            ) : (
-              <button
-                onClick={openLoginModal}
+            <li>
+              <Link
+                href="http://localhost:1337/admin"
                 className="text-blue-500 hover:text-blue-700 font-bold"
               >
-                Logga in
-              </button>
-            )}
-          </div>
+                Admin
+              </Link>
+            </li>
+            <li>
+              {isLoggedIn ? (
+                <span className="text-gray-800 dark:text-white font-bold">
+                  Min sida
+                </span>
+              ) : (
+                <button
+                  onClick={openLoginModal}
+                  className="text-blue-500 hover:text-blue-700 font-bold"
+                >
+                  Logga in
+                </button>
+              )}
+            </li>
+          </ul>
         </div>
-        <div
-          className="hamburger md:hidden flex w-10 justify-end"
-          onClick={toggleMobileNav}
-        >
-          {isMobileNavOpen ? <FaTimes size="1.5em" /> : <FaBars size="1.5em" />}
-        </div>
-      </div>
+      )}
+
       <AuthModals
         isLoginModalOpen={isLoginModalOpen}
         closeLoginModal={closeLoginModal}

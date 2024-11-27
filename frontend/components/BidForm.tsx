@@ -14,6 +14,7 @@ const BidForm: React.FC<BidFormProps> = ({ productId }) => {
   const [message, setMessage] = useState("");
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { isLoggedIn, userEmail, userName } = useAuth();
 
@@ -30,6 +31,13 @@ const BidForm: React.FC<BidFormProps> = ({ productId }) => {
       setMessage("Du måste logga in för att bjuda.");
       return;
     }
+
+    if (isSubmitting) {
+      return; // Prevent multiple submissions
+    }
+
+    setIsSubmitting(true); // Disable button
+    setTimeout(() => setIsSubmitting(false), 5000); // Re-enable after 5 seconds
 
     try {
       let biduserDocumentId;
@@ -82,6 +90,13 @@ const BidForm: React.FC<BidFormProps> = ({ productId }) => {
         setMessage("Budbeloppet måste vara ett positivt tal.");
         return;
       }
+      if (bidAmount < highestBid + 50) {
+        setMessage(
+          `Ditt bud måste vara minst 50 kronor högre än det senaste budet (${highestBid} SEK).`
+        );
+        return;
+      }
+
       if (bidAmount <= highestBid) {
         setMessage(
           `Ditt bud måste vara högre än det senaste budet (${highestBid}).`
@@ -136,9 +151,12 @@ const BidForm: React.FC<BidFormProps> = ({ productId }) => {
             onChange={(e) => setAmount(e.target.value)}
             className="border p-2 mr-2"
           />
-          <button
+         <button
             onClick={handleBid}
-            className="bg-green-500 text-white px-4 py-2"
+            disabled={isSubmitting} // Disable button when submitting
+            className={`${
+              isSubmitting ? "bg-gray-500" : "bg-green-500"
+            } text-white px-4 py-2`}
           >
             Lägg ett bud
           </button>
