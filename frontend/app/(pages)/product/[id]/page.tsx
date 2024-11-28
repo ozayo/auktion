@@ -1,4 +1,3 @@
-// app/product/[id]/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,14 +6,17 @@ import { fetchAPI, API_URL } from "@/lib/api";
 import BidForm from "@/components/BidForm";
 import BidderList from "@/components/BidderList";
 import ProductImage from "@/components/ProductImage";
+import EndInfo from "@/components/EndInfo";
+import { calculateRemainingTime } from "@/utils/calculateRemainingTime";
+import { dateFormatShort } from "@/utils/dateFormat";
 
 export default function ProductPage() {
   const params = useParams();
   const documentId = params?.id;
   const [product, setProduct] = useState<any>(null);
   const [sortedBids, setSortedBids] = useState<any[]>([]);
-  const highestBid = sortedBids.length > 0 ? sortedBids[0].Amount : null;
 
+  const totalBids = sortedBids.length;
 
   const fetchProductData = async () => {
     if (!documentId) return;
@@ -56,8 +58,16 @@ export default function ProductPage() {
     return <div>Product not found or loading...</div>;
   }
 
-  const { title, description, price, main_picture, gallery, categories } =
-    product;
+  const { title, description, price, main_picture, gallery, categories, ending_date } = product;
+
+  // Highest info
+  const highestBid = sortedBids.length > 0 ? sortedBids[0].Amount : null;
+  const highestBidder = sortedBids.length > 0 ? sortedBids[0].biduser?.Name : "Unknown";
+
+  // RemainingTime
+  const remainingTime = calculateRemainingTime(ending_date);
+  // Formatted Ending Date
+  const formattedEndingDate = dateFormatShort(ending_date);
 
   return (
     <div className="py-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -65,10 +75,10 @@ export default function ProductPage() {
         {/* Product Image */}
         <ProductImage
           mainPicture={{
-            url: `${API_URL}${main_picture.url}`
+            url: `${API_URL}${main_picture.url}`,
           }}
           gallery={gallery?.map((img: any) => ({
-            url: `${API_URL}${img.url}`
+            url: `${API_URL}${img.url}`,
           }))}
         />
       </div>
@@ -76,20 +86,52 @@ export default function ProductPage() {
         <h1 className="text-3xl font-bold">{title}</h1>
         <p className="text-gray-600 mt-2">
           Categories:{" "}
-          {categories
-            ?.map((cat: any) => cat.category_name)
-            .join(", ") || "No categories available"}
+          {categories?.map((cat: any) => cat.category_name).join(", ") ||
+            "No categories available"}
         </p>
         <div className="flex items-center justify-between mt-4">
-          <p className="text-gray-600 ">Utgångspris: {price} SEK</p>
-          {highestBid !== null && (
-            <p className="text-gray-600 font-bold">Högsta bud: {highestBid} SEK</p>
-          )}
-          <p className="text-gray-600">12 bid</p>
-          <p className="text-gray-600">3 DAYS 12 HOURS 8 MIN</p>
+          <div className="flex flex-col text-center">
+            <p className="text-gray-600 text-xs">Utgångspris</p>
+            <p className="text-gray-900 font-bold">{price} SEK</p>
+          </div>
+          <div className="flex flex-col text-center">
+            {highestBid !== null && (
+              <>
+                <p className="text-gray-600 text-xs">Ledande bud</p>
+                <p className="text-gray-900 font-bold">{highestBid} SEK</p>
+              </>
+            )}
+          </div>
+          <div className="flex flex-col text-center">
+            <p className="text-gray-600 text-xs">Antal bud</p>
+            <p className="text-gray-900 font-bold">{totalBids}</p>
+          </div>
+          {/* Auction Ending Countdown */}
+          <div className="flex flex-col text-center">
+            {remainingTime ? (
+              <p className="text-gray-600 text-xs">Budgivning avslutas</p>
+            ) : (
+              <p className="text-gray-600 text-xs">Budgivningen avslutades</p>
+            )}
+            {remainingTime ? (
+              <p className="text-gray-900 font-bold">{remainingTime}</p>
+              ) : (
+              <p className="text-gray-900 font-bold">{formattedEndingDate}</p>
+            )}
+          </div>
+          
+          {/* Auction Ending Date */}
+          {/* {remainingTime &&
+            <p className="text-gray-600 mt-2">
+              Slutar: <p className="font-semibold">{formattedEndingDate}</p>
+            </p>} */}
         </div>
         {/* Bid Submission Form */}
-        <BidForm productId={product.id} />
+        {remainingTime ? (
+          <BidForm productId={product.id} />
+        ) : (
+          <EndInfo username={highestBidder} highestBid={highestBid || 0} />
+        )}
         {/* List of Bidders */}
         <BidderList bids={sortedBids} />
       </div>
@@ -97,7 +139,6 @@ export default function ProductPage() {
         <h2 className="text-2xl font-bold my-2">Beskrivning</h2>
         <p className="whitespace-pre-line">{description}</p>
       </div>
-      
     </div>
   );
 }

@@ -13,12 +13,12 @@ interface ProductImageProps {
 }
 
 const ProductImage: React.FC<ProductImageProps> = ({ mainPicture, gallery = [] }) => {
-  const [selectedImage, setSelectedImage] = useState(mainPicture.url); // Ana görsel
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal durumu
+  const [selectedImage, setSelectedImage] = useState(mainPicture.url); // main image
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal status
 
   const images = [mainPicture, ...gallery];
 
-  // Escape tuşu ile modalı kapatmak için event listener
+  // Event listener for close with Escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isModalOpen) {
@@ -34,16 +34,16 @@ const ProductImage: React.FC<ProductImageProps> = ({ mainPicture, gallery = [] }
 
   return (
     <div className="flex flex-col">
-      {/* Ana Görsel */}
+      {/* Main */}
       <div className="relative w-full">
-        {/* Büyüteç İkonu */}
+        {/* magnifying glass icon */}
         <div
           className="absolute top-2 right-2 bg-white text-black p-2 rounded-full shadow-md cursor-pointer z-10"
           onClick={() => setIsModalOpen(true)}
         >
           <FiZoomIn className="w-6 h-6" />
         </div>
-        {/* Ana Resim */}
+        {/* Main product image */}
         <div
           className="cursor-pointer rounded-md shadow-md overflow-hidden"
           onClick={() => setIsModalOpen(true)}
@@ -84,11 +84,11 @@ const ProductImage: React.FC<ProductImageProps> = ({ mainPicture, gallery = [] }
       {isModalOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
-          onClick={() => setIsModalOpen(false)} // Resim dışına tıklayınca kapat
+          onClick={() => setIsModalOpen(false)} // close modal when click outside of picture
         >
           <div
             className="relative w-auto max-w-full max-h-screen"
-            onClick={(e) => e.stopPropagation()} // Resme tıklayınca modal kapanmasın
+            onClick={(e) => e.stopPropagation()} // But dont close modal when click picture
           >
             <Image
               src={selectedImage}
@@ -97,7 +97,7 @@ const ProductImage: React.FC<ProductImageProps> = ({ mainPicture, gallery = [] }
               alt="Expanded product"
               className="object-contain max-w-full max-h-screen"
             />
-            {/* Kapatma İkonu */}
+            {/* Close icon */}
             <button
               className="absolute top-4 right-4 bg-white text-black rounded-full p-2 z-10"
               onClick={() => setIsModalOpen(false)}
