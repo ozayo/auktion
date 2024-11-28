@@ -33,7 +33,7 @@ const ProductImage: React.FC<ProductImageProps> = ({ mainPicture, gallery = [] }
   }, [isModalOpen]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-4">
       {/* Main */}
       <div className="relative w-full">
         {/* magnifying glass icon */}
@@ -45,7 +45,7 @@ const ProductImage: React.FC<ProductImageProps> = ({ mainPicture, gallery = [] }
         </div>
         {/* Main product image */}
         <div
-          className="cursor-pointer rounded-md shadow-md overflow-hidden"
+          className="cursor-pointer border overflow-hidden"
           onClick={() => setIsModalOpen(true)}
         >
           <Image
@@ -53,7 +53,7 @@ const ProductImage: React.FC<ProductImageProps> = ({ mainPicture, gallery = [] }
             width={800}
             height={800}
             alt={mainPicture.alternativeText || "Main product image"}
-            className="object-cover"
+            className="object-cover h-96 w-full p-1"
             priority
           />
         </div>
@@ -61,11 +61,11 @@ const ProductImage: React.FC<ProductImageProps> = ({ mainPicture, gallery = [] }
 
       {/* Gallery Thumbnails */}
       {gallery.length > 0 && (
-        <div className="flex mt-4 space-x-2 overflow-x-auto">
+        <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
           {images.map((image, index) => (
             <div
               key={index}
-              className="w-20 h-20 rounded-md border border-gray-200 cursor-pointer hover:opacity-80 overflow-hidden"
+              className="w-full rounded-md border border-gray-200 cursor-pointer hover:opacity-80 overflow-hidden"
               onClick={() => setSelectedImage(image.url)}
             >
               <Image
@@ -73,7 +73,7 @@ const ProductImage: React.FC<ProductImageProps> = ({ mainPicture, gallery = [] }
                 width={80}
                 height={80}
                 alt={image.alternativeText || "Gallery image"}
-                className="object-cover"
+                className="object-cover w-full h-20"
               />
             </div>
           ))}
