@@ -11,6 +11,8 @@ interface AuthModalsProps {
   isSignUpModalOpen: boolean;
   closeSignUpModal: () => void;
   openSignUpModal: (email: string) => void;
+  isLogoutModalOpen?: boolean; // New prop for logout modal state
+  closeLogoutModal?: () => void; // New prop for closing logout modal
 }
 
 const AuthModals: React.FC<AuthModalsProps> = ({
@@ -19,14 +21,18 @@ const AuthModals: React.FC<AuthModalsProps> = ({
   isSignUpModalOpen,
   closeSignUpModal,
   openSignUpModal,
+  isLogoutModalOpen,
+  closeLogoutModal,
 }) => {
   const [localEmail, setLocalEmail] = useState<string>("");
   const [localName, setLocalName] = useState<string>("");
-  const { logIn } = useAuth();
+  const { logIn, logOut } = useAuth();
 
   // Utility function to set a persistent cookie
   const setPersistentLogin = (documentId: string) => {
-    document.cookie = `userDocumentId=${documentId}; path=/; max-age=${30 * 24 * 60 * 60};`; // 30 days
+    document.cookie = `userDocumentId=${documentId}; path=/; max-age=${
+      30 * 24 * 60 * 60
+    };`; // 30 days
     console.log(`Cookie set: userDocumentId=${documentId}`);
   };
 
@@ -142,6 +148,10 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     }
   };
 
+  const handleLogout = () => {
+    if (logOut) logOut(); // Perform logout if logOut is available
+    if (closeLogoutModal) closeLogoutModal(); // Close the modal if the handler is available
+  };
 
   return (
     <>
@@ -200,6 +210,29 @@ const AuthModals: React.FC<AuthModalsProps> = ({
                 className="px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 rounded"
               >
                 Skapa konto
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {isLogoutModalOpen && closeLogoutModal && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-md shadow-md w-96">
+            <h2 className="text-xl font-bold mb-4">
+              Är du säker på att du vill logga ut?
+            </h2>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={closeLogoutModal}
+                className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded"
+              >
+                Avbryt
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-500 text-white hover:bg-red-600 rounded"
+              >
+                Ja
               </button>
             </div>
           </div>

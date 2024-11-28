@@ -13,6 +13,7 @@ const Header: React.FC = () => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false); // Consolidate state for Logout modal
 
   const { isLoggedIn } = useAuth();
 
@@ -24,6 +25,8 @@ const Header: React.FC = () => {
     setIsSignUpModalOpen(true);
   };
   const closeSignUpModal = () => setIsSignUpModalOpen(false);
+  const openLogoutModal = () => setIsLogoutModalOpen(true);
+  const closeLogoutModal = () => setIsLogoutModalOpen(false);
 
   return (
     <header className="py-4 md:py-6 px-4 md:px-0">
@@ -62,9 +65,20 @@ const Header: React.FC = () => {
             Admin
           </Link>
           {isLoggedIn ? (
-            <span className="text-gray-800 dark:text-white font-bold">
-              Min sida
-            </span>
+            <>
+              <Link
+                href="/my_page"
+                className="text-gray-800 dark:text-white hover:text-blue-500 font-bold"
+              >
+                Min sida
+              </Link>
+              <button
+                onClick={openLogoutModal} // Directly open the logout modal
+                className="text-red-500 hover:text-red-700 font-bold"
+              >
+                Logga ut
+              </button>
+            </>
           ) : (
             <button
               onClick={openLoginModal}
@@ -104,20 +118,35 @@ const Header: React.FC = () => {
                 Admin
               </Link>
             </li>
-            <li>
-              {isLoggedIn ? (
-                <span className="text-gray-800 dark:text-white font-bold">
-                  Min sida
-                </span>
-              ) : (
+            {isLoggedIn ? (
+              <>
+                <li>
+                  <Link
+                    href="/my_page"
+                    className="text-gray-800 dark:text-white hover:text-blue-500 font-bold"
+                  >
+                    Min sida
+                  </Link>
+                </li>
+                <li>
+                  <button
+                    onClick={openLogoutModal} // Directly open the logout modal
+                    className="text-red-500 hover:text-red-700 font-bold"
+                  >
+                    Logga ut
+                  </button>
+                </li>
+              </>
+            ) : (
+              <li>
                 <button
                   onClick={openLoginModal}
                   className="text-blue-500 hover:text-blue-700 font-bold"
                 >
                   Logga in
                 </button>
-              )}
-            </li>
+              </li>
+            )}
           </ul>
         </div>
       )}
@@ -128,6 +157,8 @@ const Header: React.FC = () => {
         isSignUpModalOpen={isSignUpModalOpen}
         closeSignUpModal={closeSignUpModal}
         openSignUpModal={openSignUpModal}
+        isLogoutModalOpen={isLogoutModalOpen} // Pass logout modal state
+        closeLogoutModal={closeLogoutModal} // Pass logout modal close handler
       />
     </header>
   );

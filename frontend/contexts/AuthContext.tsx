@@ -7,6 +7,7 @@ interface AuthContextProps {
   userEmail: string;
   userName: string | null; // Allow name to be optional
   logIn: (email: string, name?: string) => void; // Make name optional
+  logOut: () => void;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -22,8 +23,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUserName(name || null); // Default to null if name is not provided
   };
 
+  const logOut = () => {
+    // Clear auth state
+    setIsLoggedIn(false);
+    setUserEmail("");
+    setUserName(null);
+
+    // Clear persistent cookie
+    document.cookie =
+      "userDocumentId=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    console.log("Logged out: Cookie cleared");
+  };
+
+
   return (
-    <AuthContext.Provider value={{ isLoggedIn, userEmail, userName, logIn }}>
+    <AuthContext.Provider value={{ isLoggedIn, userEmail, userName, logIn, logOut }}>
       {children}
     </AuthContext.Provider>
   );
