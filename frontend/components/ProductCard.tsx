@@ -30,7 +30,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const remainingTime = calculateRemainingTime(ending_date);
 
   return (
-    <Link className='border rounded border-gray-100 p-4 bg-gray-50 hover:bg-gray-100 flex flex-col' href={`/product/${product.documentId}`}>
+    <Link className='border bg-white p-4 hover:bg-gray-50 flex flex-col' href={`/product/${product.documentId}`}>
     <div className="product-card">
       <div className="product-images relative">
         {/* Product Image */}
@@ -76,12 +76,12 @@ export default function ProductCard({ product }: ProductCardProps) {
               <p className="text-gray-900 font-bold text-sm">{totalBids}</p>
             </div>
           </div>
-          <div className="items-center flex flex-col justify-center min-h-14">
+          <div className="items-center flex flex-col justify-center min-h-14 mb-3">
             {/* Remaining Time */}
               {remainingTime ? (
                 <>
                   <p className="text-gray-600 text-xs">Budgivning avslutas</p>
-                  <p className="text-gray-800 font-bold">{remainingTime}</p>
+                  <p className="text-gray-800 font-bold text-lg">{remainingTime}</p>
                 </>
               ) : (
                 <p className="text-red-500">Budgivningen avslutades</p>
