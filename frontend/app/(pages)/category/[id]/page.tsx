@@ -1,3 +1,5 @@
+// /app/(pages)/category/[id]/page.tsx
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -40,7 +42,11 @@ export default function CategoryPage() {
       const meta = productsData.meta.pagination;
 
       setProducts(products);
-      setSortedProducts(products);
+      // Default sorting: Newest first
+      const sorted = [...products].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setSortedProducts(sorted);
       setTotalPages(meta.pageCount);
     } catch (error) {
       console.error("Error fetching category data:", error);

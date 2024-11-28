@@ -1,3 +1,5 @@
+// /app/page.tsx
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -25,8 +27,13 @@ export default function HomePage() {
       const meta = productsData.meta.pagination;
 
       setProducts(products);
-      setSortedProducts(products);
       setTotalPages(meta.pageCount);
+
+      // Default sorting: Newest first
+      const sorted = [...products].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setSortedProducts(sorted);
     } catch (error) {
       console.error("Error fetching products:", error);
     } finally {
