@@ -40,23 +40,23 @@ export default function ProductCard({ product }: ProductCardProps) {
       <p className="text-gray-700">Utgångspris: {price} SEK</p>
 
       {/* Categories */}
-<p className="text-gray-600 mt-2">
-  Categories:{" "}
-  {categories?.length > 0
-    ? categories.map((category: any, index: number) => (
-        <span key={category.id}>
-          <Link
-            href={`/category/${category.documentId}`}
-            className="text-blue-500 hover:underline"
-          >
-            {category.category_name}
-          </Link>
-          {index < categories.length - 1 && ", "}
-        </span>
-      ))
-    : "No categories available"}
-</p>
-      
+      <p className="text-gray-600 mt-2">
+        Categories:{" "}
+        {categories?.length > 0
+          ? categories.map((category: any, index: number) => (
+              <span key={category.id}>
+                <Link
+                  href={`/category/${category.documentId}`}
+                  className="text-blue-500 hover:underline"
+                >
+                  {category.category_name}
+                </Link>
+                {index < categories.length - 1 && ", "}
+              </span>
+            ))
+          : "No categories available"}
+      </p>
+            
 
       {/* Highest Bid */}
       {highestBid !== null && (
