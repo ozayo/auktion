@@ -41,7 +41,7 @@ export default function ProductCard({ product, showCategories = true, showTotalB
         <div className="absolute top-0 right-0">
           {categories?.length > 0
             ? categories.map((category: any, index: number) => (
-                <span className="text-white rounded-full bg-blue-950 py-1 px-4 text-sm" key={category.id}>
+                <span className="text-white rounded-full bg-blue-950 py-1 px-4 text-sm" key={category.id || `category-${index}`}>
 
                     {category.category_name}
 
