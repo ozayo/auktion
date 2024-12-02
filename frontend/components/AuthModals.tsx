@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import InputField from "./InputField";
 import { API_URL } from "../lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 interface AuthModalsProps {
   isLoginModalOpen: boolean;
@@ -27,6 +28,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
   const [localEmail, setLocalEmail] = useState<string>("");
   const [localName, setLocalName] = useState<string>("");
   const { logIn, logOut } = useAuth();
+  const router = useRouter();
 
   // Utility function to set a persistent cookie
   const setPersistentLogin = (documentId: string) => {
@@ -151,6 +153,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
   const handleLogout = () => {
     if (logOut) logOut(); // Perform logout if logOut is available
     if (closeLogoutModal) closeLogoutModal(); // Close the modal if the handler is available
+    router.push("/");
   };
 
   return (
