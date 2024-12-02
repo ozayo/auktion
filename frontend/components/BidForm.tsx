@@ -7,9 +7,10 @@ import AuthModals from "./AuthModals";
 
 interface BidFormProps {
   productId: string;
+  refreshBids?: () => void;
 }
 
-const BidForm: React.FC<BidFormProps> = ({ productId }) => {
+const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
   const [amount, setAmount] = useState("");
   const [message, setMessage] = useState("");
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -125,9 +126,15 @@ const BidForm: React.FC<BidFormProps> = ({ productId }) => {
 
       setMessage("Ditt bud har registrerats!");
       setAmount("");
+      // Call the refreshBids callback
+      if (refreshBids) {
+      refreshBids();
+      }
     } catch (error) {
       console.error("Error in handleBid:", error);
       setMessage("Ett fel har uppstått.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

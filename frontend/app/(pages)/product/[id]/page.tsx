@@ -128,7 +128,7 @@ export default function ProductPage() {
         </div>
         {/* Bid Submission Form */}
         {remainingTime ? (
-          <BidForm productId={product.id} />
+          <BidForm productId={product.id}/>
         ) : (
           <EndInfo username={highestBidder} highestBid={highestBid || 0} />
         )}
