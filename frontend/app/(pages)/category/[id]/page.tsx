@@ -1,3 +1,5 @@
+// /app/(pages)/category/[id]/page.tsx
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -5,10 +7,12 @@ import { useParams } from "next/navigation";
 import { fetchAPI } from "@/lib/api";
 import ProductCard from "@/components/ProductCard";
 import SortDropdown from "@/components/SortDropdown";
+import CategoryList from "@/components/CategoryList";
 
 export default function CategoryPage() {
   const params = useParams();
   const [categoryName, setCategoryName] = useState<string>("");
+  const [categories, setCategories] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [sortedProducts, setSortedProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -18,6 +22,10 @@ export default function CategoryPage() {
   const fetchCategoryData = async (page: number) => {
     setLoading(true);
     try {
+      // Fetch categories
+      const categoriesData = await fetchAPI("/categories");
+      setCategories(categoriesData.data);
+
       // Fetch category details
       const categoryData = await fetchAPI(`/categories?filters[documentId][$eq]=${params.id}`);
       const category = categoryData.data[0];
@@ -40,7 +48,11 @@ export default function CategoryPage() {
       const meta = productsData.meta.pagination;
 
       setProducts(products);
-      setSortedProducts(products);
+      // Default sorting: Newest first
+      const sorted = [...products].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setSortedProducts(sorted);
       setTotalPages(meta.pageCount);
     } catch (error) {
       console.error("Error fetching category data:", error);
@@ -63,7 +75,7 @@ export default function CategoryPage() {
   }
 
   return (
-    <main className="container mx-auto p-4">
+    <div className="container mx-auto">
       <h1 className="text-2xl font-bold mb-4">
         {categoryName ? (
           <>
@@ -73,6 +85,11 @@ export default function CategoryPage() {
           "Kategori hittades inte"
         )}
       </h1>
+
+      {/* Category List */}
+      <div>
+        <CategoryList categories={categories} />
+      </div>
 
       {products.length > 0 && (
         <SortDropdown products={products} setSortedProducts={setSortedProducts} />
@@ -104,6 +121,6 @@ export default function CategoryPage() {
           </button>
         ))}
       </div>
-    </main>
+    </div>
   );
 }

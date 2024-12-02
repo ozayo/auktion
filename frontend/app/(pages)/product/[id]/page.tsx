@@ -9,6 +9,7 @@ import ProductImage from "@/components/ProductImage";
 import EndInfo from "@/components/EndInfo";
 import { calculateRemainingTime } from "@/utils/calculateRemainingTime";
 import { dateFormatShort } from "@/utils/dateFormat";
+import Link from "next/link";
 
 export default function ProductPage() {
   const params = useParams();
@@ -84,11 +85,23 @@ export default function ProductPage() {
       </div>
       <div className="flex flex-col">
         <h1 className="text-3xl font-bold">{title}</h1>
-        <p className="text-gray-600 mt-2">
-          Categories:{" "}
-          {categories?.map((cat: any) => cat.category_name).join(", ") ||
-            "No categories available"}
-        </p>
+              <p className="text-gray-600 mt-2">
+        Categories:{" "}
+        {categories?.length > 0
+          ? categories.map((category: any, index: number) => (
+              <span key={category.id}>
+                <Link
+                  href={`/category/${category.documentId}`}
+                  className="text-blue-500 hover:underline"
+                >
+                  {category.category_name}
+                </Link>
+                {index < categories.length - 1 && ", "}
+              </span>
+            ))
+          : "No categories available"}
+      </p>
+      
         <div className="flex items-center justify-between mt-4">
           <div className="flex flex-col text-center">
             <p className="text-gray-600 text-xs">Utgångspris</p>

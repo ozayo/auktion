@@ -1,10 +1,13 @@
+// /app/page.tsx
+
 "use client";
 
 import { useState, useEffect } from "react";
 import { fetchAPI } from "../lib/api";
-import ProductCard from "../components/ProductCard";
-import Link from "next/link";
-import SortDropdown from "../components/SortDropdown";
+import CategoryList from "@/components/CategoryList";
+import SortDropdown from "@/components/SortDropdown";
+import ProductCard from "@/components/ProductCard";
+
 
 export default function HomePage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -17,7 +20,7 @@ export default function HomePage() {
   const fetchProducts = async (page: number) => {
     setLoading(true);
     try {
-      // Fetch paginated products
+    // Fetch paginated products
       const productsData = await fetchAPI(
         `/products?pagination[page]=${page}&pagination[pageSize]=9&populate[0]=bids&populate[1]=bids.biduser&populate[2]=main_picture&populate[3]=gallery&populate[4]=categories`
       );
@@ -25,8 +28,13 @@ export default function HomePage() {
       const meta = productsData.meta.pagination;
 
       setProducts(products);
-      setSortedProducts(products);
       setTotalPages(meta.pageCount);
+
+      // Default sorting: Newest first
+      const sorted = [...products].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setSortedProducts(sorted);
     } catch (error) {
       console.error("Error fetching products:", error);
     } finally {
@@ -37,7 +45,7 @@ export default function HomePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch categories
+      // Fetch categories
         const categoriesData = await fetchAPI("/categories");
         setCategories(categoriesData.data);
 
@@ -65,17 +73,7 @@ export default function HomePage() {
       <h1 className="text-2xl font-bold mb-4">Produkter</h1>
 
       {/* Categories */}
-      <div className="flex space-x-4 mb-6">
-        {categories.map((category: any) => (
-          <Link
-            key={category.id}
-            href={`/category/${category.documentId}`}
-            className="text-blue-500 hover:underline"
-          >
-            {category.category_name}
-          </Link>
-        ))}
-      </div>
+      <CategoryList categories={categories} />
 
       {/* Sort Dropdown */}
       {products.length > 0 && (
@@ -83,7 +81,7 @@ export default function HomePage() {
       )}
 
       {/* Product List */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {sortedProducts.map((product: any) => (
           <ProductCard key={product.id} product={product} />
         ))}
