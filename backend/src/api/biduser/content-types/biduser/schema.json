@@ -29,6 +29,12 @@
     "active": {
       "type": "boolean",
       "default": true
+    },
+    "favourites": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product.product",
+      "mappedBy": "biduser"
     }
   }
 }

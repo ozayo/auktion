@@ -417,6 +417,7 @@ export interface ApiBiduserBiduser extends Struct.CollectionTypeSchema {
     email: Schema.Attribute.Email &
       Schema.Attribute.Required &
       Schema.Attribute.Unique;
+    favourites: Schema.Attribute.Relation<'oneToMany', 'api::product.product'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -472,6 +473,7 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
   };
   attributes: {
     bids: Schema.Attribute.Relation<'oneToMany', 'api::bid.bid'>;
+    biduser: Schema.Attribute.Relation<'manyToOne', 'api::biduser.biduser'>;
     categories: Schema.Attribute.Relation<
       'oneToMany',
       'api::category.category'

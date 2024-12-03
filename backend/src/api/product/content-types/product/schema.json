@@ -53,6 +53,12 @@
       "relation": "oneToMany",
       "target": "api::bid.bid",
       "mappedBy": "product"
+    },
+    "biduser": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::biduser.biduser",
+      "inversedBy": "favourites"
     }
   }
 }
