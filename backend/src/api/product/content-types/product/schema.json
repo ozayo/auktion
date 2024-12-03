@@ -59,6 +59,16 @@
       "relation": "manyToOne",
       "target": "api::biduser.biduser",
       "inversedBy": "favourites"
+    },
+    "lottery_product": {
+      "type": "boolean",
+      "default": false
+    },
+    "lottery_users": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::lotteryuser.lotteryuser",
+      "mappedBy": "products"
     }
   }
 }

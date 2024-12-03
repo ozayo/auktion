@@ -424,6 +424,10 @@ export interface ApiBiduserBiduser extends Struct.CollectionTypeSchema {
       'api::biduser.biduser'
     > &
       Schema.Attribute.Private;
+    lottery_user: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::lotteryuser.lotteryuser'
+    >;
     Name: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
@@ -453,6 +457,36 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
       'api::category.category'
     > &
       Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiLotteryuserLotteryuser extends Struct.CollectionTypeSchema {
+  collectionName: 'lotteryusers';
+  info: {
+    displayName: 'Lottery Users';
+    pluralName: 'lotteryusers';
+    singularName: 'lotteryuser';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    biduser: Schema.Attribute.Relation<'oneToOne', 'api::biduser.biduser'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    is_winner: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::lotteryuser.lotteryuser'
+    > &
+      Schema.Attribute.Private;
+    products: Schema.Attribute.Relation<'manyToMany', 'api::product.product'>;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -490,6 +524,12 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
       'api::product.product'
     > &
       Schema.Attribute.Private;
+    lottery_product: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    lottery_users: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::lotteryuser.lotteryuser'
+    >;
     main_picture: Schema.Attribute.Media<'images' | 'files'>;
     price: Schema.Attribute.Decimal;
     publishedAt: Schema.Attribute.DateTime;
@@ -1012,6 +1052,7 @@ declare module '@strapi/strapi' {
       'api::bid.bid': ApiBidBid;
       'api::biduser.biduser': ApiBiduserBiduser;
       'api::category.category': ApiCategoryCategory;
+      'api::lotteryuser.lotteryuser': ApiLotteryuserLotteryuser;
       'api::product.product': ApiProductProduct;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
