@@ -76,7 +76,7 @@ export default function ProductPage() {
         {/* Product Image */}
         <ProductImage
           mainPicture={{
-            url: `${API_URL}${main_picture.url}`,
+            url: main_picture?.url ? `${API_URL}${main_picture.url}` : "/placeholder.png",
           }}
           gallery={gallery?.map((img: any) => ({
             url: `${API_URL}${img.url}`,
