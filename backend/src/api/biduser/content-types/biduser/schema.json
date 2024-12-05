@@ -29,6 +29,18 @@
     "active": {
       "type": "boolean",
       "default": true
+    },
+    "favourites": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product.product",
+      "mappedBy": "biduser"
+    },
+    "lottery_user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::lotteryuser.lotteryuser",
+      "mappedBy": "biduser"
     }
   }
 }

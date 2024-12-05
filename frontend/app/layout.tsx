@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Header from "@/components/Header";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { FavoritesProvider } from "@/contexts/FavoritesContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -31,10 +32,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          <main className="container mx-auto max-w-5xl px-3">
-            <Header />
-            {children}
-          </main>
+          <FavoritesProvider>
+            <main className="container mx-auto max-w-5xl px-3">
+              <Header />
+              {children}
+            </main>
+          </FavoritesProvider>
         </AuthProvider>
       </body>
     </html>

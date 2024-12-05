@@ -1,27 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { API_URL } from "../../../lib/api";
+import { fetchAndProcessBids } from "@/utils/fetchAndProcessBids";
 import { useAuth } from "@/contexts/AuthContext";
+import { Bid } from "@/types";
 import ProductCard from "../../../components/ProductCard";
 import BidForm from "../../../components/BidForm";
 import SortDropdown from "../../../components/SortDropdown";
-
-interface Bid {
-  id: string;
-  Amount: number;
-  product: {
-    id: string;
-    documentId: string;
-    title: string;
-    description: string;
-    price: number;
-    ending_date: string;
-    main_picture: { url: string; alternativeText?: string } | null;
-    highestBid: number | null;
-    categories?: string[];
-  };
-}
+import { calculateRemainingTime } from "@/utils/calculateRemainingTime";
+import Link from "next/link";
 
 const MyPage: React.FC = () => {
   const { userEmail } = useAuth();
@@ -31,78 +18,65 @@ const MyPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [message, setMessage] = useState<string>("");
 
-  const fetchUserBids = async () => {
-    if (!userEmail) return;
-
-    try {
-      const response = await fetch(
-        `${API_URL}/api/bids?filters[biduser][email][$eq]=${encodeURIComponent(
-          userEmail
-        )}&populate=product.main_picture&populate=product.bids&populate=product.categories`
-      );
-      if (!response.ok) throw new Error("Failed to fetch bids");
-
-      const data = await response.json();
-      const groupedBids: Record<string, Bid> = {};
-      const categorySet: Set<string> = new Set();
-
-      data.data.forEach((bid: any) => {
-        const productId = bid.product.id;
-        const highestBid =
-          bid.product.bids?.reduce((max: number, curr: any) => {
-            return Math.max(max, curr.Amount);
-          }, 0) || null;
-
-        const categories =
-          bid.product.categories?.map((cat: any) => cat.category_name) || [];
-        categories.forEach((category: string) => categorySet.add(category));
-
-        const bidData = {
-          id: bid.id,
-          Amount: bid.Amount,
-          product: {
-            ...bid.product,
-            highestBid,
-            categories,
-          },
-        };
-
-        if (
-          !groupedBids[productId] ||
-          groupedBids[productId].Amount < bid.Amount
-        ) {
-          groupedBids[productId] = bidData;
-        }
-      });
-
-      setBids(Object.values(groupedBids));
-      setSortedBids(Object.values(groupedBids));
-      setCategories(Array.from(categorySet));
-    } catch (error) {
-      console.error("Error fetching user bids:", error);
-      setMessage("Failed to fetch your bids.");
-    }
-  };
-
   useEffect(() => {
-    fetchUserBids();
+    const fetchBids = async () => {
+      if (!userEmail) return;
+
+      try {
+        const processedBids = await fetchAndProcessBids(userEmail);
+
+        // Extract unique categories
+        const uniqueCategories = Array.from(
+          new Set(
+            processedBids.flatMap(
+              (bid) =>
+                bid.product.categories?.map((cat) => cat.category_name) || []
+            )
+          )
+        );
+
+        setBids(processedBids);
+        setSortedBids(processedBids);
+        setCategories(uniqueCategories);
+      } catch (error) {
+        console.error("Error fetching user bids:", error);
+        setMessage("Failed to fetch your bids.");
+      }
+    };
+
+    fetchBids();
   }, [userEmail]);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
-    const filteredBids =
-      category === ""
-        ? bids
-        : bids.filter((bid) => bid.product.categories?.includes(category));
-    setSortedBids(filteredBids);
+
+    if (!category) {
+      setSortedBids(bids);
+    } else {
+      setSortedBids(
+        bids.filter((bid) =>
+          bid.product.categories?.some((cat) => cat.category_name === category)
+        )
+      );
+    }
   };
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Min Sida</h1>
 
+      {/* Link to Mina Favoriter */}
+      <div className="mb-4">
+        <Link href="/favourites">
+          <button className="text-blue-500 hover:underline">
+            Mina Favoriter
+          </button>
+        </Link>
+      </div>
+
       {bids.length > 0 && (
         <>
+          {/* Sorting and Category Filtering */}
           <SortDropdown
             products={bids.map((bid) => ({
               ...bid.product,
@@ -146,25 +120,31 @@ const MyPage: React.FC = () => {
         <p>Du har inga bud just nu.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {sortedBids.map((bid) => (
-            <div key={bid.id} className="border p-4 rounded shadow">
-              <ProductCard
-                product={bid.product}
-                showCategories={false}
-                showTotalBids={false}
-              />
-              <p className="text-gray-700 mt-1">
-                <strong>Högsta bud:</strong>{" "}
-                {bid.product.highestBid
-                  ? `${bid.product.highestBid} SEK`
-                  : "Inga bud"}
-              </p>
-              <p className="text-gray-700 mt-2">
-                <strong>Mitt högsta bud:</strong> {bid.Amount} SEK
-              </p>
-              <BidForm productId={bid.product.id} refreshBids={fetchUserBids} />
-            </div>
-          ))}
+          {sortedBids.map((bid) => {
+            const remainingTime = calculateRemainingTime(
+              bid.product.ending_date
+            );
+
+            return (
+              <div key={bid.id}>
+                <ProductCard
+                  product={bid.product}
+                  showTotalBids={false}
+                  userBid={bid.Amount}
+                />
+
+                {/* Render BidForm only if the auction has not ended */}
+                {remainingTime ? (
+                  <BidForm
+                    productId={bid.product.id}
+                    refreshBids={() => fetchAndProcessBids(userEmail)}
+                  />
+                ) : (
+                  <></>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
 

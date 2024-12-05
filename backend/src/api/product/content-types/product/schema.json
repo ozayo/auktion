@@ -53,6 +53,18 @@
       "relation": "oneToMany",
       "target": "api::bid.bid",
       "mappedBy": "product"
+    },
+    "biduser": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::biduser.biduser",
+      "inversedBy": "favourites"
+    },
+    "lottery_users": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::lotteryuser.lotteryuser",
+      "mappedBy": "products"
     }
   }
 }
