@@ -1,3 +1,5 @@
+//components/ProductImage.tsx
+
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { FiZoomIn, FiX } from "react-icons/fi";

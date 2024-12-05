@@ -76,7 +76,7 @@ export default function ProductPage() {
         {/* Product Image */}
         <ProductImage
           mainPicture={{
-            url: `${API_URL}${main_picture.url}`,
+            url: main_picture?.url ? `${API_URL}${main_picture.url}` : "/placeholder.png",
           }}
           gallery={gallery?.map((img: any) => ({
             url: `${API_URL}${img.url}`,
@@ -86,7 +86,7 @@ export default function ProductPage() {
       <div className="flex flex-col">
         <h1 className="text-3xl font-bold">{title}</h1>
               <p className="text-gray-600 mt-2">
-        Categories:{" "}
+        Kategori:{" "}
         {categories?.length > 0
           ? categories.map((category: any, index: number) => (
               <span key={category.id}>
