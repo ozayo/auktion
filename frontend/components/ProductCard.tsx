@@ -61,7 +61,7 @@ export default function ProductCard({ product, showCategories = true, showTotalB
             <div className="flex flex-col text-center">
               {/* Base Price */}
               <p className="text-gray-600 text-xs">Utgångspris</p>
-              <p className="text-gray-900 font-bold text-sm">{price} SEK</p>
+              <p className="text-gray-900 font-bold text-sm">{price ?? 0} SEK</p>
             </div>
             <div className="flex flex-col text-center">
               {/* Highest Bid */}
