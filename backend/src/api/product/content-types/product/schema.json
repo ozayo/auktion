@@ -67,7 +67,7 @@
     "lottery_users": {
       "type": "relation",
       "relation": "manyToMany",
-      "target": "api::lotteryuser.lotteryuser",
+      "target": "api::lottery-user.lottery-user",
       "mappedBy": "products"
     }
   }
