@@ -76,23 +76,29 @@ export default function ProductCard({
                     key={category.id || `category-${index}`}
                   >
                     {category.category_name}
-                  </span>
-                ))}
+
+                  {index < categories.length - 1 && ", "}
+                </span>
+              ))
+            : "No categories available"}
+        </div>
+      </div>
+      <div className="product-details flex flex-col">
+        <div className="title min-h-16">
+          {/* Product Title */}
+          <h2 className="text-xl font-semibold">{title}</h2>
+        </div>
+        <div className="middle">
+          <div className="flex items-center justify-between py-2">
+            <div className="flex flex-col text-center">
+              {/* Base Price */}
+              <p className="text-gray-600 text-xs">Utgångspris</p>
+              <p className="text-gray-900 font-bold text-sm">{price ?? 0} SEK</p>
             </div>
-          </div>
-          <div className="product-details flex flex-col">
-            <div className="title min-h-16">
-              <h2 className="text-xl font-semibold">{title}</h2>
-            </div>
-            <div className="middle">
-              <div className="flex items-center justify-between py-2">
-                <div className="flex flex-col text-center">
-                  {/* Base Price */}
-                  <p className="text-gray-600 text-xs">Utgångspris</p>
-                  <p className="text-gray-900 font-bold text-sm">{price} SEK</p>
-                </div>
-                <div className="flex flex-col text-center">
-                  {/* Highest Bid */}
+            <div className="flex flex-col text-center">
+              {/* Highest Bid */}
+              {highestBid !== null && (
+                <>
                   <p className="text-gray-600 text-xs">Ledande bud</p>
                   <p className="text-gray-900 font-bold text-sm">
                     {highestBid ? `${highestBid} SEK` : "Inga bud"}

@@ -7,6 +7,7 @@ import { fetchAPI } from "../lib/api";
 import CategoryList from "@/components/CategoryList";
 import SortDropdown from "@/components/SortDropdown";
 import ProductCard from "@/components/ProductCard";
+import ProductCardLot from "@/components/ProductCardLot";
 
 
 export default function HomePage() {
@@ -22,7 +23,8 @@ export default function HomePage() {
     try {
     // Fetch paginated products
       const productsData = await fetchAPI(
-        `/products?pagination[page]=${page}&pagination[pageSize]=9&populate[0]=bids&populate[1]=bids.biduser&populate[2]=main_picture&populate[3]=gallery&populate[4]=categories`
+        `/products?pagination[page]=${page}&pagination[pageSize]=9&populate[0]=bids.biduser&populate[1]=main_picture&populate[2]=gallery&populate[3]=categories&populate[4]=lottery_users.biduser`
+        // `/products?pagination[page]=${page}&pagination[pageSize]=9&populate[0]=bids&populate[1]=bids.biduser&populate[2]=main_picture&populate[3]=gallery&populate[4]=categories`
       );
       const products = productsData.data;
       const meta = productsData.meta.pagination;
@@ -81,9 +83,18 @@ export default function HomePage() {
       )}
 
       {/* Product List */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {sortedProducts.map((product: any) => (
           <ProductCard key={product.id} product={product} />
+        ))}
+      </div> */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {sortedProducts.map((product: any) => (
+          product.lottery_product === true ? (
+            <ProductCardLot key={product.id} product={product} />
+          ) : (
+            <ProductCard key={product.id} product={product} />
+          )
         ))}
       </div>
 

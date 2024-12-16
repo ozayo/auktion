@@ -36,10 +36,10 @@
       "target": "api::product.product",
       "mappedBy": "biduser"
     },
-    "lottery_user": {
+    "lottery_users": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::lotteryuser.lotteryuser",
+      "relation": "oneToMany",
+      "target": "api::lottery-user.lottery-user",
       "mappedBy": "biduser"
     }
   }

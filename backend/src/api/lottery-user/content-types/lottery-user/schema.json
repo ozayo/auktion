@@ -1,10 +1,11 @@
 {
   "kind": "collectionType",
-  "collectionName": "lotteryusers",
+  "collectionName": "lottery_users",
   "info": {
-    "singularName": "lotteryuser",
-    "pluralName": "lotteryusers",
-    "displayName": "Lottery Users"
+    "singularName": "lottery-user",
+    "pluralName": "lottery-users",
+    "displayName": "Lottery Users",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -13,19 +14,15 @@
   "attributes": {
     "biduser": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "manyToOne",
       "target": "api::biduser.biduser",
-      "inversedBy": "lottery_user"
+      "inversedBy": "lottery_users"
     },
     "products": {
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::product.product",
       "inversedBy": "lottery_users"
-    },
-    "is_winner": {
-      "type": "boolean",
-      "default": false
     }
   }
 }
