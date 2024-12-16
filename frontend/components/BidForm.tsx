@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { fetchAPI } from "../lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import AuthModals from "./AuthModals";
@@ -27,6 +27,22 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
   };
   const closeSignUpModal = () => setIsSignUpModalOpen(false);
 
+  useEffect(() => {
+    let timeout: NodeJS.Timeout | null = null;
+
+    if (isSubmitting) {
+      timeout = setTimeout(() => {
+        setIsSubmitting(false);
+      }, 5000);
+    }
+
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    };
+  }, [isSubmitting]);
+
   const handleBid = async () => {
     if (!isLoggedIn) {
       setMessage("Du måste logga in för att bjuda.");
@@ -38,7 +54,7 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
     }
 
     setIsSubmitting(true); // Disable button
-    setTimeout(() => setIsSubmitting(false), 5000); // Re-enable after 5 seconds
+    
 
     try {
       let biduserDocumentId;
@@ -133,8 +149,6 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
     } catch (error) {
       console.error("Error in handleBid:", error);
       setMessage("Ett fel har uppstått.");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

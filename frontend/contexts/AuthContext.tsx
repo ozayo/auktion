@@ -1,10 +1,17 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  
+} from "react";
 
 interface AuthContextProps {
   isLoggedIn: boolean;
   userEmail: string;
+  
   userName: string | null; // Allow name to be optional
   logIn: (email: string, name?: string) => void; // Make name optional
   logOut: () => void;
