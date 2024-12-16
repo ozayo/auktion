@@ -81,7 +81,7 @@ export default function ProductCard({
                 <span>No categories available</span>
               )}
             </div>
-          </div> {/* Kapanış etiketi eklendi */}
+          </div>
           <div className="product-details flex flex-col">
             <div className="title min-h-16">
               {/* Product Title */}
@@ -125,8 +125,8 @@ export default function ProductCard({
                     </p>
                   </div>
                 )}
-
-                <div className="items-center flex flex-col justify-center min-h-14 mb-3">
+              </div>
+              <div className="items-center flex flex-col justify-center min-h-14 mb-3">
                   {/* Remaining Time */}
                   {remainingTime ? (
                     <>
@@ -141,7 +141,6 @@ export default function ProductCard({
                     <p className="text-red-500">Budgivningen avslutades</p>
                   )}
                 </div>
-              </div>
               {/* <Link className='flex items-center group font-bold text-black justify-end' href={`/product/${product.documentId}`}>
           Lägg ett bud <FaLongArrowAltRight className='ml-2 group-hover:ml-2' />
         </Link> */}
