@@ -524,6 +524,8 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
       'api::product.product'
     > &
       Schema.Attribute.Private;
+    lottery_product: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
     lottery_users: Schema.Attribute.Relation<
       'manyToMany',
       'api::lotteryuser.lotteryuser'

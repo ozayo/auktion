@@ -7,12 +7,18 @@ interface ProductCardProps {
   product: any;
   showTotalBids?: boolean; // Toggle total bids visibility
   userBid?: number | null; // Optional user's highest bid (for my_page)
+  onFavoriteChange?: () => void;
+  borderless?: boolean;
+ 
 }
 
 export default function ProductCard({
   product,
   showTotalBids = true,
   userBid = null, // Default to no user bid
+  onFavoriteChange,
+  borderless = false,
+  
 }: ProductCardProps) {
   if (!product) {
     console.error("Product is undefined:", product);
@@ -35,7 +41,11 @@ export default function ProductCard({
   const remainingTime = calculateRemainingTime(ending_date);
 
   return (
-    <div className="product-card-wrapper relative border bg-white p-4 hover:bg-gray-50">
+    <div
+      className={`product-card-wrapper relative ${
+        borderless ? "" : "border"
+      } bg-white p-4 hover:bg-gray-50`}
+    >
       {/* Favorites Button */}
       <div
         className="absolute top-2 right-2 z-10"
@@ -45,7 +55,10 @@ export default function ProductCard({
           right: "12px",
         }}
       >
-        <SaveToFavoritesButton productId={product.id} />
+        <SaveToFavoritesButton
+          productId={product.id}
+          onFavoriteChange={onFavoriteChange}
+        />
       </div>
       <Link className="block" href={`/product/${product.documentId}`}>
         <div className="product-card">

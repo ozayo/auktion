@@ -61,6 +61,16 @@ const MyPage: React.FC = () => {
     }
   };
 
+  const refreshBids = async () => {
+    try {
+      const updatedBids = await fetchAndProcessBids(userEmail);
+      setBids(updatedBids);
+      setSortedBids(updatedBids);
+    } catch (error) {
+      console.error("Error refreshing bids:", error);
+    }
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Min Sida</h1>
@@ -126,19 +136,26 @@ const MyPage: React.FC = () => {
             );
 
             return (
-              <div key={bid.id}>
+              <div
+                key={bid.id}
+                className="border rounded-lg p-4 shadow-md bg-white flex flex-col"
+              >
+                {/* Product Card */}
                 <ProductCard
                   product={bid.product}
                   showTotalBids={false}
                   userBid={bid.Amount}
+                  borderless={true}
                 />
 
                 {/* Render BidForm only if the auction has not ended */}
                 {remainingTime ? (
-                  <BidForm
-                    productId={bid.product.id}
-                    refreshBids={() => fetchAndProcessBids(userEmail)}
-                  />
+                  <div className="mt-4">
+                    <BidForm
+                      productId={bid.product.id}
+                      refreshBids={refreshBids} // Use centralized refresh
+                    />
+                  </div>
                 ) : (
                   <></>
                 )}

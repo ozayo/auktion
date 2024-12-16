@@ -1,12 +1,19 @@
 import { useFavorites } from "@/contexts/FavoritesContext";
 import { FaHeart } from "react-icons/fa";
 
-const SaveToFavoritesButton = ({ productId }: { productId: number }) => {
+const SaveToFavoritesButton = ({
+  productId,
+  onFavoriteChange,
+}: {
+  productId: number;
+  onFavoriteChange?: () => void; // Callback for when favorites change
+}) => {
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
 
   const handleClick = () => {
     if (isFavorite(productId)) {
       removeFavorite(productId);
+      onFavoriteChange?.(); // Trigger callback after removing favorite
     } else {
       addFavorite(productId);
     }
@@ -17,17 +24,13 @@ const SaveToFavoritesButton = ({ productId }: { productId: number }) => {
       onClick={handleClick}
       className="relative flex items-center justify-center p-2 focus:outline-none"
     >
-      {/* Outer Heart for Border */}
       <FaHeart
-        size={28} // Slightly larger heart for the border
+        size={28}
         className="absolute text-white"
-        style={{
-          zIndex: 0,
-        }}
+        style={{ zIndex: 0 }}
       />
-      {/* Inner Heart */}
       <FaHeart
-        size={24} // Slightly smaller heart for the filled shape
+        size={24}
         className={`relative z-10 transition-colors duration-300 ${
           isFavorite(productId) ? "text-red-500" : "text-gray-400"
         }`}

@@ -1,15 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { fetchAPI } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
-
-interface FavoritesContextProps {
-  favorites: number[];
-  addFavorite: (productId: number) => void; // No need for async here
-  removeFavorite: (productId: number) => void; // No need for async here
-  isFavorite: (productId: number) => boolean;
-  userDocumentId: string | null;
-  clearFavorites: () => void;
-}
+import { FavoritesContextProps } from "@/types";
 
 const FavoritesContext = createContext<FavoritesContextProps | undefined>(
   undefined
@@ -134,6 +126,7 @@ export const FavoritesProvider: React.FC<{
         isFavorite,
         clearFavorites,
         userDocumentId,
+        userEmail,
       }}
     >
       {children}
