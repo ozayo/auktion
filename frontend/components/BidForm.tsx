@@ -17,6 +17,10 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
   const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Modal states
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [tempBidAmount, setTempBidAmount] = useState<number | null>(null);
+
   const { isLoggedIn, userEmail, userName } = useAuth();
 
   const openLoginModal = () => setIsLoginModalOpen(true);
@@ -43,9 +47,9 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
     };
   }, [isSubmitting]);
 
-  const handleBid = async () => {
+  const handleBid = async (confirmed = false) => {
     if (!isLoggedIn) {
-      setMessage("Du måste logga in för att bjuda.");
+      setMessage("Du måste vara inloggad för att bjuda.");
       return;
     }
 
@@ -53,8 +57,15 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
       return; // Prevent multiple submissions
     }
 
+    const bidAmount = parseFloat(amount);
+    if (!confirmed && bidAmount > 20000) {
+      // Threshold for unreasonably high bid
+      setTempBidAmount(bidAmount);
+      setShowConfirmationModal(true);
+      return;
+    }
+
     setIsSubmitting(true); // Disable button
-    
 
     try {
       let biduserDocumentId;
@@ -102,14 +113,13 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
       const highestBid = bidsData.data.length > 0 ? bidsData.data[0].Amount : 0;
 
       // Validate bid
-      const bidAmount = parseFloat(amount);
       if (isNaN(bidAmount) || bidAmount <= 0) {
-        setMessage("Budbeloppet måste vara ett positivt tal.");
+        setMessage("Ditt bud måste vara ett positivt tal.");
         return;
       }
       if (bidAmount < highestBid + 50) {
         setMessage(
-          `Ditt bud måste vara minst 50 kronor högre än det senaste budet (${highestBid} SEK).`
+          `Ditt bud måste vara minst 50 kronor högre än det senaste budet.`
         );
         return;
       }
@@ -128,7 +138,7 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
       }
 
       // Submit bid
-      const createBidResponse = await fetchAPI("/bids", {
+      await fetchAPI("/bids", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -142,9 +152,8 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
 
       setMessage("Ditt bud har registrerats!");
       setAmount("");
-      // Call the refreshBids callback
       if (refreshBids) {
-      refreshBids();
+        refreshBids();
       }
     } catch (error) {
       console.error("Error in handleBid:", error);
@@ -172,10 +181,10 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
             onChange={(e) => setAmount(e.target.value)}
             className="border p-2 mr-2"
           />
-         <button
-            onClick={handleBid}
-            disabled={isSubmitting} // Disable button when submitting
-            className={`${
+          <button
+            onClick={() => handleBid()}
+            disabled={isSubmitting}
+            className={`mt-2 ${
               isSubmitting ? "bg-gray-500" : "bg-green-500"
             } text-white px-4 py-2`}
           >
@@ -184,6 +193,36 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
         </div>
       )}
       {message && <p className="mt-2">{message}</p>}
+
+      {/* Confirmation Modal */}
+      {showConfirmationModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-lg font-bold">Bekräfta ditt bud</h3>
+            <p className="mt-4">
+              Är du säker på att du vill bjuda {tempBidAmount} SEK? Din plånbok kommer tacka dig om du låter bli.
+            </p>
+            <div className="mt-6 flex justify-end space-x-4">
+              <button
+                onClick={() => setShowConfirmationModal(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg"
+              >
+                Avbryt
+              </button>
+              <button
+                onClick={() => {
+                  setShowConfirmationModal(false);
+                  handleBid(true); // Proceed with bid
+                }}
+                className="px-4 py-2 bg-green-500 text-white rounded-lg"
+              >
+                Bekräfta
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <AuthModals
         isLoginModalOpen={isLoginModalOpen}
         closeLoginModal={closeLoginModal}

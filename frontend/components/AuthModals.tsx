@@ -5,6 +5,7 @@ import InputField from "./InputField";
 import { API_URL } from "../lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import MessageModal from "./MessageModal";
 
 interface AuthModalsProps {
   isLoginModalOpen: boolean;
@@ -27,6 +28,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
 }) => {
   const [localEmail, setLocalEmail] = useState<string>("");
   const [localName, setLocalName] = useState<string>("");
+  const [modalMessage, setModalMessage] = useState<string | null>(null); // State for message modal
   const { logIn, logOut } = useAuth();
   const router = useRouter();
 
@@ -75,7 +77,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
 
   const handleLogin = async () => {
     if (!localEmail) {
-      alert("Vänligen fyll i e-postadress.");
+      setModalMessage("Vänligen fyll i din e-postadress.");
       return;
     }
 
@@ -87,24 +89,23 @@ const AuthModals: React.FC<AuthModalsProps> = ({
       const data = await response.json();
 
       if (data.data.length > 0) {
-        const documentId = data.data[0].documentId; // Retrieve documentId
-        setPersistentLogin(documentId); // Store documentId in cookie
-        logIn(localEmail); // Log in using the email or other method
+        const documentId = data.data[0].documentId;
+        logIn(localEmail);
         closeLoginModal();
-        alert("Inloggad!");
+        setModalMessage("Du är inloggad!");
       } else {
-        alert("Email not found. Skapa konto istället.");
+        setModalMessage("E-postadressen hittades inte. Skapa ett konto.");
         openSignUpModal(localEmail);
       }
     } catch (error) {
       console.error("Login error:", error);
-      alert("Ett fel uppstod vid inloggningen. Försök igen.");
+      setModalMessage("Ett fel uppstod vid inloggningen. Försök igen.");
     }
   };
 
   const handleSignUp = async () => {
     if (!localEmail || !localName) {
-      alert("Vänligen fyll i alla fält.");
+      setModalMessage("Vänligen fyll i alla fält.");
       return;
     }
 
@@ -117,7 +118,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
       const checkData = await checkResponse.json();
 
       if (checkData.data.length > 0) {
-        alert("Denna e-postadress är redan registrerad.");
+        setModalMessage("Denna e-postadress är redan registrerad.");
         return;
       }
 
@@ -138,26 +139,30 @@ const AuthModals: React.FC<AuthModalsProps> = ({
 
       if (!createResponse.ok) throw new Error("Failed to create account");
 
-      const createdUser = await createResponse.json();
-      const documentId = createdUser.data.documentId; // Retrieve documentId
-      setPersistentLogin(documentId); // Store documentId in cookie
       logIn(localEmail, localName);
       closeSignUpModal();
-      alert("Kontot skapades framgångsrikt!");
+      setModalMessage("Kontot skapades framgångsrikt!");
     } catch (error) {
       console.error("Sign-up error:", error);
-      alert("Ett fel uppstod vid skapandet av kontot.");
+      setModalMessage("Ett fel uppstod vid skapandet av kontot.");
     }
   };
 
   const handleLogout = () => {
-    if (logOut) logOut(); // Perform logout if logOut is available
-    if (closeLogoutModal) closeLogoutModal(); // Close the modal if the handler is available
+    if (logOut) logOut();
+    if (closeLogoutModal) closeLogoutModal();
     router.push("/");
+    setModalMessage("Du har loggats ut.");
   };
 
   return (
     <>
+      <MessageModal
+        isOpen={modalMessage !== null}
+        message={modalMessage || ""}
+        onClose={() => setModalMessage(null)}
+      />
+
       {isLoginModalOpen && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-md shadow-md w-96">
@@ -185,6 +190,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
           </div>
         </div>
       )}
+
       {isSignUpModalOpen && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-md shadow-md w-96">
@@ -218,6 +224,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
           </div>
         </div>
       )}
+
       {isLogoutModalOpen && closeLogoutModal && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-md shadow-md w-96">
