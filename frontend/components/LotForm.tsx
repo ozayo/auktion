@@ -30,21 +30,21 @@ const fetchUserLotteryData = async () => {
     );
 
     if (response?.data) {
-      // Tarihi geçmemiş ürünleri filtrele
+      // Filter ending date products
       const registeredProducts = response.data.flatMap((entry: any) => {
         if (entry.products) {
           return entry.products.filter((product: any) => {
             const endingDate = new Date(product.ending_date);
-            return endingDate > new Date(); // Tarihi geçmemiş ürünler
+            return endingDate > new Date();
           });
         }
         return [];
       });
 
-      // Süresi geçmemiş ürünleri say
+      // Count expired products
       setRegisteredProductsCount(registeredProducts.length);
 
-      // Şu anki ürüne kayıtlı olup olmadığını kontrol et
+      // Check if you are registered for the current product
       const registeredEntry = response.data.find((entry: any) =>
         entry.products.some((product: any) => product.documentId === productId)
       );
@@ -81,7 +81,7 @@ const handleRegister = async () => {
   try {
     let biduserDocumentId;
 
-    // Kullanıcıyı kontrol et veya oluştur
+    // Check or create user
     const bidusersData = await fetchAPI(
       `/bidusers?filters[email][$eq]=${encodeURIComponent(userEmail)}`
     );
@@ -102,7 +102,7 @@ const handleRegister = async () => {
       biduserDocumentId = newUser.data.documentId;
     }
 
-    // Lottery User kaydı
+    // Lottery User registry
     await fetchAPI("/lottery-users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -110,7 +110,7 @@ const handleRegister = async () => {
         data: {
           biduser: biduserDocumentId,
           products: {
-            connect: [{ documentId: productId }], // Burada productId artık documentId
+            connect: [{ documentId: productId }],
           },
         },
       }),
