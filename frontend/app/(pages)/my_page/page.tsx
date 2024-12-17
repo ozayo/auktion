@@ -7,70 +7,38 @@ import { Bid } from "@/types";
 import ProductCard from "../../../components/ProductCard";
 import ProductCardLot from "@/components/ProductCardLot";
 import BidForm from "../../../components/BidForm";
-import SortDropdown from "../../../components/SortDropdown";
 import { calculateRemainingTime } from "@/utils/calculateRemainingTime";
 import Link from "next/link";
 
 const MyPage: React.FC = () => {
   const { userEmail } = useAuth();
   const [bids, setBids] = useState<Bid[]>([]);
-  const [sortedBids, setSortedBids] = useState<Bid[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [lotteryProducts, setLotteryProducts] = useState<any[]>([]);
   const [message, setMessage] = useState<string>("");
 
   useEffect(() => {
-    const fetchBids = async () => {
+    const fetchData = async () => {
       if (!userEmail) return;
 
       try {
+        // Fetch bids
         const processedBids = await fetchAndProcessBids(userEmail);
-
-        // Extract unique categories
-        const uniqueCategories = Array.from(
-          new Set(
-            processedBids.flatMap(
-              (bid) =>
-                bid.product.categories?.map((cat) => cat.category_name) || []
-            )
-          )
-        );
-
         setBids(processedBids);
-        setSortedBids(processedBids);
-        setCategories(uniqueCategories);
+
+        // Fetch products with lottery_users
+        const lotteryData = await fetchProductsWithLotteryUsers();
+        setLotteryProducts(lotteryData);
+
+        console.log("Bids:", processedBids);
+        console.log("Lottery Products:", lotteryData);
       } catch (error) {
-        console.error("Error fetching user bids:", error);
-        setMessage("Failed to fetch your bids.");
+        console.error("Error fetching data:", error);
+        setMessage("Failed to fetch your data.");
       }
     };
 
-    fetchBids();
+    fetchData();
   }, [userEmail]);
-
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category);
-
-    if (!category) {
-      setSortedBids(bids);
-    } else {
-      setSortedBids(
-        bids.filter((bid) =>
-          bid.product.categories?.some((cat) => cat.category_name === category)
-        )
-      );
-    }
-  };
-
-  const refreshBids = async () => {
-    try {
-      const updatedBids = await fetchAndProcessBids(userEmail);
-      setBids(updatedBids);
-      setSortedBids(updatedBids);
-    } catch (error) {
-      console.error("Error refreshing bids:", error);
-    }
-  };
 
   return (
     <div className="container mx-auto p-4">
@@ -85,53 +53,13 @@ const MyPage: React.FC = () => {
         </Link>
       </div>
 
-      {bids.length > 0 && (
-        <>
-          {/* Sorting and Category Filtering */}
-          <SortDropdown
-            products={bids.map((bid) => ({
-              ...bid.product,
-              myBidAmount: bid.Amount,
-            }))}
-            setSortedProducts={(sortedProducts) => {
-              const updatedBids = sortedProducts
-                .map((product) =>
-                  bids.find((bid) => bid.product.id === product.id)
-                )
-                .filter((bid): bid is Bid => bid !== undefined); // Remove undefined
-              setSortedBids(updatedBids);
-            }}
-          />
-
-          <div className="flex items-center gap-2 mb-4">
-            <label
-              htmlFor="category-filter"
-              className="text-gray-700 font-semibold"
-            >
-              Filtrera efter kategori:
-            </label>
-            <select
-              id="category-filter"
-              value={selectedCategory}
-              onChange={(e) => handleCategoryChange(e.target.value)}
-              className="border border-gray-300 rounded p-2"
-            >
-              <option value="">Alla kategorier</option>
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-          </div>
-        </>
-      )}
-
-      {sortedBids.length === 0 ? (
-        <p>Du har inga bud just nu.</p>
+      {/* User Bids Section */}
+     
+      {bids.length === 0 ? (
+        <p>Du har inga produkter just nu.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {sortedBids.map((bid) => {
+          {bids.map((bid) => {
             const remainingTime = calculateRemainingTime(
               bid.product.ending_date
             );
@@ -141,33 +69,40 @@ const MyPage: React.FC = () => {
                 key={bid.id}
                 className="border rounded-lg p-4 shadow-md bg-white flex flex-col"
               >
-                {/* Product Card */}
                 <ProductCard
                   product={bid.product}
                   showTotalBids={false}
                   userBid={bid.Amount}
                   borderless={true}
                 />
-                {/* Render BidForm only if the auction has not ended */}
-                {remainingTime ? (
+                {remainingTime && (
                   <div className="mt-4">
                     <BidForm
                       productId={bid.product.id}
-                      refreshBids={refreshBids} // Use centralized refresh
+                      refreshBids={() => {}}
                     />
-                  </div>
-                ) : (
-                  <></>
-                )}
-                {/* Render ProductCardLot only if lottery_product is true */}
-                {bid.product.lottery_product && (
-                  <div className="mt-4">
-                    <ProductCardLot product={bid.product} />
                   </div>
                 )}
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Products with Lottery Users */}
+      
+      {lotteryProducts.length === 0 ? (
+        <p>Inga lotteriprodukter hittades.</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {lotteryProducts.map((product) => (
+            <div
+              key={product.id}
+              className="border rounded-lg p-4 shadow-md bg-white flex flex-col"
+            >
+              <ProductCardLot product={product} />
+            </div>
+          ))}
         </div>
       )}
 
@@ -177,3 +112,36 @@ const MyPage: React.FC = () => {
 };
 
 export default MyPage;
+
+// Fetch products with lottery_users
+const fetchProductsWithLotteryUsers = async () => {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:1337";
+
+  try {
+    const response = await fetch(
+      `${API_URL}/api/products?populate=main_picture&populate=categories&populate=lottery_users`
+    );
+
+    if (!response.ok) throw new Error("Failed to fetch products");
+
+    const data = await response.json();
+
+    // Filter products with non-empty lottery_users relation
+    const productsWithLotteryUsers = data.data.filter(
+      (product: any) =>
+        product.lottery_users && product.lottery_users.length > 0
+    );
+
+    return productsWithLotteryUsers.map((product: any) => ({
+      id: product.id,
+      title: product.title,
+      main_picture: product.main_picture || null,
+      categories: product.categories || [],
+      ending_date: product.ending_date || null,
+      lottery_users: product.lottery_users || [],
+    }));
+  } catch (error) {
+    console.error("Error fetching lottery products:", error);
+    return [];
+  }
+};
