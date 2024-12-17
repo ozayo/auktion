@@ -92,7 +92,7 @@ export default function ProductPage() {
             ? categories.map((category: any, index: number) => (
                 <span key={category.id}>
                   <Link
-                    href={`/category/${category.documentId}`}
+                    href={`/category/${category.slug}`}
                     className="text-blue-500 hover:underline"
                   >
                     {category.category_name}

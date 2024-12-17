@@ -1,8 +1,11 @@
+//components/CategoryList.tsx
+
 import Link from "next/link";
 
 interface Category {
   id: number;
   documentId: string;
+  slug: string; // for slug use
   category_name: string;
 }
 
@@ -20,7 +23,8 @@ export default function CategoryList({ categories }: CategoryListProps) {
       {categories.map((category) => (
         <Link
           key={category.id}
-          href={`/category/${category.documentId}`}
+          // href={`/category/${category.documentId}`}
+          href={`/category/${category.slug}`} // slug link
           className="text-blue-500 hover:underline"
         >
           {category.category_name}
