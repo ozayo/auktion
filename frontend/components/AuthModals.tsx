@@ -91,6 +91,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
       if (data.data.length > 0) {
         const documentId = data.data[0].documentId;
         logIn(localEmail);
+        setPersistentLogin(documentId);
         closeLoginModal();
         setModalMessage("Du är inloggad!");
       } else {
