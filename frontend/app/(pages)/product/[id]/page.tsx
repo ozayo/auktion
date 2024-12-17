@@ -15,8 +15,13 @@ import EndInfoLot from "@/components/EndInfoLot";
 import { calculateRemainingTime } from "@/utils/calculateRemainingTime";
 import { dateFormatShort } from "@/utils/dateFormat";
 import Link from "next/link";
+import SaveToFavoritesButton from "@/components/SaveToFavoritesButton";
 
-export default function ProductPage() {
+interface ProductPageProps {
+  onFavoriteChange?: () => void; // Optional callback function
+}
+
+export default function ProductPage({onFavoriteChange}: ProductPageProps) {
   const params = useParams();
   const documentId = params?.id;
   const [product, setProduct] = useState<any>(null);
@@ -77,7 +82,9 @@ export default function ProductPage() {
       <div className="flex flex-col">
         <ProductImage
           mainPicture={{
-            url: main_picture?.url ? `${API_URL}${main_picture.url}` : "/placeholder.png",
+            url: main_picture?.url
+              ? `${API_URL}${main_picture.url}`
+              : "/placeholder.png",
           }}
           gallery={gallery?.map((img: any) => ({
             url: `${API_URL}${img.url}`,
@@ -86,23 +93,30 @@ export default function ProductPage() {
       </div>
       <div className="flex flex-col">
         <h1 className="text-3xl font-bold">{title}</h1>
-        <p className="text-gray-600 mt-2">
-          Kategori:{" "}
-          {categories?.length > 0
-            ? categories.map((category: any, index: number) => (
-                <span key={category.id}>
-                  <Link
-                    href={`/category/${category.documentId}`}
-                    className="text-blue-500 hover:underline"
-                  >
-                    {category.category_name}
-                  </Link>
-                  {index < categories.length - 1 && ", "}
-                </span>
-              ))
-            : "No categories available"}
-        </p>
+        <div className="flex flex-row justify-between">
+          <p className="text-gray-600 mt-2">
+            Kategori:{" "}
+            {categories?.length > 0
+              ? categories.map((category: any, index: number) => (
+                  <span key={category.id}>
+                    <Link
+                      href={`/category/${category.documentId}`}
+                      className="text-blue-500 hover:underline"
+                    >
+                      {category.category_name}
+                    </Link>
+                    {index < categories.length - 1 && ", "}
+                  </span>
+                ))
+              : "No categories available"}
+          </p>
 
+          <SaveToFavoritesButton
+            productId={product.id}
+            onFavoriteChange={onFavoriteChange}
+            withText={true}
+          />
+        </div>
         <div className="flex items-center justify-between mt-4">
           <div className="flex flex-col text-center">
             <p className="text-gray-600 text-xs">Utgångspris</p>
@@ -136,7 +150,9 @@ export default function ProductPage() {
               </p>
             ) : (
               <p className="text-gray-600 text-xs">
-                {isLotteryProduct ? "Lotteri avslutades" : "Budgivningen avslutades"}
+                {isLotteryProduct
+                  ? "Lotteri avslutades"
+                  : "Budgivningen avslutades"}
               </p>
             )}
             {remainingTime ? (
@@ -148,16 +164,17 @@ export default function ProductPage() {
         </div>
         {remainingTime ? (
           isLotteryProduct ? (
-            <LotForm productId={product.documentId} onUpdate={handleImmediateUpdate} />
+            <LotForm
+              productId={product.documentId}
+              onUpdate={handleImmediateUpdate}
+            />
           ) : (
             <BidForm productId={product.id} />
           )
+        ) : isLotteryProduct ? (
+          <EndInfoLot winner={product.lottery_winner?.biduser || null} />
         ) : (
-          isLotteryProduct ? (
-            <EndInfoLot winner={product.lottery_winner?.biduser || null} />
-          ) : (
-            <EndInfo username={highestBidder} highestBid={highestBid || 0} />
-          )
+          <EndInfo username={highestBidder} highestBid={highestBid || 0} />
         )}
         {isLotteryProduct ? (
           <BidderListLot lotteryUsers={product.lottery_users || []} />

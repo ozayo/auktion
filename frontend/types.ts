@@ -14,6 +14,7 @@ export interface Bid {
     main_picture: { url: string; alternativeText?: string } | null;
     highestBid: number | null;
     categories?: { category_name: string }[];
+    lottery_product: boolean;
   };
 }
 
