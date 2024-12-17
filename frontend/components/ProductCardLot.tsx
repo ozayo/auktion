@@ -3,23 +3,27 @@
 import Link from "next/link";
 import { API_URL } from "../lib/api";
 import { calculateRemainingTime } from "@/utils/calculateRemainingTime";
+import SaveToFavoritesButton from "./SaveToFavoritesButton";
 
 interface ProductCardLotProps {
   product: any;
   showCategories?: boolean; // New prop to toggle categories
+  onFavoriteChange?: () => void;
+  borderless?: boolean;
 }
 
-export default function ProductCardLot({ product, showCategories = true }: ProductCardLotProps) {
+export default function ProductCardLot({
+  product,
+  onFavoriteChange,
+  borderless = false,
+  showCategories = true }:
+  ProductCardLotProps) {
   if (!product) {
     console.error("Product is undefined:", product);
     return null; // or show an appropriate error message
   }
 
-  const { id, title, price, main_picture, categories, lottery_users, ending_date } = product;
-
-  // Debugging lottery_users
-  // console.log("Lottery Users for product:", product.title, lottery_users);
-
+  const { id, title, price, main_picture, categories, ending_date } = product;
 
   const imageUrl = main_picture?.url
     ? `${API_URL}${main_picture.url}`
@@ -29,8 +33,16 @@ export default function ProductCardLot({ product, showCategories = true }: Produ
   const remainingTime = calculateRemainingTime(ending_date);
 
   return (
+    <div className="relative">
+          {/* Favorites Button */}
+      <div className="absolute top-3 right-3 z-10">
+        <SaveToFavoritesButton
+          productId={product.id}
+          onFavoriteChange={onFavoriteChange}
+        />
+      </div>
     <Link
-      className="border bg-green-50 p-4 hover:bg-gray-50 flex flex-col"
+        className={`${borderless ? "" : "border"} bg-green-50 p-4 hover:bg-gray-50 flex flex-col z-0`}
       href={`/product/${product.documentId}`}
     >
       <div className="product-card">
@@ -42,7 +54,7 @@ export default function ProductCardLot({ product, showCategories = true }: Produ
             className="w-full h-48 object-cover mb-2"
           />
           {/* Categories badge */}
-          <div className="absolute top-0 right-0">
+          <div className="absolute top-0 left-0">
             {categories?.length > 0
               ? categories.map((category: any, index: number) => (
                   <span
@@ -55,6 +67,7 @@ export default function ProductCardLot({ product, showCategories = true }: Produ
                 ))
               : "No categories available"}
           </div>
+
         </div>
         <div className="product-details flex flex-col">
           <div className="title min-h-16">
@@ -91,5 +104,6 @@ export default function ProductCardLot({ product, showCategories = true }: Produ
         </div>
       </div>
     </Link>
+    </div>
   );
 }
