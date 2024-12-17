@@ -5,6 +5,7 @@ import { fetchAndProcessBids } from "@/utils/fetchAndProcessBids";
 import { useAuth } from "@/contexts/AuthContext";
 import { Bid } from "@/types";
 import ProductCard from "../../../components/ProductCard";
+import ProductCardLot from "@/components/ProductCardLot";
 import BidForm from "../../../components/BidForm";
 import SortDropdown from "../../../components/SortDropdown";
 import { calculateRemainingTime } from "@/utils/calculateRemainingTime";
@@ -147,7 +148,6 @@ const MyPage: React.FC = () => {
                   userBid={bid.Amount}
                   borderless={true}
                 />
-
                 {/* Render BidForm only if the auction has not ended */}
                 {remainingTime ? (
                   <div className="mt-4">
@@ -158,6 +158,12 @@ const MyPage: React.FC = () => {
                   </div>
                 ) : (
                   <></>
+                )}
+                {/* Render ProductCardLot only if lottery_product is true */}
+                {bid.product.lottery_product && (
+                  <div className="mt-4">
+                    <ProductCardLot product={bid.product} />
+                  </div>
                 )}
               </div>
             );
