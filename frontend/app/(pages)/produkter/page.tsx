@@ -1,90 +1,68 @@
+// app/(pages)/produkter/page.tsx
+
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { fetchAPI } from "@/lib/api";
-import ProductCard from "@/components/ProductCard";
 import CategoryList from "@/components/CategoryList";
+import ProductCard from "@/components/ProductCard";
+import ProductCardLot from "@/components/ProductCardLot";
 import SortDropdownNew from "@/components/SortDropdownNew";
 
 type FilterType = "all" | "bidding" | "lottery";
 
-export default function CategoryPage() {
-  const params = useParams();
+export default function ProdukterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [categoryName, setCategoryName] = useState<string>("");
-  const [categories, setCategories] = useState<any[]>([]);
   const [allProducts, setAllProducts] = useState<any[]>([]);
-  
-  const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
-  const [sortedProducts, setSortedProducts] = useState<any[]>([]);
-  
+  const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(1);
 
   const [filter, setFilter] = useState<FilterType>("all");
   const [hideEnded, setHideEnded] = useState<boolean>(true);
 
-  // Varsayılan sıralama
+  const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
+  const [sortedProducts, setSortedProducts] = useState<any[]>([]);
+
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+
+  // Default sorting (Nyaste först)
   const [sortOption, setSortOption] = useState<string>("createdAt:desc");
 
-  // Sayfa başı ürün sayısı
   const pageSize = 9;
 
-  const fetchCategoryAllProducts = async () => {
+  const fetchAllProducts = async () => {
     setLoading(true);
     try {
-      // Kategorileri çek
-      const categoriesData = await fetchAPI("/categories");
-      setCategories(categoriesData.data);
-
-      // İlgili kategoriyi slug'a göre çek
-      const categoryData = await fetchAPI(
-        `/categories?filters[slug][$eq]=${params.slug}`
-      );
-      const category = categoryData.data[0];
-
-      if (!category) {
-        setCategoryName("Kategori hittades inte");
-        setAllProducts([]);
-        setFilteredProducts([]);
-        setSortedProducts([]);
-        setLoading(false);
-        return;
-      }
-      setCategoryName(category.category_name);
-
-      // Kategoriye ait TÜM ürünleri çek (client-side pagination için)
-      // Burada pagination[pageSize]=9999 ile büyük bir sayı veriyoruz.
       const productsData = await fetchAPI(
-        `/products?filters[categories][slug][$eq]=${
-          params.slug
-        }&pagination[pageSize]=9999&populate[0]=bids&populate[1]=bids.biduser&populate[2]=main_picture&populate[3]=gallery&populate[4]=categories`
+        `/products?populate=bids.biduser&populate=main_picture&populate=gallery&populate=categories&populate=lottery_users.biduser&pagination[pageSize]=9999`
       );
       const products = productsData.data;
       setAllProducts(products);
     } catch (error) {
-      console.error("Error fetching category data:", error);
+      console.error("Error fetching products:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchCategoryAllProducts();
-  }, [params.slug]);
+    const fetchData = async () => {
+      try {
+        const categoriesData = await fetchAPI("/categories");
+        setCategories(categoriesData.data);
+        await fetchAllProducts();
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
-  // URL'den page parametresini oku
-  useEffect(() => {
-    const pageFromUrl = searchParams.get("page");
-    const pageNumber = pageFromUrl ? parseInt(pageFromUrl, 10) : 1;
-    setCurrentPage(pageNumber);
-  }, [searchParams]);
-
-  // Filtre uygula (All / Bidding / Lottery + Hide ended)
+  // Filters
   useEffect(() => {
     const now = new Date();
     const newFiltered = allProducts.filter((product) => {
@@ -102,19 +80,25 @@ export default function CategoryPage() {
     setFilteredProducts(newFiltered);
   }, [allProducts, filter, hideEnded]);
 
-  // filteredProducts değişince totalPages ve sayfa kontrolü
+  // URL page parameters
+  useEffect(() => {
+    const pageFromUrl = searchParams.get("page");
+    const pageNumber = pageFromUrl ? parseInt(pageFromUrl, 10) : 1;
+    setCurrentPage(pageNumber);
+  }, [searchParams]);
+
+  // when filteredProducts changes, calculate the total pages
   useEffect(() => {
     const computedTotalPages = Math.ceil(filteredProducts.length / pageSize);
     setTotalPages(computedTotalPages);
-
-    // Eğer mevcut sayfa yeni totalPages'ten büyükse ilk sayfaya git
+    // if current page is greater than total pages, go to first page
     if (currentPage > computedTotalPages && computedTotalPages > 0) {
-      router.push(`/category/${params.slug}?page=1`);
+      router.push(`/produkter?page=1`);
       setCurrentPage(1);
     }
-  }, [filteredProducts, currentPage, router, pageSize, params.slug]);
+  }, [filteredProducts, currentPage, router, pageSize]);
 
-  // Sıralama
+  // sorted logic
   useEffect(() => {
     const sorted = [...filteredProducts];
 
@@ -148,7 +132,7 @@ export default function CategoryPage() {
         break;
 
       default:
-        // Varsayılan: createdAt:desc
+        // default: createdAt:desc
         sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         break;
     }
@@ -156,13 +140,10 @@ export default function CategoryPage() {
     setSortedProducts(sorted);
   }, [filteredProducts, sortOption]);
 
-  const currentPageProducts = sortedProducts.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  const currentPageProducts = sortedProducts.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const handlePageChange = (page: number) => {
-    router.push(`/category/${params.slug}?page=${page}`);
+    router.push(`/produkter?page=${page}`);
   };
 
   const isLotteryOnly = filter === "lottery";
@@ -172,23 +153,13 @@ export default function CategoryPage() {
   }
 
   return (
-    <div className="container mx-auto">
-      <h1 className="text-2xl font-bold mb-4">
-        {categoryName ? (
-          <>
-            Produkter i <span className="text-blue-600">{categoryName}</span> kategori
-          </>
-        ) : (
-          "Kategori hittades inte"
-        )}
-      </h1>
+    <div className="w-full mx-auto pb-14">
+      <h1 className="text-4xl font-bold mb-4">Produkter</h1>
 
-      {/* Category List */}
-      <div>
-        <CategoryList categories={categories} />
-      </div>
+      {/* Categories */}
+      <CategoryList categories={categories} />
 
-      {/* Filtre Seçenekleri */}
+      {/* Filter Options */}
       <div className="mb-4 flex flex-col gap-2">
         <div className="flex gap-4">
           <label className="flex items-center gap-2">
@@ -233,7 +204,7 @@ export default function CategoryPage() {
         </label>
       </div>
 
-      {/* Sort Dropdown */}
+      {/* Sort Dropdown new component for testing */}
       {filteredProducts.length > 0 && (
         <SortDropdownNew
           selectedOption={sortOption}
@@ -242,15 +213,16 @@ export default function CategoryPage() {
         />
       )}
 
-      {currentPageProducts.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {currentPageProducts.map((product: any) => (
+      {/* Product List */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {currentPageProducts.map((product: any) =>
+          product.lottery_product === true ? (
+            <ProductCardLot key={product.id} product={product} />
+          ) : (
             <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      ) : (
-        <p className="text-gray-600">Inga produkter hittades i denna kategori.</p>
-      )}
+          )
+        )}
+      </div>
 
       {/* Pagination */}
       {totalPages > 1 && (
@@ -260,7 +232,9 @@ export default function CategoryPage() {
               key={index}
               onClick={() => handlePageChange(index + 1)}
               className={`px-4 py-2 mx-1 ${
-                currentPage === index + 1 ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"
+                currentPage === index + 1
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-700"
               } rounded`}
             >
               {index + 1}

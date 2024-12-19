@@ -59,6 +59,11 @@ const Header: React.FC = () => {
             Home
           </Link>
           <Link
+            href="/produkter"
+            className="text-gray-800 dark:text-white hover:text-blue-500 font-bold"
+          >Produkter
+          </Link>
+          <Link
             href="http://localhost:1337/admin"
             className="text-blue-500 hover:text-blue-700 font-bold"
           >
