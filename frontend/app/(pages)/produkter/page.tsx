@@ -170,7 +170,7 @@ export default function ProdukterPage() {
               checked={filter === "all"}
               onChange={() => setFilter("all")}
             />
-            All products
+            Alla objekt
           </label>
           <label className="flex items-center gap-2">
             <input
@@ -180,7 +180,7 @@ export default function ProdukterPage() {
               checked={filter === "bidding"}
               onChange={() => setFilter("bidding")}
             />
-            Just bidding products
+            Auktion
           </label>
           <label className="flex items-center gap-2">
             <input
@@ -190,7 +190,7 @@ export default function ProdukterPage() {
               checked={filter === "lottery"}
               onChange={() => setFilter("lottery")}
             />
-            Just lottery products
+            Lotteri
           </label>
         </div>
 
@@ -200,7 +200,7 @@ export default function ProdukterPage() {
             checked={hideEnded}
             onChange={() => setHideEnded((prev) => !prev)}
           />
-          Hide ended product
+          Dölj avslutad auktion/lotteri
         </label>
       </div>
 

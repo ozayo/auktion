@@ -28,20 +28,21 @@ export default function CategoryPage() {
   const [filter, setFilter] = useState<FilterType>("all");
   const [hideEnded, setHideEnded] = useState<boolean>(true);
 
-  // Varsayılan sıralama
+  // default sorting: Newest first
   const [sortOption, setSortOption] = useState<string>("createdAt:desc");
 
-  // Sayfa başı ürün sayısı
+  
+  // products per page
   const pageSize = 9;
 
   const fetchCategoryAllProducts = async () => {
     setLoading(true);
     try {
-      // Kategorileri çek
+      // fetch categories
       const categoriesData = await fetchAPI("/categories");
       setCategories(categoriesData.data);
 
-      // İlgili kategoriyi slug'a göre çek
+      // fetch specific category (slug)
       const categoryData = await fetchAPI(
         `/categories?filters[slug][$eq]=${params.slug}`
       );
@@ -57,8 +58,7 @@ export default function CategoryPage() {
       }
       setCategoryName(category.category_name);
 
-      // Kategoriye ait TÜM ürünleri çek (client-side pagination için)
-      // Burada pagination[pageSize]=9999 ile büyük bir sayı veriyoruz.
+      // fetch all products for the category
       const productsData = await fetchAPI(
         `/products?filters[categories][slug][$eq]=${
           params.slug
@@ -77,14 +77,14 @@ export default function CategoryPage() {
     fetchCategoryAllProducts();
   }, [params.slug]);
 
-  // URL'den page parametresini oku
+  // read page parameter from URL
   useEffect(() => {
     const pageFromUrl = searchParams.get("page");
     const pageNumber = pageFromUrl ? parseInt(pageFromUrl, 10) : 1;
     setCurrentPage(pageNumber);
   }, [searchParams]);
 
-  // Filtre uygula (All / Bidding / Lottery + Hide ended)
+  // Filter products by type and hide ended products
   useEffect(() => {
     const now = new Date();
     const newFiltered = allProducts.filter((product) => {
@@ -102,19 +102,20 @@ export default function CategoryPage() {
     setFilteredProducts(newFiltered);
   }, [allProducts, filter, hideEnded]);
 
-  // filteredProducts değişince totalPages ve sayfa kontrolü
+  
+  // change totalPages and page control when filteredProducts changes
   useEffect(() => {
     const computedTotalPages = Math.ceil(filteredProducts.length / pageSize);
     setTotalPages(computedTotalPages);
 
-    // Eğer mevcut sayfa yeni totalPages'ten büyükse ilk sayfaya git
+    // if current page is greater than new totalPages, go to first page
     if (currentPage > computedTotalPages && computedTotalPages > 0) {
       router.push(`/category/${params.slug}?page=1`);
       setCurrentPage(1);
     }
   }, [filteredProducts, currentPage, router, pageSize, params.slug]);
 
-  // Sıralama
+  // Order
   useEffect(() => {
     const sorted = [...filteredProducts];
 
@@ -148,7 +149,7 @@ export default function CategoryPage() {
         break;
 
       default:
-        // Varsayılan: createdAt:desc
+        // Default: createdAt:desc
         sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         break;
     }
@@ -173,7 +174,7 @@ export default function CategoryPage() {
 
   return (
     <div className="container mx-auto">
-      <h1 className="text-2xl font-bold mb-4">
+      <h1 className="text-4xl font-bold mb-4">
         {categoryName ? (
           <>
             Produkter i <span className="text-blue-600">{categoryName}</span> kategori
@@ -188,7 +189,7 @@ export default function CategoryPage() {
         <CategoryList categories={categories} />
       </div>
 
-      {/* Filtre Seçenekleri */}
+      {/* Filter Options */}
       <div className="mb-4 flex flex-col gap-2">
         <div className="flex gap-4">
           <label className="flex items-center gap-2">
@@ -199,7 +200,7 @@ export default function CategoryPage() {
               checked={filter === "all"}
               onChange={() => setFilter("all")}
             />
-            All products
+            Alla objekt
           </label>
           <label className="flex items-center gap-2">
             <input
@@ -209,7 +210,7 @@ export default function CategoryPage() {
               checked={filter === "bidding"}
               onChange={() => setFilter("bidding")}
             />
-            Just bidding products
+            Auktion
           </label>
           <label className="flex items-center gap-2">
             <input
@@ -219,7 +220,7 @@ export default function CategoryPage() {
               checked={filter === "lottery"}
               onChange={() => setFilter("lottery")}
             />
-            Just lottery products
+            Lotteri
           </label>
         </div>
 
@@ -229,11 +230,11 @@ export default function CategoryPage() {
             checked={hideEnded}
             onChange={() => setHideEnded((prev) => !prev)}
           />
-          Hide ended product
+          Dölj avslutad auktion/lotteri
         </label>
       </div>
 
-      {/* Sort Dropdown */}
+      {/* Sort Dropdown New */}
       {filteredProducts.length > 0 && (
         <SortDropdownNew
           selectedOption={sortOption}
