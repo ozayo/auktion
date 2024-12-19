@@ -3,15 +3,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { fetchAPI } from "@/lib/api";
 import ProductCard from "@/components/ProductCard";
 import SortDropdown from "@/components/SortDropdown";
 import CategoryList from "@/components/CategoryList";
 
 export default function CategoryPage() {
-  const params = useParams(); 
-  // Artık params.slug kullanılacak
+  const params = useParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [categoryName, setCategoryName] = useState<string>("");
   const [categories, setCategories] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
@@ -23,12 +25,14 @@ export default function CategoryPage() {
   const fetchCategoryData = async (page: number) => {
     setLoading(true);
     try {
-      // Kategorileri çek
+      // fetch categories
       const categoriesData = await fetchAPI("/categories");
       setCategories(categoriesData.data);
 
-      // Belirli kategori (slug'a göre)
-      const categoryData = await fetchAPI(`/categories?filters[slug][$eq]=${params.slug}`);
+      // specific category (slug) fetch
+      const categoryData = await fetchAPI(
+        `/categories?filters[slug][$eq]=${params.slug}`
+      );
       const category = categoryData.data[0];
 
       if (!category) {
@@ -41,16 +45,19 @@ export default function CategoryPage() {
 
       setCategoryName(category.category_name);
 
-      // Ürünleri slug üzerinden filtrele
+      // Filter products by category
       const productsData = await fetchAPI(
-        `/products?filters[categories][slug][$eq]=${params.slug}&pagination[page]=${page}&pagination[pageSize]=9&populate[0]=bids&populate[1]=bids.biduser&populate[2]=main_picture&populate[3]=gallery&populate[4]=categories`
+        `/products?filters[categories][slug][$eq]=${
+          params.slug
+        }&pagination[page]=${page}&pagination[pageSize]=9&populate[0]=bids&populate[1]=bids.biduser&populate[2]=main_picture&populate[3]=gallery&populate[4]=categories`
       );
       const products = productsData.data;
       const meta = productsData.meta.pagination;
 
       setProducts(products);
       const sorted = [...products].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
       setSortedProducts(sorted);
       setTotalPages(meta.pageCount);
@@ -62,12 +69,16 @@ export default function CategoryPage() {
   };
 
   useEffect(() => {
-    fetchCategoryData(1);
-  }, [params.slug]);
+    // take the page parameter from the URL
+    const pageFromUrl = searchParams.get("page");
+    const pageNumber = pageFromUrl ? parseInt(pageFromUrl, 10) : 1;
+    setCurrentPage(pageNumber);
+    fetchCategoryData(pageNumber);
+  }, [params.slug, searchParams]);
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    fetchCategoryData(page);
+    // Update the URL with the new page number
+    router.push(`/category/${params.slug}?page=${page}`);
   };
 
   if (loading) {
@@ -112,9 +123,7 @@ export default function CategoryPage() {
             key={index}
             onClick={() => handlePageChange(index + 1)}
             className={`px-4 py-2 mx-1 ${
-              currentPage === index + 1
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-700"
+              currentPage === index + 1 ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"
             } rounded`}
           >
             {index + 1}

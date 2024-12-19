@@ -3,6 +3,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { fetchAPI } from "../lib/api";
 import CategoryList from "@/components/CategoryList";
 import SortDropdown from "@/components/SortDropdown";
@@ -11,6 +12,9 @@ import ProductCardLot from "@/components/ProductCardLot";
 
 
 export default function HomePage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [products, setProducts] = useState<any[]>([]);
   const [sortedProducts, setSortedProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -34,7 +38,8 @@ export default function HomePage() {
 
       // Default sorting: Newest first
       const sorted = [...products].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
       setSortedProducts(sorted);
     } catch (error) {
@@ -45,25 +50,26 @@ export default function HomePage() {
   };
 
   useEffect(() => {
+    const pageFromUrl = searchParams.get("page");
+    const pageNumber = pageFromUrl ? parseInt(pageFromUrl, 10) : 1;
+    setCurrentPage(pageNumber);
+
     const fetchData = async () => {
       try {
-      // Fetch categories
         const categoriesData = await fetchAPI("/categories");
         setCategories(categoriesData.data);
 
-        // Fetch initial products
-        await fetchProducts(1);
+        await fetchProducts(pageNumber);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
-  }, []);
+  }, [searchParams]);
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    fetchProducts(page);
+    router.push(`/?page=${page}`);
   };
 
   if (loading) {
