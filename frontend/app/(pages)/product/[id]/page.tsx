@@ -17,7 +17,7 @@ import SaveToFavoritesButton from "@/components/SaveToFavoritesButton";
 interface ProductPageProps {
   onFavoriteChange?: () => void; // Optional callback function
 }
-export default function ProductPage({ onFavoriteChange }: ProductPageProps) {
+export default function ProductPage({onFavoriteChange}: ProductPageProps) {
   const params = useParams();
   const documentId = params?.id;
   const [product, setProduct] = useState<any>(null);
@@ -33,8 +33,7 @@ export default function ProductPage({ onFavoriteChange }: ProductPageProps) {
       if (productData) {
         const bids = productData.bids || [];
         const sorted = [...bids].sort(
-          (a: any, b: any) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
         setProduct(productData);
         setSortedBids(sorted);
@@ -58,20 +57,10 @@ export default function ProductPage({ onFavoriteChange }: ProductPageProps) {
     return <div>Product not found or loading...</div>;
   }
   const isLotteryProduct = product.lottery_product === true;
-  const {
-    title,
-    description,
-    price,
-    main_picture,
-    gallery,
-    categories,
-    ending_date,
-    lottery_users,
-  } = product;
+  const { title, description, price, main_picture, gallery, categories, ending_date, lottery_users } = product;
   const totalBids = sortedBids.length;
   const highestBid = sortedBids.length > 0 ? sortedBids[0].Amount : null;
-  const highestBidder =
-    sortedBids.length > 0 ? sortedBids[0].biduser?.Name : "Unknown";
+  const highestBidder = sortedBids.length > 0 ? sortedBids[0].biduser?.Name : "Unknown";
   const remainingTime = calculateRemainingTime(ending_date);
   const formattedEndingDate = dateFormatShort(ending_date);
   // This callback is passed to LotForm to immediately refresh data after register/unregister actions
