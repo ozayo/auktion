@@ -10,12 +10,14 @@ interface ProductCardLotProps {
   showCategories?: boolean; // New prop to toggle categories
   onFavoriteChange?: () => void;
   borderless?: boolean;
+  colorless?: boolean;
 }
 
 export default function ProductCardLot({
   product,
   onFavoriteChange,
   borderless = false,
+  colorless = false,
   showCategories = true }:
   ProductCardLotProps) {
   if (!product) {
@@ -42,7 +44,7 @@ export default function ProductCardLot({
         />
       </div>
     <Link
-        className={`${borderless ? "" : "border"} bg-green-50 p-4 hover:bg-gray-50 flex flex-col z-0`}
+        className={`${borderless ? "" : "border"} ${colorless ? "" : "bg-green-50"} p-4 hover:bg-gray-50 flex flex-col z-0`}
       href={`/product/${product.documentId}`}
     >
       <div className="product-card">
