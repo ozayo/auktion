@@ -532,7 +532,10 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
       'manyToMany',
       'api::lottery-user.lottery-user'
     >;
+    lottery_winner: Schema.Attribute.String;
     main_picture: Schema.Attribute.Media<'images' | 'files'>;
+    manual_lottery: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
     price: Schema.Attribute.Decimal;
     publishedAt: Schema.Attribute.DateTime;
     title: Schema.Attribute.String & Schema.Attribute.Required;
