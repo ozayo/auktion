@@ -1,4 +1,3 @@
-// product/[id]/page.tsx
 "use client";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
@@ -14,14 +13,18 @@ import { calculateRemainingTime } from "@/utils/calculateRemainingTime";
 import { dateFormatShort } from "@/utils/dateFormat";
 import Link from "next/link";
 import SaveToFavoritesButton from "@/components/SaveToFavoritesButton";
+
+// Optional callback function (kept as in the original code)
 interface ProductPageProps {
   onFavoriteChange?: () => void; // Optional callback function
 }
-export default function ProductPage({onFavoriteChange}: ProductPageProps) {
+
+export default function ProductPage({ onFavoriteChange }: ProductPageProps) {
   const params = useParams();
   const documentId = params?.id;
   const [product, setProduct] = useState<any>(null);
   const [sortedBids, setSortedBids] = useState<any[]>([]);
+
   // Called every 5 seconds for bidding products but also used for immediate refresh after register/unregister actions.
   const fetchProductData = async () => {
     if (!documentId) return;
@@ -33,7 +36,8 @@ export default function ProductPage({onFavoriteChange}: ProductPageProps) {
       if (productData) {
         const bids = productData.bids || [];
         const sorted = [...bids].sort(
-          (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          (a: any, b: any) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
         setProduct(productData);
         setSortedBids(sorted);
@@ -45,6 +49,7 @@ export default function ProductPage({onFavoriteChange}: ProductPageProps) {
       setProduct(null);
     }
   };
+
   useEffect(() => {
     fetchProductData();
     const interval = setInterval(() => {
@@ -53,20 +58,50 @@ export default function ProductPage({onFavoriteChange}: ProductPageProps) {
     }, 5000);
     return () => clearInterval(interval);
   }, [documentId]);
+
   if (!product) {
     return <div>Product not found or loading...</div>;
   }
+
   const isLotteryProduct = product.lottery_product === true;
-  const { title, description, price, main_picture, gallery, categories, ending_date, lottery_users } = product;
+  const {
+    title,
+    description,
+    price,
+    main_picture,
+    gallery,
+    categories,
+    ending_date,
+    lottery_users,
+    lottery_winner, // This is a string holding the winner's biduser.documentId
+  } = product;
+
   const totalBids = sortedBids.length;
   const highestBid = sortedBids.length > 0 ? sortedBids[0].Amount : null;
   const highestBidder = sortedBids.length > 0 ? sortedBids[0].biduser?.Name : "Unknown";
+
   const remainingTime = calculateRemainingTime(ending_date);
   const formattedEndingDate = dateFormatShort(ending_date);
+
   // This callback is passed to LotForm to immediately refresh data after register/unregister actions
   const handleImmediateUpdate = () => {
     fetchProductData();
   };
+
+  // New logic to find lottery winner by documentId in the product's lottery_users (only if the product is a lottery and time is up).
+  let lotteryWinnerObj: { Name: string; Email: string } | null = null;
+  if (isLotteryProduct && !remainingTime && lottery_winner) {
+    const found = lottery_users?.find(
+      (item: any) => item.biduser?.documentId === lottery_winner
+    );
+    if (found) {
+      lotteryWinnerObj = {
+        Name: found.biduser?.Name || "Okänd användare",
+        Email: found.biduser?.email || "Okänd e-post",
+      };
+    }
+  }
+
   return (
     <div className="py-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
       <div className="flex flex-col">
@@ -153,15 +188,13 @@ export default function ProductPage({onFavoriteChange}: ProductPageProps) {
         </div>
         {remainingTime ? (
           isLotteryProduct ? (
-            <LotForm
-              productId={product.documentId}
-              onUpdate={handleImmediateUpdate}
-            />
+            <LotForm productId={product.documentId} onUpdate={handleImmediateUpdate} />
           ) : (
             <BidForm productId={product.id} />
           )
         ) : isLotteryProduct ? (
-          <EndInfoLot winner={product.lottery_winner?.biduser || null} />
+          // Passing the lotteryWinnerObj to EndInfoLot
+          <EndInfoLot winner={lotteryWinnerObj} />
         ) : (
           <EndInfo username={highestBidder} highestBid={highestBid || 0} />
         )}
