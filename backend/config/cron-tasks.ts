@@ -3,13 +3,13 @@
 export default {
   lotteryCheck: {
     task: async ({ strapi }) => {
-      console.log('[CRON] Lottery kontrolü başladı (Document Service API).');
+      console.log('[CRON] Lottery check started (Document Service API).');
 
       try {
         const now = new Date();
 
-        // 1) lottery_product = true, manual_lottery=false/null, ending_date < now, lottery_winner null
-        //   Document Service API'de filters parametresi “v4” ile benzer şekilde kullanılıyor.
+        // 1) Check and find correct products
+        // Check lottery_product = true, manual_lottery=false/null, ending_date < now, lottery_winner null
         const endedLotteryProducts = await strapi
           .documents('api::product.product')
           .findMany({
@@ -22,67 +22,64 @@ export default {
               ending_date: { $lt: now },
               lottery_winner: { $null: true },
             },
-            // populate alanları
+            // populate fields
             populate: {
               lottery_users: {
                 populate: 'biduser',
               },
             },
-            // draft & publish kontekstinde default `status: 'draft'` döner,
-            // eğer "published" sürümlerini sorgulamak isterseniz `status: 'published'` ekleyebilirsiniz.
-            // Ama bitmiş lottery genelde "draft" modundaki en güncel sürümü yakalamak için yeterli.
           });
 
         if (!endedLotteryProducts || endedLotteryProducts.length === 0) {
-          console.log('[CRON] Bitmiş ürün yok veya winner zaten atanmış (Document Service).');
+          console.log('[CRON] There is no finished product or winner has already been assigned (Document Service).');
           return;
         }
 
-        console.log(`[CRON] ${endedLotteryProducts.length} üründe çekiliş yapılacak (DocService).`);
+        console.log(`[CRON] A lottery will be held on the ${endedLotteryProducts.length} product (DocService).`);
 
         for (const product of endedLotteryProducts) {
           if (!product.lottery_users?.length) {
-            console.log(`[CRON] Ürün "${product.title}" için lottery_users boş.`);
+            console.log(`[CRON] Lottery_users for product "${product.title}" is empty.`);
             continue;
           }
 
-          // Rastgele index
+          // Find a random user from lottery_users
           const randomIndex = Math.floor(Math.random() * product.lottery_users.length);
           const chosenLotteryUser = product.lottery_users[randomIndex];
 
           if (!chosenLotteryUser?.biduser?.documentId) {
-            console.log(`[CRON] Ürün "${product.title}", seçilen user'ın documentId yok!`);
+            console.log(`[CRON] Product "${product.title}", selected user has no documentId!`);
             continue;
           }
 
           const winnerDocId = chosenLotteryUser.biduser.documentId;
-          console.log(`[CRON] Ürün "${product.title}" kazanan: ${winnerDocId}`);
+          console.log(`[CRON] For product "${product.title}" winner is: ${winnerDocId}`);
 
-          // 2) "lottery_winner" set etme
-          // Document Service API'de update => "strapi.documents(uid).update({ documentId, data, status })"
-          // - "documentId" => product.documentId (ana belgenin)
-          // - "data" => Değiştirilecek alanlar
-          // - "status: 'published'" => eğer otomatik publish etmek isterseniz
+          // 2) Set "lottery_winner"
+          // In Document Service API update => "strapi.documents(uid).update({ documentId, data, status })"
+          // - "documentId" => product.documentId (of the main document)
+          // - "data" => Fields to be changed
+          // - "status: 'published'" => if you want to publish automatically
           await strapi.documents('api::product.product').update({
-            documentId: product.documentId, // Burada numeric ID yerine documentId
+            documentId: product.documentId, 
             data: {
               lottery_winner: winnerDocId,
             },
-            // "status: 'published'" => ekleyerek direkt published hale getirebilirsiniz.
-            status: 'published', // (Opsiyonel)
+            // "status: 'published'" => if you want to change product status publish automatically after update
+            status: 'published', // optional
           });
 
-          console.log(`[CRON] Ürün "${product.title}" güncellendi (DocService).`);
+          console.log(`[CRON] Product "${product.title}" updated (DocService).`);
         }
 
-        console.log('[CRON] Lottery kontrolü tamam (DocService).');
+        console.log('[CRON] Lottery check is done (DocService).');
       } catch (err) {
-        console.error('[CRON] Lottery kontrolünde hata (DocService):', err);
+        console.error('[CRON] ERROR on Lottery check (DocService):', err);
       }
     },
     options: {
-      rule: '*/30 * * * *', // 30 dakikada bir
-      tz: 'Europe/Stockholm', // isterseniz
+      rule: '0 6 * * 1-5', // run at 6:00 AM, Monday through Friday
+      tz: 'Europe/Stockholm', // Timezone for Stockholm
     },
   },
 };
