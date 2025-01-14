@@ -14,8 +14,8 @@ export async function POST(req: Request) {
       throw new Error('Unauthorized');
     }
 
-    const user = await response.json();
-    return NextResponse.json({ isAdmin: true, user });
+    const { data } = await response.json();
+    return NextResponse.json({ isAdmin: true, user: data });
   } catch (error) {
     return NextResponse.json({ isAdmin: false }, { status: 401 });
   }
