@@ -3,8 +3,7 @@
 export default {
   /**
    * 1) beforeCreate
-   *    - Eğer "ending_date" belirtilmemişse 10 gün sonrasını atar.
-   */
+   *    - If "ending_date" is not specified, it will be 10 days later. */
   async beforeCreate(event: any) {
     const { data } = event.params;
     if (!data.ending_date) {
@@ -15,49 +14,47 @@ export default {
   },
 
   /**
-   * 2) afterUpdate
-   *    - Otomatik olarak "lottery winner" belirler
-   *    - Şartlar:
-   *       a) lottery_product = true
-   *       b) manual_lottery = false (otomatik çekiliş devrede)
-   *       c) ending_date geçmiş (şu andan önce)
-   *       d) lottery_winner henüz atanmamış
-   *    - Rastgele "lottery_users" içinden birinin biduser.documentId'sini seçip "lottery_winner" alanına yazar
-   */
+  * 2) afterUpdate
+  * - Automatically determines "lottery winner"
+  * - Conditions:
+  * a) lottery_product = true
+  * b) manual_lottery = false (automatic draw enabled)
+  * c) ending_date has passed (before now)
+  * d) lottery_winner has not been assigned yet
+  * - Randomly selects the biduser.documentId of one of the "lottery_users" and writes it to the "lottery_winner" field
+  */
   async afterUpdate(event: any) {
-    const { result } = event; // Güncellenen Product kaydı (any)
+    const { result } = event; // Updated Product record (any)
 
     try {
-      // 1) lottery_product = true mü?
+      // 1) lottery_product = true ?
       if (!result.lottery_product) return;
 
-      // 2) manual_lottery = true ise otomatik çekiliş yapma
+      // 2) If manual_lottery = true, do not make automatic lottery
       if (result.manual_lottery) {
         console.log(`[afterUpdate] manual_lottery=true, otomatik çekiliş iptal. Ürün: ${result.title}`);
         return;
       }
 
-      // 3) ending_date geçmiş mi?
+      // 3) ending_date is passed?
       const now = new Date();
       const productEndDate = new Date(result.ending_date || '');
       if (productEndDate > now) {
-        // Bitiş tarihi henüz geçmemiş
+        // ending date is not passed yet
         return;
       }
 
-      // 4) lottery_winner zaten var mı?
+      // 4) Is there already a lottery_winner? If so, do not make automatic lottery
       if (result.lottery_winner) {
         return;
       }
 
-      // 5) "fresh" olarak ürünü tekrar çekiyoruz
-      //    => Bu sayede "lottery_users" ve altındaki "biduser" populate'lı gelir
+      // 5) We pull the product again as "fresh"
+      // => In this way, "lottery_users" and "biduser" below it will be populated
       const freshProduct: any = await strapi.entityService.findOne(
         'api::product.product',
-        // Numeric ID kullanıyorsanız "result.id":
         result.id,
         {
-          // Eğer "documentId" bazlı güncelleme yapıyorsanız:
           // where: { documentId: result.documentId },
           populate: {
             lottery_users: {
@@ -67,25 +64,26 @@ export default {
         }
       );
 
-      // 6) lottery_users var mı?
+      // 6) Is there any "lottery_users"? If not, do not make automatic lottery
       if (!freshProduct?.lottery_users?.length) {
         console.warn('[afterUpdate] lottery_users boş veya undefined.');
         return;
       }
 
-      // 7) Rastgele bir "lottery_user" seç
+      // 7) Choose a random "lottery_user"
       const randomIndex = Math.floor(Math.random() * freshProduct.lottery_users.length);
       const chosenLotteryUser = freshProduct.lottery_users[randomIndex];
 
-      // 8) biduser.documentId var mı?
+    
+      // 8) Does biduser.documentId exist?
       if (!chosenLotteryUser?.biduser?.documentId) {
-        console.warn(`[afterUpdate] Seçilen lottery_user'da biduser veya documentId yok!`);
+        console.warn(`[afterUpdate] Selected lottery_user has no biduser or documentId!`);
         return;
       }
 
       const winnerBidUserDocId = chosenLotteryUser.biduser.documentId;
 
-      // 9) Ürüne "lottery_winner" olarak atıyoruz
+      // 9) Set "lottery_winner" on the product as the winner
       await strapi.entityService.update('api::product.product', result.id, {
         data: {
           lottery_winner: winnerBidUserDocId,
@@ -93,11 +91,11 @@ export default {
       });
 
       console.log(
-        `🎉 [afterUpdate] Otomatik çekiliş tamam! Kazanan => ${winnerBidUserDocId} (Product: ${freshProduct.title})`
+        `🎉 [afterUpdate] Auto lottery is done! Winner => ${winnerBidUserDocId} (Product: ${freshProduct.title})`
       );
 
     } catch (err) {
-      console.error('Lottery winner atama hatası:', err);
+      console.error('Lottery winner assign error:', err);
     }
   },
 };
