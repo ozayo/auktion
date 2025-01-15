@@ -3,6 +3,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from "next/link";
 import { useRouter } from 'next/navigation';
 
 interface Product {
@@ -11,6 +12,10 @@ interface Product {
   title: string;
   ending_date: string;
   lottery_users: Array<any>;
+  createdAt: string;
+  main_picture: {
+    url: string;
+  };
 }
 
 export default function LotteriesPage() {
@@ -88,11 +93,12 @@ export default function LotteriesPage() {
   }
 
   return (
-    <div>
-      <h1>Lotteries</h1>
+    <div className='w-full mx-auto pb-14'>
+      <h1 className='text-4xl font-bold mb-4'>Lottery products</h1>
+      <p>The following products are ready for manual lottery. Only products with manual_lottery=true are listed.</p>
 
-      <div>
-        <label>
+      <div className='flex gap-4 mt-6 mb-4'>
+        <label className='flex items-center gap-2'>
           <input
             type="checkbox"
             checked={showExpired}
@@ -100,7 +106,7 @@ export default function LotteriesPage() {
           />
           Only expired products
         </label>
-        <label>
+        <label className='flex items-center gap-2'>
           <input
             type="checkbox"
             checked={hideNoUsers}
@@ -111,14 +117,34 @@ export default function LotteriesPage() {
       </div>
 
       {filteredProducts.map((product) => (
-        <div key={product.id}>
-          <h2>{product.title}</h2>
-          <p>Document ID: {product.documentId}</p>
-          <p>Ending Date: {new Date(product.ending_date).toLocaleString()}</p>
-          <p>Total Users: {product.lottery_users.length}</p>
-          <button onClick={() => router.push(`/lotteries/${product.documentId}`)}>
-            Start Lottery
-          </button>
+        <div className='bg-gray-50 mb-2 py-4 px-6' key={product.id}>
+          <h2 className='text-2xl font-bold mb-2'>{product.title}</h2>
+          <div className='flex flex-col sm:flex-row gap-4'>
+            <div className='imagearea relative w-full sm:w-3/12 rounded-lg overflow-hidden'>
+              {product.main_picture ? (
+                <img
+                  className='w-full h-48 object-cover'
+                  src={`${process.env.NEXT_PUBLIC_API_URL}${product.main_picture.url}`}
+                  alt={product.title}
+                />
+              ) : (
+                <img className='w-full h-48 object-cover' src="/placeholder.png" alt="Placeholder image" />
+              )}
+            </div>
+            <div className='infoarea flex flex-col gap-2 w-full sm:w-6/12'>
+              <p>Product ID:  <Link href={`/product/${product.documentId}`} target="_blank" className='hover:decoration-2 text-black underline decoration-pink-500'>{product.documentId}</Link></p>
+              <p>Crated Date: {new Date(product.createdAt).toLocaleString()}</p>
+              <p>Ending Date: {new Date(product.ending_date).toLocaleString()}</p>
+              <p>Total Users: {product.lottery_users.length}</p>
+            </div>
+            <div className='buttonarea w-full sm:w-3/12'>
+              <button
+                className='bg-black text-white p-2'
+                onClick={() => router.push(`/lotteries/${product.documentId}`)}>
+                Start Lottery →
+              </button>
+            </div>
+          </div>
         </div>
       ))}
     </div>
