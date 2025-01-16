@@ -21,6 +21,7 @@ interface Product {
   title: string;
   lottery_users: LotteryUser[];
   lottery_winner: string | null;
+  ending_date: string;
 }
 
 export default function LotteryDetailPage() {
@@ -159,31 +160,51 @@ export default function LotteryDetailPage() {
     saveWinner(winner);
   };
 
-  const saveWinner = async (winner: BidUser) => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${documentId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          data: { lottery_winner: winner.documentId },
-        }),
-      });
+const saveWinner = async (winner: BidUser) => {
+  try {
+    if (!product) return;
 
-      if (!response.ok) {
-        const error = await response.json();
-        console.error('Failed to save winner:', error);
-        alert('Kazanan kaydedilemedi. Lütfen tekrar deneyin.');
-      } else {
-        // API'den kazanan bilgisini al ve güncelle
-        setExistingWinner(winner);
-      }
-    } catch (err) {
-      console.error('Failed to save winner', err);
+    // Çekilişin yapıldığı tarih ve saat
+    const currentDate = new Date();
+    const endingDate = new Date(product.ending_date);
+
+    // Eğer ending_date gelecekteyse, çekilişin yapıldığı tarih olarak güncellenecek
+    const shouldUpdateEndingDate = endingDate > currentDate;
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${documentId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        data: {
+          lottery_winner: winner.documentId,
+          ...(shouldUpdateEndingDate && { ending_date: currentDate.toISOString() }),
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('Failed to save winner:', error);
       alert('Kazanan kaydedilemedi. Lütfen tekrar deneyin.');
+    } else {
+      // API'den kazanan bilgisini al ve güncelle
+      setExistingWinner(winner);
+
+      if (shouldUpdateEndingDate) {
+        // ending_date'i güncelle
+        setProduct((prev) => {
+          if (!prev) return prev;
+          return { ...prev, ending_date: currentDate.toISOString() };
+        });
+      }
     }
-  };
+  } catch (err) {
+    console.error('Failed to save winner', err);
+    alert('Kazanan kaydedilemedi. Lütfen tekrar deneyin.');
+  }
+};
 
   const resetState = () => {
     setWinner(null);
