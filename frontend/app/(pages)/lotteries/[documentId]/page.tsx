@@ -9,7 +9,6 @@ interface BidUser {
   Name: string;
   email: string;
   documentId: string;
-  
 }
 
 interface LotteryUser {
@@ -87,6 +86,14 @@ export default function LotteryDetailPage() {
       return;
     }
 
+    // Eğer sadece bir kullanıcı varsa doğrudan kazananı kaydet ve modal'ı göster
+    if (product.lottery_users.length === 1) {
+      const singleUser = product.lottery_users[0].biduser;
+      saveWinner(singleUser);
+      setWinner(singleUser); // Kazananı belirle
+      return;
+    }
+
     setIsRunning(true);
     setWinner(null); // Kazananı sıfırla
     setActiveIndex(null); // Aktif kullanıcıyı sıfırla
@@ -94,7 +101,6 @@ export default function LotteryDetailPage() {
     const duration = 5000; // Çekiliş süresi (ms)
     let lastIndex: number | null = null; // Son kullanılan indeks
     intervalId = setInterval(() => {
-      // Rastgele bir indeks seçin, son indekse eşit olmayan bir indeks sağlayın
       let randomIndex;
       do {
         randomIndex = Math.floor(Math.random() * product.lottery_users.length);
@@ -102,7 +108,7 @@ export default function LotteryDetailPage() {
 
       lastIndex = randomIndex;
       setActiveIndex(randomIndex);
-    }, 150); // Rastgele kullanıcı seçimi
+    }, 150);
 
     setTimeout(() => {
       stopLottery(lastIndex);
@@ -115,7 +121,6 @@ export default function LotteryDetailPage() {
     clearInterval(intervalId); // Interval'i temizle
     intervalId = null;
 
-    // Final indeksini kontrol et
     if (
       finalIndex === null ||
       finalIndex < 0 ||
@@ -138,32 +143,31 @@ export default function LotteryDetailPage() {
     const selectedWinner = selectedUser.biduser;
     setWinner(selectedWinner); // Kazananı belirle
     saveWinner(selectedWinner); // API'ye kaydet
-
     setIsRunning(false); // Çekilişi durdur
   };
 
-const saveWinner = async (winner: BidUser) => {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${documentId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        data: { lottery_winner: winner.documentId },
-      }),
-    });
+  const saveWinner = async (winner: BidUser) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${documentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          data: { lottery_winner: winner.documentId },
+        }),
+      });
 
-    if (!response.ok) {
-      const error = await response.json();
-      console.error('Failed to save winner:', error);
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('Failed to save winner:', error);
+        alert('Kazanan kaydedilemedi. Lütfen tekrar deneyin.');
+      }
+    } catch (err) {
+      console.error('Failed to save winner', err);
       alert('Kazanan kaydedilemedi. Lütfen tekrar deneyin.');
     }
-  } catch (err) {
-    console.error('Failed to save winner', err);
-    alert('Kazanan kaydedilemedi. Lütfen tekrar deneyin.');
-  }
-};
+  };
 
   const resetState = () => {
     setWinner(null);
@@ -178,6 +182,8 @@ const saveWinner = async (winner: BidUser) => {
   if (!product) {
     return <div>Product not found</div>;
   }
+
+  const isSingleParticipant = product.lottery_users.length === 1;
 
   return (
     <div>
@@ -195,8 +201,19 @@ const saveWinner = async (winner: BidUser) => {
         ))}
       </div>
 
-      <button onClick={startLottery} disabled={isRunning}>
-        {isRunning ? 'Running...' : 'Start Lottery'}
+      <button
+        onClick={() => {
+          if (isSingleParticipant) {
+            const singleWinner = product.lottery_users[0].biduser;
+            setWinner(singleWinner); // Kazananı modal için belirle
+            saveWinner(singleWinner); // Kazananı kaydet
+          } else {
+            startLottery();
+          }
+        }}
+        disabled={isRunning}
+      >
+        {isSingleParticipant ? 'Save this user as winner' : isRunning ? 'Running...' : 'Start Lottery'}
       </button>
 
       {winner && (
