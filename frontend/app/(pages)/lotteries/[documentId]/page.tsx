@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -20,6 +20,7 @@ interface Product {
   id: number;
   title: string;
   lottery_users: LotteryUser[];
+  lottery_winner: string | null;
 }
 
 export default function LotteryDetailPage() {
@@ -29,6 +30,7 @@ export default function LotteryDetailPage() {
   const [isRunning, setIsRunning] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [winner, setWinner] = useState<BidUser | null>(null);
+  const [existingWinner, setExistingWinner] = useState<BidUser | null>(null);
   const router = useRouter();
   let intervalId: NodeJS.Timeout | null = null;
 
@@ -70,6 +72,14 @@ export default function LotteryDetailPage() {
         );
         const data = await res.json();
         setProduct(data.data);
+
+        if (data.data.lottery_winner) {
+          const winnerUser = data.data.lottery_users.find(
+            (user: LotteryUser) => user.biduser.documentId === data.data.lottery_winner
+          );
+          setExistingWinner(winnerUser?.biduser || null);
+        }
+
         setIsLoading(false);
       } catch (err) {
         console.error('Failed to fetch product', err);
@@ -86,11 +96,8 @@ export default function LotteryDetailPage() {
       return;
     }
 
-    // Eğer sadece bir kullanıcı varsa doğrudan kazananı kaydet ve modal'ı göster
     if (product.lottery_users.length === 1) {
-      const singleUser = product.lottery_users[0].biduser;
-      saveWinner(singleUser);
-      setWinner(singleUser); // Kazananı belirle
+      saveSingleWinner(product.lottery_users[0].biduser);
       return;
     }
 
@@ -108,7 +115,7 @@ export default function LotteryDetailPage() {
 
       lastIndex = randomIndex;
       setActiveIndex(randomIndex);
-    }, 150);
+    }, 150); // Rastgele kullanıcı seçimi
 
     setTimeout(() => {
       stopLottery(lastIndex);
@@ -141,9 +148,15 @@ export default function LotteryDetailPage() {
     }
 
     const selectedWinner = selectedUser.biduser;
-    setWinner(selectedWinner); // Kazananı belirle
-    saveWinner(selectedWinner); // API'ye kaydet
-    setIsRunning(false); // Çekilişi durdur
+    setWinner(selectedWinner);
+    saveWinner(selectedWinner);
+
+    setIsRunning(false);
+  };
+
+  const saveSingleWinner = (winner: BidUser) => {
+    setWinner(winner);
+    saveWinner(winner);
   };
 
   const saveWinner = async (winner: BidUser) => {
@@ -162,6 +175,9 @@ export default function LotteryDetailPage() {
         const error = await response.json();
         console.error('Failed to save winner:', error);
         alert('Kazanan kaydedilemedi. Lütfen tekrar deneyin.');
+      } else {
+        // API'den kazanan bilgisini al ve güncelle
+        setExistingWinner(winner);
       }
     } catch (err) {
       console.error('Failed to save winner', err);
@@ -183,11 +199,17 @@ export default function LotteryDetailPage() {
     return <div>Product not found</div>;
   }
 
-  const isSingleParticipant = product.lottery_users.length === 1;
-
   return (
     <div>
       <h1>{product.title}</h1>
+
+      {existingWinner ? (
+        <div className="existing-winner">
+          <h2>Kazanan:</h2>
+          <p>{existingWinner.Name}</p>
+          <p>{existingWinner.email}</p>
+        </div>
+      ) : null}
 
       <div className="participants-list">
         {product.lottery_users.map((user, index) => (
@@ -201,19 +223,12 @@ export default function LotteryDetailPage() {
         ))}
       </div>
 
-      <button
-        onClick={() => {
-          if (isSingleParticipant) {
-            const singleWinner = product.lottery_users[0].biduser;
-            setWinner(singleWinner); // Kazananı modal için belirle
-            saveWinner(singleWinner); // Kazananı kaydet
-          } else {
-            startLottery();
-          }
-        }}
-        disabled={isRunning}
-      >
-        {isSingleParticipant ? 'Save this user as winner' : isRunning ? 'Running...' : 'Start Lottery'}
+      <button onClick={startLottery} disabled={isRunning}>
+        {isRunning
+          ? 'Running...'
+          : product.lottery_users.length === 1
+          ? 'Save this user as winner'
+          : 'Start Lottery'}
       </button>
 
       {winner && (
