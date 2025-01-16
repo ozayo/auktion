@@ -4,16 +4,34 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
 
+interface BidUser {
+  id: number;
+  Name: string;
+  email: string;
+  documentId: string;
+  
+}
+
+interface LotteryUser {
+  id: number;
+  biduser: BidUser;
+}
+
 interface Product {
   id: number;
   title: string;
+  lottery_users: LotteryUser[];
 }
 
 export default function LotteryDetailPage() {
   const { documentId } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRunning, setIsRunning] = useState(false);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [winner, setWinner] = useState<BidUser | null>(null);
   const router = useRouter();
+  let intervalId: NodeJS.Timeout | null = null;
 
   useEffect(() => {
     const token = localStorage.getItem('strapi-admin-token');
@@ -49,7 +67,7 @@ export default function LotteryDetailPage() {
     const fetchProduct = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/products/${documentId}?populate=*`
+          `${process.env.NEXT_PUBLIC_API_URL}/api/products/${documentId}?populate=lottery_users.biduser`
         );
         const data = await res.json();
         setProduct(data.data);
@@ -63,6 +81,96 @@ export default function LotteryDetailPage() {
     checkAdmin();
   }, [documentId, router]);
 
+  const startLottery = () => {
+    if (!product || isRunning || !product.lottery_users || product.lottery_users.length === 0) {
+      alert('Kullanıcılar listesi boş veya çekiliş başlatılamıyor!');
+      return;
+    }
+
+    setIsRunning(true);
+    setWinner(null); // Kazananı sıfırla
+    setActiveIndex(null); // Aktif kullanıcıyı sıfırla
+
+    const duration = 5000; // Çekiliş süresi (ms)
+    let lastIndex: number | null = null; // Son kullanılan indeks
+    intervalId = setInterval(() => {
+      // Rastgele bir indeks seçin, son indekse eşit olmayan bir indeks sağlayın
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * product.lottery_users.length);
+      } while (randomIndex === lastIndex);
+
+      lastIndex = randomIndex;
+      setActiveIndex(randomIndex);
+    }, 150); // Rastgele kullanıcı seçimi
+
+    setTimeout(() => {
+      stopLottery(lastIndex);
+    }, duration);
+  };
+
+  const stopLottery = (finalIndex: number | null) => {
+    if (!product || intervalId === null) return;
+
+    clearInterval(intervalId); // Interval'i temizle
+    intervalId = null;
+
+    // Final indeksini kontrol et
+    if (
+      finalIndex === null ||
+      finalIndex < 0 ||
+      finalIndex >= product.lottery_users.length
+    ) {
+      console.error('Invalid activeIndex:', finalIndex);
+      alert('Hata: Geçerli bir kazanan belirlenemedi!');
+      setIsRunning(false);
+      return;
+    }
+
+    const selectedUser = product.lottery_users[finalIndex];
+    if (!selectedUser || !selectedUser.biduser) {
+      console.error('Invalid user data:', selectedUser);
+      alert('Hata: Kullanıcı verisi eksik!');
+      setIsRunning(false);
+      return;
+    }
+
+    const selectedWinner = selectedUser.biduser;
+    setWinner(selectedWinner); // Kazananı belirle
+    saveWinner(selectedWinner); // API'ye kaydet
+
+    setIsRunning(false); // Çekilişi durdur
+  };
+
+const saveWinner = async (winner: BidUser) => {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${documentId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        data: { lottery_winner: winner.documentId },
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('Failed to save winner:', error);
+      alert('Kazanan kaydedilemedi. Lütfen tekrar deneyin.');
+    }
+  } catch (err) {
+    console.error('Failed to save winner', err);
+    alert('Kazanan kaydedilemedi. Lütfen tekrar deneyin.');
+  }
+};
+
+  const resetState = () => {
+    setWinner(null);
+    setActiveIndex(null);
+    setIsRunning(false);
+  };
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -74,6 +182,32 @@ export default function LotteryDetailPage() {
   return (
     <div>
       <h1>{product.title}</h1>
+
+      <div className="participants-list">
+        {product.lottery_users.map((user, index) => (
+          <div
+            key={user.id}
+            className={`participant ${activeIndex === index ? 'active' : ''}`}
+          >
+            <p>{user.biduser.Name}</p>
+            <p>{user.biduser.email}</p>
+          </div>
+        ))}
+      </div>
+
+      <button onClick={startLottery} disabled={isRunning}>
+        {isRunning ? 'Running...' : 'Start Lottery'}
+      </button>
+
+      {winner && (
+        <div className="winner-modal">
+          <div className="modal-content">
+            <h2>Kazanan: {winner.Name}</h2>
+            <p>{winner.email}</p>
+            <button onClick={resetState}>Kapat</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
