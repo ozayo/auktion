@@ -63,12 +63,6 @@ const Header: React.FC = () => {
             className="text-gray-800 dark:text-white hover:text-blue-500 font-bold"
           >Produkter
           </Link>
-          <Link
-            href="http://localhost:1337/admin"
-            className="text-blue-500 hover:text-blue-700 font-bold"
-          >
-            Admin
-          </Link>
           {isLoggedIn ? (
             <>
               <Link
@@ -92,6 +86,12 @@ const Header: React.FC = () => {
               Logga in
             </button>
           )}
+          <Link
+            href="http://localhost:3000/login"
+            className="text-blue-500 hover:text-blue-700 font-bold"
+          >
+            Admin login
+          </Link>
         </div>
 
         {/* Hamburger menu for mobile navigation */}
@@ -115,14 +115,7 @@ const Header: React.FC = () => {
                 Home
               </Link>
             </li>
-            <li>
-              <Link
-                href="http://localhost:1337/admin"
-                className="text-blue-500 hover:text-blue-700 font-bold"
-              >
-                Admin
-              </Link>
-            </li>
+            
             {isLoggedIn ? (
               <>
                 <li>
@@ -151,7 +144,16 @@ const Header: React.FC = () => {
                   Logga in
                 </button>
               </li>
+              
             )}
+            <li>
+              <Link
+                href="http://localhost:3000/login"
+                className="text-blue-500 hover:text-blue-700 font-bold"
+              >
+                Admin login
+              </Link>
+            </li>
           </ul>
         </div>
       )}
