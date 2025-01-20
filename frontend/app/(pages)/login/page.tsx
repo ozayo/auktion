@@ -90,6 +90,8 @@ export default function LoginPage() {
         <h2 className='text-xl mt-6 mb-5'>Hello admin <span className='font-semibold '>{admin.firstname} {admin.lastname}</span></h2>
         <div className='flex flex-col gap-2 justify-start items-start'>
           <a className='text-blue-600 hover:text-blue-950' href='/lotteries'>Start lottery →</a>
+          <a className='text-blue-600 hover:text-blue-950' href='/winners/lottery-winners'>See all lottery winners →</a>
+           <a className='text-blue-600 hover:text-blue-950' href='/winners/bidding-winners'>See all bidding winners →</a>
           <button className='text-blue-600 hover:text-blue-950' onClick={handleLogout}>Logout →</button>
           <a className='text-blue-600 hover:text-blue-950' href={`${process.env.NEXT_PUBLIC_API_URL}/admin`} target="_blank" rel="noopener noreferrer">Go Strapi Admin →</a>
         </div>
