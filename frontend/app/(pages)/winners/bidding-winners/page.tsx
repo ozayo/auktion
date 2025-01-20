@@ -39,7 +39,7 @@ export default async function BiddingWinnersPage() {
   let error: string | null = null;
 
   try {
-    // Ürünleri filtrele
+    // filter products that are not lottery products and have ended
     const productResponse = await fetchAPI('/products?populate=*');
     const now = new Date();
 
@@ -50,18 +50,18 @@ export default async function BiddingWinnersPage() {
       );
     });
 
-    // Her ürün için en yüksek teklifi bul ve kullanıcı bilgilerini getir
+    // Find the highest bid for each product and get user details
     const productsWithWinners = await Promise.all(
       filteredProducts.map(async (product: any) => {
         const bids = product.bids || [];
         if (bids.length === 0) return null;
 
-        // En yüksek teklifi bul
+        // Find the highest bid
         const highestBid = bids.reduce((max: any, bid: any) =>
           bid.Amount > max.Amount ? bid : max
         );
 
-        // Teklif bilgilerini detaylandır
+        // Get user (bids) details
         const bidResponse = await fetchAPI(`/bids/${highestBid.documentId}?populate=*`);
         const biduser = bidResponse.data?.biduser;
 
@@ -127,7 +127,7 @@ export default async function BiddingWinnersPage() {
                 <div className='winnerarea w-full sm:w-4/12'>
                   {product.highestBid ? (
                     <div>
-                      <h3 className='font-bold text-xl'>Winner</h3>
+                      <h3 className='font-bold text-xl pb-2'>Winner:</h3>
                       <p>
                         <strong>Highest Bid:</strong> {product.highestBid.Amount}
                       </p>
