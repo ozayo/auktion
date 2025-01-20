@@ -133,7 +133,7 @@ export default function LotteriesPage() {
             </div>
             <div className='infoarea flex flex-col gap-2 w-full sm:w-6/12'>
               <p>Product ID:  <Link href={`/product/${product.documentId}`} target="_blank" className='hover:decoration-2 text-black underline decoration-pink-500'>{product.documentId}</Link></p>
-              <p>Crated Date: {new Date(product.createdAt).toLocaleString()}</p>
+              <p>Created Date: {new Date(product.createdAt).toLocaleString()}</p>
               <p>Ending Date: {new Date(product.ending_date).toLocaleString()}</p>
               <p>Total Users: {product.lottery_users.length}</p>
             </div>
