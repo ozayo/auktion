@@ -222,17 +222,17 @@ const saveWinner = async (winner: BidUser) => {
 
   return (
     <div>
-      <h1>{product.title}</h1>
+      <h1 className='text-3xl font-bold my-3 pt-7'>{product.title}</h1>
 
       {existingWinner ? (
-        <div className="existing-winner">
-          <h2>Kazanan:</h2>
+        <div className="existing-winner bg-gray-100 p-4 my-4">
+          <h2 className='text-2xl font-bold my-2'>Winner:</h2>
           <p>{existingWinner.Name}</p>
           <p>{existingWinner.email}</p>
         </div>
       ) : null}
 
-      <div className="participants-list">
+      <div className="participants-list grid grid-cols-3 gap-2">
         {product.lottery_users.map((user, index) => (
           <div
             key={user.id}
@@ -244,20 +244,22 @@ const saveWinner = async (winner: BidUser) => {
         ))}
       </div>
 
-      <button onClick={startLottery} disabled={isRunning}>
+      <button onClick={startLottery} disabled={isRunning} className='bg-black text-white mt-8 py-4 px-6 w-72 hover:bg-gray-800'>
         {isRunning
           ? 'Running...'
           : product.lottery_users.length === 1
-          ? 'Save this user as winner'
-          : 'Start Lottery'}
+          ? 'Save this user as winner 💾'
+          : 'Start Lottery 🎲'}
       </button>
 
       {winner && (
         <div className="winner-modal">
           <div className="modal-content">
-            <h2>Kazanan: {winner.Name}</h2>
+            <div className=" text-6xl">👑</div>
+            <h2 className='text-4xl font-bold text-amber-400'>WINNER</h2>
+            <p className='font-bold text-3xl'>{winner.Name}</p>
             <p>{winner.email}</p>
-            <button onClick={resetState}>Kapat</button>
+            <button onClick={resetState}>Save & Close 💾</button>
           </div>
         </div>
       )}

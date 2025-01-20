@@ -23,17 +23,17 @@ body {
 
 
 .participants-list {
-  display: flex;
+  /* display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
+  gap: 10px; */
+  /* justify-content: center; */
   margin-top: 20px;
 }
 .participant {
-  width: 150px;
+  /* width: 150px; */
   text-align: center;
   font-size: 16px;
-  background-color: #ecf0f1;
+  background-color: #f3f4f6;
   border-radius: 5px;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);  
   padding: 10px;
@@ -44,7 +44,7 @@ body {
 }
 
 .participant.active {
-  background-color: #f39c12;
+  background-color: #cb9407;
   color: white;
   transform: scale(1.1);
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
@@ -64,10 +64,18 @@ body {
 }
 
 .winner-modal .modal-content {
-  background: #fff;
+  background: #000;
   padding: 20px;
   border-radius: 8px;
   text-align: center;
+  width: 90%;
+  height: 90%;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
 }
 
 .winner-modal button {
@@ -78,6 +86,7 @@ body {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  width: 200px;
 }
 
 .winner-modal button:hover {
