@@ -113,7 +113,7 @@ export default async function BiddingWinnersPage() {
                   </p>
                   <p>
                     <strong>Product Link:</strong>{' '}
-                    <a href={`${process.env.NEXT_PUBLIC_API_URL}/product/${product.documentId}`}
+                    <a href={`http://localhost:3000/product/${product.documentId}`}
                       className="text-blue-600 underline">View Product
                     </a>
                   </p>
