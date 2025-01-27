@@ -1,42 +1,64 @@
 import { API_URL } from "@/lib/api";
-import { Bid } from "@/types";
+import { Bid, Product } from "@/types";
 
+interface BidResponse {
+  id: number;
+  Amount: number;
+  product: Product & {
+    bids: Array<{
+      id: number;
+      Amount: number;
+      biduser: {
+        id: number;
+        email: string;
+      };
+    }>;
+  };
+}
 
 export const fetchAndProcessBids = async (email: string): Promise<Bid[]> => {
   try {
     const response = await fetch(
       `${API_URL}/api/bids?filters[biduser][email][$eq]=${encodeURIComponent(
         email
-      )}&populate=product.main_picture&populate=product.bids&populate=product.categories`
+      )}&populate=product.main_picture&populate=product.categories&populate=product.bids.biduser`
     );
+
     if (!response.ok) throw new Error("Failed to fetch bids");
 
     const data = await response.json();
 
-    const groupedBids: Record<string, Bid> = {};
+    return data.data.map((bid: BidResponse) => {
+      const product = bid.product;
+      const allBids = product.bids || [];
+      
+      const highestBid = allBids.length > 0 
+        ? Math.max(...allBids.map(b => b.Amount))
+        : 0;
 
-    data.data.forEach((bid: any) => {
-      const productId: string = bid.product.id;
+      const userBids = allBids
+        .filter(b => b.biduser?.email === email)
+        .map(b => b.Amount);
+      
+      const userHighestBid = userBids.length > 0 
+        ? Math.max(...userBids)
+        : 0;
 
-      const highestBid: number | null =
-        bid.product.bids?.reduce((max: number, curr: any) => {
-          return Math.max(max, curr.Amount);
-        }, 0) || null;
-
-      groupedBids[productId] = {
+      return {
         id: bid.id,
         Amount: bid.Amount,
         product: {
-          ...bid.product,
-          highestBid,
-          categories: bid.product.categories || [],
-        },
+          ...product,
+          total_bids: allBids.length,
+          highest_bid: highestBid,
+          userBid: userHighestBid,
+          isHighestBidder: userHighestBid === highestBid,
+          type: 'bidding' as const
+        }
       };
     });
-
-    return Object.values(groupedBids);
   } catch (error) {
-    console.error("Error fetching bids:", error);
-    throw error;
+    console.error("Error in fetchAndProcessBids:", error);
+    return [];
   }
 };

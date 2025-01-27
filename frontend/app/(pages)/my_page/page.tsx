@@ -13,7 +13,7 @@ import { API_URL } from "@/lib/api";
 import LotForm from "@/components/LotForm";
 
 const MyPage: React.FC = () => {
-  const { userEmail } = useAuth();
+  const { userEmail, userName } = useAuth();
   const [bids, setBids] = useState<Bid[]>([]);
   const [lotteryProducts, setLotteryProducts] = useState<any[]>([]);
   const [message, setMessage] = useState<string>("");
@@ -76,7 +76,14 @@ const MyPage: React.FC = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Min Sida</h1>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold mb-2">Min Sida</h1>
+        {userName && (
+          <p className="text-lg text-gray-600">
+            Hej {userName}!
+          </p>
+        )}
+      </div>
 
       <div className="mb-4">
         <Link href="/favourites">
