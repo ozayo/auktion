@@ -38,17 +38,24 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <head>
+        <title>Bouvet Second Hand</title> 
+        <meta name="description" content="Get a chance to win unused or old computers, phones, and other tech products through auctions or lottery! This sustainability-focused platform allows you to acquire valuable items while contributing to the environment." />
+        {/* <meta name="description" content="Få chansen att vinna oanvända eller gamla datorer, telefoner och andra tekniska produkter genom auktioner eller lotteri! Denna hållbarhetsfokuserade plattform låter dig skaffa värdefulla föremål samtidigt som du bidrar till miljön." /> */}
+      </head>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
-          {/* Pass the login modal handler to the FavoritesProvider */}
           <FavoritesProvider openLoginModal={openLoginModal}>
-            <main className="container mx-auto max-w-5xl px-3">
-              <Header />
-              {children}
+            <header>
+              <div className="container mx-auto max-w-6xl px-4">
+                <Header /> 
+              </div>
+            </header>
+            <main>
+              <div className="container mx-auto max-w-6xl px-4">
+                {children}
+              </div>
             </main>
-            {/* Include the AuthModals for login/signup functionality */}
             <AuthModals
               isLoginModalOpen={isLoginModalOpen}
               closeLoginModal={closeLoginModal}
