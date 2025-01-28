@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchAndProcessBids } from "@/utils/fetchAndProcessBids";
 import { useAuth } from "@/contexts/AuthContext";
-import { Bid } from "@/types";
 import ProductCard from "../../../components/ProductCard";
 import ProductCardLot from "@/components/ProductCardLot";
 import BidForm from "../../../components/BidForm";
@@ -11,6 +9,24 @@ import { calculateRemainingTime } from "@/utils/calculateRemainingTime";
 import Link from "next/link";
 import { API_URL } from "@/lib/api";
 import LotForm from "@/components/LotForm";
+
+interface Bid {
+  id: number;
+  Amount: number;
+  product: {
+    id: number;
+    title: string;
+    documentId: string;
+    ending_date: string;
+    main_picture?: {
+      url: string;
+    };
+    categories?: {
+      id: number;
+      category_name: string;
+    }[];
+  };
+}
 
 const MyPage: React.FC = () => {
   const { userEmail, userName } = useAuth();
@@ -32,7 +48,10 @@ const MyPage: React.FC = () => {
         />
         {remainingTime && (
           <div className="mt-4">
-            <BidForm productId={bid.product.id} refreshBids={() => {}} />
+            <BidForm 
+              productId={bid.product.id.toString()} 
+              refreshBids={() => {}} 
+            />
           </div>
         )}
       </div>
@@ -120,13 +139,9 @@ const MyPage: React.FC = () => {
   );
 };
 
-
-
 export default MyPage;
 
-
 const fetchProductsWithLotteryUsers = async (email: string) => {
-
   try {
     const response = await fetch(
       `${API_URL}/api/lottery-users?filters[biduser][email][$eq]=${encodeURIComponent(
@@ -160,6 +175,37 @@ const fetchProductsWithLotteryUsers = async (email: string) => {
     return products;
   } catch (error) {
     console.error("Error fetching lottery products:", error);
+    return [];
+  }
+};
+
+const fetchAndProcessBids = async (email: string): Promise<Bid[]> => {
+  try {
+    const response = await fetch(
+      `${API_URL}/api/bids?filters[biduser][email][$eq]=${encodeURIComponent(
+        email
+      )}&populate=product.main_picture&populate=product.categories&populate=product.bids.biduser`
+    );
+
+    if (!response.ok) throw new Error("Failed to fetch bids");
+
+    const data = await response.json();
+    
+    // Ürünleri grupla ve her ürün için en yüksek teklifi al
+    const groupedBids = data.data.reduce((acc: Record<number, Bid>, bid: Bid) => {
+      const productId = bid.product.id;
+      
+      if (!acc[productId] || acc[productId].Amount < bid.Amount) {
+        acc[productId] = bid;
+      }
+      
+      return acc;
+    }, {});
+
+    // Objeyi array'e çevir
+    return Object.values(groupedBids);
+  } catch (error) {
+    console.error("Error fetching bids:", error);
     return [];
   }
 };
