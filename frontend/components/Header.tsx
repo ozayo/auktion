@@ -71,6 +71,12 @@ const Header: React.FC = () => {
               >
                 Min sida
               </Link>
+               <Link
+                href="/my-page"
+                className="text-gray-800 dark:text-white hover:text-blue-500 font-bold"
+              >
+                New Min sida
+              </Link>
               <button
                 onClick={openLogoutModal} // Directly open the logout modal
                 className="text-red-500 hover:text-red-700 font-bold"
