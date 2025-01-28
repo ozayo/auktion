@@ -1,7 +1,11 @@
 export interface Bid {
   id: number;
   Amount: number;
-  product: ProductWithStatus;
+  biduser?: {
+    id: number;
+    email: string;
+  };
+  product: Product;  // Product özelliğini ekledik
 }
 
 export interface FavoritesContextProps {
@@ -33,6 +37,7 @@ export interface Product {
   lottery_winner: string | null;
   manual_lottery: boolean | null;
   lottery_users?: any[];
+  bids?: Bid[];  // Bid interface'ini ekledik
 }
 
 export interface ProductWithStatus extends Product {
