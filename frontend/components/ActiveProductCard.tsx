@@ -4,47 +4,29 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ProductWithStatus } from '@/types';
 import { calculateRemainingTime } from "@/utils/calculateRemainingTime"
-import { useEffect } from 'react';
+
 
 interface ActiveProductCardProps {
   product: ProductWithStatus;
 }
 
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleString('sv-SE', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  });
-};
-
 const ActiveProductCard = ({ product }: ActiveProductCardProps) => {
   const remainingTime = calculateRemainingTime(product.ending_date);
+  const cardClassName = `bg-white rounded-lg shadow-md overflow-hidden ${
+    product.type === 'lottery' ? 'lottery' : 'bidding'
+  }`;
   
-  // Debug bilgisini useEffect içinde yapalım
-  useEffect(() => {
-    if (product.type === 'bidding') {
-      console.log('Card Product:', product.title, {
-        isHighestBidder: product.isHighestBidder,
-        userBid: product.userBid,
-        highestBid: product.highest_bid
-      });
-    }
-  }, [product]);
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      {/* Ürün Başlığı */}
+    <div className={cardClassName}>
+      {/* Product title*/}
       <div className="p-4 border-b">
         <h2 className="text-xl font-semibold">{product.title}</h2>
       </div>
 
-      {/* Ana İçerik - 3 Kolonlu Grid */}
+      {/* Product card - 3 col Grid */}
       <div className="grid grid-cols-3 gap-4 p-4">
-        {/* Ürün İmajı */}
+        {/* Product image */}
         <div className="relative h-48">
           <Image
             src={product.main_picture?.url || '/placeholder.png'}
@@ -52,13 +34,22 @@ const ActiveProductCard = ({ product }: ActiveProductCardProps) => {
             fill
             className="object-cover rounded"
           />
+          {/* Categories */}
+          <div className="absolute top-0 left-0">
+            {product.categories && product.categories.length > 0 ? (
+              <span className="text-white rounded-full bg-blue-950 py-1 px-4 text-sm mr-2">
+                {product.categories[0].category_name}
+              </span>
+            ) : (
+              <span className="text-gray-500 text-sm">No categories</span>
+            )}
+          </div>     
         </div>
 
-        {/* Ürün Bilgileri */}
+        {/* Product details */}
         <div className="space-y-2">
           <p>Product ID: {product.documentId}</p>
           <p>Kategori: {product.categories?.[0]?.category_name}</p>
-          <p>Skapat datum: {formatDate(product.createdAt)}</p>
           <p>Utgångspris: {product.price} SEK</p>
           
           {product.type === 'bidding' && (
@@ -80,14 +71,14 @@ const ActiveProductCard = ({ product }: ActiveProductCardProps) => {
           </div>
         </div>
 
-        {/* User Durum Bilgisi */}
+        {/* User status info */}
         <div className="space-y-4">
           {product.type === 'bidding' ? (
             <>
               <div className="bg-gray-100 p-2 rounded">
                 {product.userBid && product.highest_bid && product.userBid >= product.highest_bid ? (
                   <span className="text-green-600 font-semibold">
-                    Du leder budgivningen!
+                    Du är högsta budgivare 🤘
                   </span>
                 ) : (
                   <span className="text-yellow-600 font-semibold">
