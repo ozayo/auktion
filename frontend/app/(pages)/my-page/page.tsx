@@ -6,6 +6,7 @@ import { fetchAndProcessBids } from "@/utils/fetchAndProcessBids";
 import { API_URL } from "@/lib/api";
 import { ProductWithStatus, Product } from "@/types";
 import ActiveProductCard from "@/components/ActiveProductCard";
+import Link from "next/link";
 
 type ProductType = 'all' | 'auction' | 'lottery';
 type SortOption = 'createdAt:desc' | 'createdAt:asc' | 'ending_date:asc' | 
@@ -54,7 +55,7 @@ const fetchProductsWithLotteryUsers = async (email: string) => {
 };
 
 const MyNewPage = () => {
-  const { userEmail } = useAuth();
+  const { userEmail, userName } = useAuth();
   const [activeProducts, setActiveProducts] = useState<ProductWithStatus[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<ProductWithStatus[]>([]);
   const [productType, setProductType] = useState<ProductType>('all');
@@ -150,13 +151,29 @@ const MyNewPage = () => {
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Mina produkter</h1>
+    <div className="py-4">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold mb-4">Min Sida | mina produkter</h1>
+        {userName && (
+          <>
+          <p className="text-lg pb-1">
+            Hej {userName}, välkomna! 
+          </p>
+          <p className=" text-base ">
+            {userEmail}    
+          </p>
+          </>
+        )}
+      </div>
+      <div className="pt-2 pb-8 flex gap-2">
+        <Link href="/my-page">Mina produkter</Link> |
+        <Link href="/my-page/my-win">Vunna produkter</Link> |
+        <Link href="#">Mina Favoriter</Link>
+      </div>
       
       {/* Filters */}
       <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
         <div className="space-x-4">
-          <span className="font-medium">Visa:</span>
           <label className="inline-flex items-center">
             <input
               type="radio"
