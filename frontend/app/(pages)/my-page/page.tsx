@@ -7,6 +7,7 @@ import { API_URL } from "@/lib/api";
 import { ProductWithStatus, Product } from "@/types";
 import ActiveProductCard from "@/components/ActiveProductCard";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 type ProductType = 'all' | 'auction' | 'lottery';
 type SortOption = 'createdAt:desc' | 'createdAt:asc' | 'ending_date:asc' | 
@@ -62,6 +63,7 @@ const MyNewPage = () => {
   const [sortBy, setSortBy] = useState<SortOption>('createdAt:desc');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const pathname = usePathname()
 
   // Filtering and sorting
   useEffect(() => {
@@ -166,9 +168,21 @@ const MyNewPage = () => {
         )}
       </div>
       <div className="pt-2 pb-8 flex gap-2">
-        <Link href="/my-page">Mina produkter</Link> |
-        <Link href="/my-page/my-win">Vunna produkter</Link> |
-        <Link href="#">Mina Favoriter</Link>
+        <Link
+          className={`text-blue-500 rounded-full bg-gray-100 py-1 px-5 hover:text-white hover:bg-blue-950 hover:text-white" [&.active]:bg-blue-950 [&.active]:text-white ${pathname === '/my-page' ? 'active' : ''}`}
+          href="/my-page">
+          Mina produkter
+        </Link>
+        <Link
+          className={`text-blue-500 rounded-full bg-gray-100 py-1 px-5 hover:text-white hover:bg-blue-950 hover:text-white" [&.active]:bg-blue-950 [&.active]:text-white ${pathname === '/my-page/my-win' ? 'active' : ''}`}
+          href="/my-page/my-win">
+          Vunna produkter
+        </Link>
+        <Link
+          className={`text-blue-500 rounded-full bg-gray-100 py-1 px-5 hover:text-white hover:bg-blue-950 hover:text-white" [&.active]:bg-blue-950 [&.active]:text-white ${pathname === '#' ? 'active' : ''}`}
+          href="#">
+          Mina Favoriter
+        </Link>
       </div>
       
       {/* Filters */}
@@ -227,7 +241,7 @@ const MyNewPage = () => {
       </div>
       
       {/* Product List */}
-      <div className="space-y-4">
+      <div className="mt-4 grid gap-6">
         {filteredProducts.length === 0 ? (
           <p>Du har inga produkter på gång.</p>
         ) : (

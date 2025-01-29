@@ -9,7 +9,7 @@ interface WonProductCardProps {
 }
 
 const WonProductCard = ({ product }: WonProductCardProps) => {
-  const cardClassName = `bg-white rounded-lg shadow-md overflow-hidden ${
+  const cardClassName = `border bg-white py-4 px-6 hover:bg-zinc-50 overflow-hidden ${
     product.type === 'lottery' ? 'lottery' : 'bidding'
   }`;
 
@@ -19,13 +19,15 @@ const WonProductCard = ({ product }: WonProductCardProps) => {
 
   return (
     <div className={cardClassName}>
-      {/* Ürün Başlığı */}
-      <div className="p-4 border-b">
-        <h2 className="text-xl font-semibold">{product.title}</h2>
+      {/* Product title*/}
+      <div className="pb-4">
+        <h2 className="text-2xl font-semibold">{product.title}</h2>
       </div>
-      <div className='grid grid-cols-3 gap-4 p-4'>
-        {/* Ürün İmajı */}
-        <div className="relative h-48">
+
+      {/* Product card - 3 col Grid */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        {/* Product image */}
+        <div className="relative w-full sm:w-3/12 min-h-48 rounded-lg overflow-hidden">
           <Image
             src={imageUrl}
             alt={product.title}
@@ -43,41 +45,48 @@ const WonProductCard = ({ product }: WonProductCardProps) => {
             )}
           </div>            
         </div>
-        {/* Ürün Detayları */}
-        <div className="space-y-2">
-          <p>Kategori: {product.categories?.[0]?.category_name || 'N/A'}</p>
-          <p>Utgångspris: {product.price || '0'} SEK</p>
-          <p>Skapat datum: {dateFormatWithouth(product.createdAt)}</p>
-          <p>
-            {product.type === 'lottery' ? 'Lotteri avslutades' : 'Budgivningen avslutades'}: {' '}
-            {dateFormatWithouth(product.ending_date)}
-          </p>
-          
-          {product.type === 'lottery' && (
-            <>
-              <p>Antal deltagare: {product.lottery_users?.length || 0}</p>
-              <p>Lotteri typ: {product.manual_lottery ? 'Manuell' : 'Automatisk'}</p>
-            </>
-          )}
 
-          {product.type === 'bidding' && (
-            <>
-              <p>Antal bud: {product.total_bids || 0}</p>
-              <p>Ledande bud: {product.highest_bid || 0} SEK</p>
-              <p>Mitt högsta bud: {product.userBid || 0} SEK</p>
-            </>
-          )}
+        {/* Product details */}
+        <div className="infoarea flex flex-col w-full sm:w-5/12 px-4">
+          <div className='flex flex-col gap-1 justify-between'>
+            <p className='text-gray-700 text-sm'><strong>Kategori:</strong> {product.categories?.[0]?.category_name || 'N/A'}</p>
+            <p className='text-gray-700 text-sm'><strong>Utgångspris:</strong> {product.price || '0'} SEK</p>
+            <p className='text-gray-700 text-sm'><strong>Skapat datum:</strong> {dateFormatWithouth(product.createdAt)}</p>
+            
+            {product.type === 'lottery' && (
+              <>
+                <p className='text-gray-700 text-sm'><strong>Antal deltagare:</strong> {product.lottery_users?.length || 0}</p>
+                <p className='text-gray-700 text-sm'><strong>Lotteri typ:</strong> {product.manual_lottery ? 'Manuell' : 'Automatisk'}</p>
+              </>
+            )}
+
+            {product.type === 'bidding' && (
+              <>
+                <p className='text-gray-700 text-sm'><strong>Antal bud:</strong> {product.total_bids || 0}</p>
+                <p className='text-gray-700 text-sm'><strong>Ledande bud:</strong> {product.highest_bid || 0} SEK</p>
+                <p className='text-gray-700 text-sm'><strong>Mitt högsta bud:</strong> {product.userBid || 0} SEK</p>
+              </>
+            )}
+          </div>
+          <div className="flex flex-col">
+            <div className='w-48 border-t pb-2'> </div>
+            <p className="text-gray-600 text-xs">
+              {product.type === 'lottery' ? 'Lotteri avslutades:' : 'Budgivning avslutades:'}
+            </p>
+            <p className='text-gray-800 font-bold text-lg'>{dateFormatWithouth(product.ending_date)}</p>
+          </div>
         </div>
-        {/* Kazanma Durumu */}
-        <div className='space-y-4'>
-          {/* Kazanma Durumu */}
+        
+        {/* User status info */}
+        <div className="winnerarea w-full sm:w-4/12">
+          {/* Winning status */}
           <div className="mt-4">
             <span className="text-green-600 font-semibold">
               Du vinner
             </span>
           </div>
 
-          {/* Ürün Linki */}
+          {/* Product link */}
           <Link 
             href={`/product/${product.documentId}`}
             className="block w-full mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-center"

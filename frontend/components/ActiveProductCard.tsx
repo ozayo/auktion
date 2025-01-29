@@ -12,7 +12,7 @@ interface ActiveProductCardProps {
 
 const ActiveProductCard = ({ product }: ActiveProductCardProps) => {
   const remainingTime = calculateRemainingTime(product.ending_date);
-  const cardClassName = `bg-white rounded-lg shadow-md overflow-hidden ${
+  const cardClassName = `border bg-white py-4 px-6 hover:bg-zinc-50 overflow-hidden ${
     product.type === 'lottery' ? 'lottery' : 'bidding'
   }`;
   
@@ -20,19 +20,19 @@ const ActiveProductCard = ({ product }: ActiveProductCardProps) => {
   return (
     <div className={cardClassName}>
       {/* Product title*/}
-      <div className="p-4 border-b">
-        <h2 className="text-xl font-semibold">{product.title}</h2>
+      <div className="pb-4">
+        <h2 className="text-2xl font-semibold">{product.title}</h2>
       </div>
 
       {/* Product card - 3 col Grid */}
-      <div className="grid grid-cols-3 gap-4 p-4">
+      <div className="flex flex-col sm:flex-row gap-4">
         {/* Product image */}
-        <div className="relative h-48">
+        <div className="relative w-full sm:w-3/12 min-h-48 rounded-lg overflow-hidden">
           <Image
             src={product.main_picture?.url || '/placeholder.png'}
             alt={product.title}
             fill
-            className="object-cover rounded"
+            className="object-cover rounded h-48"
           />
           {/* Categories */}
           <div className="absolute top-0 left-0">
@@ -47,32 +47,34 @@ const ActiveProductCard = ({ product }: ActiveProductCardProps) => {
         </div>
 
         {/* Product details */}
-        <div className="space-y-2">
-          <p>Product ID: {product.documentId}</p>
-          <p>Kategori: {product.categories?.[0]?.category_name}</p>
-          <p>Utgångspris: {product.price} SEK</p>
-          
-          {product.type === 'bidding' && (
-            <p>Antal bud: {product.total_bids || 0}</p>
+        <div className="infoarea flex flex-col w-full sm:w-5/12 px-4">
+          <div className='flex flex-col gap-1 justify-between'>
+            <p className='text-gray-700 text-sm'><strong>Product ID:</strong> {product.documentId}</p>
+            <p className='text-gray-700 text-sm'><strong>Kategori:</strong> {product.categories?.[0]?.category_name}</p>
+            <p className='text-gray-700 text-sm'><strong>Utgångspris:</strong> {product.price} SEK</p>
+            
+            {product.type === 'bidding' && (
+              <p className='text-gray-700 text-sm'><strong>Antal bud:</strong> {product.total_bids || 0}</p>
+            )}
+            
+            {product.type === 'lottery' && (
+              <>
+                <p className='text-gray-700 text-sm'><strong>Antal deltagare:</strong> {product.lottery_users?.length || 0}</p>
+                <p className='text-gray-700 text-sm'><strong>Lotteri typ:</strong> {product.manual_lottery ? 'Manuell' : 'Automatisk'}</p>
+              </>
           )}
-          
-          {product.type === 'lottery' && (
-            <>
-              <p>Antal deltagare: {product.lottery_users?.length || 0}</p>
-              <p>Manual Lottery: {product.manual_lottery ? 'Yes' : 'No'}</p>
-            </>
-          )}
-          
-          <div className="mt-4">
-            <h3 className="font-semibold">
-              {product.type === 'lottery' ? 'Lotteri avslutas' : 'Budgivning avslutas'}
-            </h3>
-            <p>{remainingTime}</p>
+          </div>
+          <div className="flex flex-col">
+            <div className='w-48 border-t pb-2'> </div>
+            <p className="text-gray-600 text-xs">
+              {product.type === 'lottery' ? 'Lotteri avslutas:' : 'Budgivning avslutas:'}
+            </p>
+            <p className='text-gray-800 font-bold text-lg'>{remainingTime}</p>
           </div>
         </div>
 
         {/* User status info */}
-        <div className="space-y-4">
+        <div className="winnerarea w-full sm:w-4/12">
           {product.type === 'bidding' ? (
             <>
               <div className="bg-gray-100 p-2 rounded">
@@ -99,6 +101,7 @@ const ActiveProductCard = ({ product }: ActiveProductCardProps) => {
             </div>
           )}
           
+          {/* Product link */}
           <Link 
             href={`/product/${product.documentId}`}
             className="block w-full mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-center"
