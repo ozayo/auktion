@@ -40,12 +40,12 @@ export default function FavoriteProductCard({
   return (
     <div className={cardClassName}>
       {/* Favorites Button */}
-      <div className="absolute top-2 right-2 z-10">
+      <div className="absolute top-4 right-4 z-10 hover:scale-110">
         <SaveToFavoritesButton
           productId={product.id}
           onFavoriteChange={onFavoriteChange}
         />
-      </div>
+      </div>     
 
       <Link className="block" href={`/product/${product.documentId}`}>
         <div className="product-card">
@@ -57,7 +57,7 @@ export default function FavoriteProductCard({
               className="w-full h-48 object-cover mb-2"
             />
             {/* Categories */}
-            <div className="absolute top-0 left-0">
+            <div className="absolute top-2 left-1">
               {categoryName ? (
                 <span className="text-white rounded-full bg-blue-950 py-1 px-4 text-sm mr-2">
                   {categoryName}

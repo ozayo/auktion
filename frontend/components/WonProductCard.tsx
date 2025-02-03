@@ -3,12 +3,14 @@ import Link from 'next/link';
 import { ProductWithStatus } from '@/types';
 import { dateFormatWithouth } from "@/utils/dateFormat";
 import { API_URL } from "@/lib/api";
+import SaveToFavoritesButton from './SaveToFavoritesButton';
 
 interface WonProductCardProps {
   product: ProductWithStatus;
+  onFavoriteChange?: () => void;
 }
 
-const WonProductCard = ({ product }: WonProductCardProps) => {
+const WonProductCard = ({ product, onFavoriteChange, }: WonProductCardProps) => {
   const cardClassName = `border bg-white py-4 px-6 hover:bg-zinc-50 overflow-hidden ${
     product.type === 'lottery' ? 'lottery' : 'bidding'
   }`;
@@ -42,7 +44,15 @@ const WonProductCard = ({ product }: WonProductCardProps) => {
             ) : (
               <span className="text-gray-500 text-sm">No categories</span>
             )}
-          </div>            
+          </div>
+          {/* Favorites Button */}
+          <div
+            className="absolute top-0 right-0 z-10 hover:scale-110">
+            <SaveToFavoritesButton
+              productId={product.id}
+              onFavoriteChange={onFavoriteChange}
+            />
+          </div>
         </div>
 
         {/* Product details */}

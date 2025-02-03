@@ -3,14 +3,16 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ProductWithStatus } from '@/types';
-import { calculateRemainingTime } from "@/utils/calculateRemainingTime"
+import { calculateRemainingTime } from "@/utils/calculateRemainingTime";
+import SaveToFavoritesButton from './SaveToFavoritesButton';
 
 
 interface ActiveProductCardProps {
   product: ProductWithStatus;
+  onFavoriteChange?: () => void;
 }
 
-const ActiveProductCard = ({ product }: ActiveProductCardProps) => {
+const ActiveProductCard = ({ product, onFavoriteChange, }: ActiveProductCardProps) => {
   const remainingTime = calculateRemainingTime(product.ending_date);
   const cardClassName = `border bg-white py-4 px-6 hover:bg-zinc-50 overflow-hidden ${
     product.type === 'lottery' ? 'lottery' : 'bidding'
@@ -36,7 +38,7 @@ const ActiveProductCard = ({ product }: ActiveProductCardProps) => {
             className="object-cover rounded h-48"
           />
           {/* Categories */}
-          <div className="absolute top-0 left-0">
+          <div className="absolute top-2 left-1">
             {product.categories && product.categories.length > 0 ? (
               <span className="text-white rounded-full bg-blue-950 py-1 px-4 text-sm mr-2">
                 {product.categories[0].category_name}
@@ -44,7 +46,15 @@ const ActiveProductCard = ({ product }: ActiveProductCardProps) => {
             ) : (
               <span className="text-gray-500 text-sm">No categories</span>
             )}
-          </div>     
+          </div>
+          {/* Favorites Button */}
+          <div
+            className="absolute top-0 right-0 z-10 hover:scale-110">
+            <SaveToFavoritesButton
+              productId={product.id}
+              onFavoriteChange={onFavoriteChange}
+            />
+          </div>
         </div>
 
         {/* Product details */}
