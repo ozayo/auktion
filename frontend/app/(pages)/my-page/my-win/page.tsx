@@ -140,9 +140,6 @@ const WinnersPage = () => {
     fetchWonProducts();
   }, [userEmail]);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div className="text-red-500">{error}</div>;
-
   return (
     <div className="py-4">
       <div className="mb-6">
@@ -171,7 +168,7 @@ const WinnersPage = () => {
         </Link>
         <Link
           className={`text-blue-500 rounded-full bg-gray-100 py-1 px-5 hover:text-white hover:bg-blue-950 hover:text-white" [&.active]:bg-blue-950 [&.active]:text-white ${pathname === '#' ? 'active' : ''}`}
-          href="#">
+          href="/my-page/my-favorites">
           Mina Favoriter
         </Link>
       </div>
@@ -226,6 +223,10 @@ const WinnersPage = () => {
           </select>
         </div>
       </div>
+
+      {loading && <div className="text-lg">Laddar...</div>}
+      {error && <div className="text-red-500">{error}</div>}
+      
 
       {/* Products List */}
       <div className="mt-4 grid gap-6">
