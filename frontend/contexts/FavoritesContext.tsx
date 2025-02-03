@@ -11,7 +11,7 @@ export const FavoritesProvider: React.FC<{
   children: React.ReactNode;
   openLoginModal: () => void;
 }> = ({ children, openLoginModal }) => {
-  const { isLoggedIn, userEmail } = useAuth();
+  const { isLoggedIn, userEmail, userName } = useAuth();
   const [favorites, setFavorites] = useState<number[]>([]);
   const [userDocumentId, setUserDocumentId] = useState<string | null>(null);
 
@@ -127,6 +127,7 @@ export const FavoritesProvider: React.FC<{
         clearFavorites,
         userDocumentId,
         userEmail,
+        userName,
       }}
     >
       {children}

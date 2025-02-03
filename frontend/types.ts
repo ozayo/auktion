@@ -15,6 +15,7 @@ export interface FavoritesContextProps {
   isFavorite: (productId: number) => boolean;
   userDocumentId: string | null;
   userEmail: string | null;
+  userName: string | null; 
   clearFavorites: () => void;
 }
 
