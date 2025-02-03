@@ -64,7 +64,7 @@ const ActiveProductCard = ({ product }: ActiveProductCardProps) => {
               </>
           )}
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col mt-3">
             <div className='w-48 border-t pb-2'> </div>
             <p className="text-gray-600 text-xs">
               {product.type === 'lottery' ? 'Lotteri avslutas:' : 'Budgivning avslutas:'}
