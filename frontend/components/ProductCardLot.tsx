@@ -35,7 +35,7 @@ export default function ProductCardLot({
   const remainingTime = calculateRemainingTime(ending_date);
 
   return (
-    <div className="relative">
+    <div className="relative lottery">
           {/* Favorites Button */}
       <div className="absolute top-3 right-3 z-10">
         <SaveToFavoritesButton

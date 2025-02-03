@@ -28,10 +28,9 @@ const WonProductCard = ({ product }: WonProductCardProps) => {
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Product image */}
         <div className="relative w-full sm:w-3/12 min-h-48 rounded-lg overflow-hidden">
-          <Image
+          <img
             src={imageUrl}
             alt={product.title}
-            fill
             className="object-cover rounded"
           />
           {/* Categories */}

@@ -40,7 +40,7 @@ export default function ProductCard({
 
   return (
     <div
-      className={`product-card-wrapper relative ${
+      className={`product-card-wrapper relative bidding ${
         borderless ? "" : "border"
       } bg-white p-4 hover:bg-gray-50`}
     >

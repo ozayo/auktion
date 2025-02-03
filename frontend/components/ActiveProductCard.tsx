@@ -31,7 +31,8 @@ const ActiveProductCard = ({ product }: ActiveProductCardProps) => {
           <Image
             src={product.main_picture?.url || '/placeholder.png'}
             alt={product.title}
-            fill
+            width={800}
+            height={800}
             className="object-cover rounded h-48"
           />
           {/* Categories */}
