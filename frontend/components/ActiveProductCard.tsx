@@ -29,7 +29,7 @@ const ActiveProductCard = ({ product, onFavoriteChange, }: ActiveProductCardProp
       {/* Product card - 3 col Grid */}
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Product image */}
-        <div className="relative w-full sm:w-3/12 min-h-48 rounded-lg overflow-hidden">
+        <div className="product-images relative w-full sm:w-3/12 min-h-48 rounded-lg overflow-hidden">
           <Image
             src={product.main_picture?.url || '/placeholder.png'}
             alt={product.title}
@@ -38,18 +38,26 @@ const ActiveProductCard = ({ product, onFavoriteChange, }: ActiveProductCardProp
             className="object-cover rounded h-48"
           />
           {/* Categories */}
-          <div className="absolute top-2 left-1">
+          <div className="absolute top-2 left-1 flex gap-2">
             {product.categories && product.categories.length > 0 ? (
-              <span className="text-white rounded-full bg-blue-950 py-1 px-4 text-sm mr-2">
-                {product.categories[0].category_name}
-              </span>
+              product.categories.map((category) => (
+                <Link
+                  href={`/category/${category.slug}`}
+                  key={category.id}
+                  className="hover:opacity-90 transition-opacity"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <span className="text-white rounded-full bg-blue-950 py-1 px-4 text-sm inline-block">
+                    {category.category_name}
+                  </span>
+                </Link>
+              ))
             ) : (
               <span className="text-gray-500 text-sm">No categories</span>
             )}
           </div>
           {/* Favorites Button */}
-          <div
-            className="absolute top-0 right-0 z-10 hover:scale-110">
+          <div className="absolute top-1 right-1 z-10 hover:scale-110">
             <SaveToFavoritesButton
               productId={product.id}
               onFavoriteChange={onFavoriteChange}

@@ -4,6 +4,7 @@ export interface Bid {
   biduser?: {
     id: number;
     email: string;
+    slug: string;
   };
   product: Product;  // Product özelliğini ekledik
 }
@@ -33,6 +34,7 @@ export interface Product {
   categories?: {
     id: number;
     category_name: string;
+    slug: string;
   }[];
   lottery_product: boolean;
   lottery_winner: string | null;

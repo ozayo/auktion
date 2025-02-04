@@ -45,20 +45,33 @@ export default function ProductCard({
       } bg-white p-4 hover:bg-gray-50`}
     >
       {/* Favorites Button */}
-      <div
-        className="absolute top-2 right-2 z-10"
-        style={{
-          position: "absolute",
-          top: "12px",
-          right: "12px",
-        }}
-      >
+      <div className="absolute top-3 right-3 z-10 hover:scale-110">
         <SaveToFavoritesButton
           productId={product.id}
           onFavoriteChange={onFavoriteChange}
         />
       </div>
 
+      {/* Categories*/}
+      <div className="absolute top-4 left-4 flex gap-2 z-10">
+        {categories?.length > 0 ? (
+          categories.map((category: any) => (
+            <Link
+              href={`/category/${category.slug}`}
+              key={category.id}
+              className="hover:opacity-90 transition-opacity"
+            >
+              <span className="text-white rounded-full bg-blue-950 py-1 px-4 text-sm inline-block">
+                {category.category_name}
+              </span>
+            </Link>
+          ))
+        ) : (
+          <span className="text-gray-500 text-sm">No categories</span>
+        )}
+      </div>
+
+      {/* Product Link */}
       <Link className="block" href={`/product/${product.documentId}`}>
         <div className="product-card">
           {/* Product Image */}
@@ -68,21 +81,6 @@ export default function ProductCard({
               alt={title}
               className="w-full h-48 object-cover mb-2"
             />
-            {/* Categories */}
-            <div className="absolute top-0 left-0">
-              {categories?.length > 0 ? (
-                categories.map((category: any, index: number) => (
-                  <span
-                    className="text-white rounded-full bg-blue-950 py-1 px-4 text-sm mr-2"
-                    key={category.id || `category-${index}`}
-                  >
-                    {category.category_name}
-                  </span>
-                ))
-              ) : (
-                <span className="text-gray-500 text-sm">No categories</span>
-              )}
-            </div>
           </div>
 
           {/* Product Details */}
