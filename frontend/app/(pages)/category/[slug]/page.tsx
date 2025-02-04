@@ -173,7 +173,7 @@ export default function CategoryPage() {
   }
 
   return (
-    <div className="container mx-auto">
+    <div className="w-full mx-auto pb-14">
       <h1 className="text-4xl font-bold mb-4">
         {categoryName ? (
           <>
@@ -185,63 +185,64 @@ export default function CategoryPage() {
       </h1>
 
       {/* Category List */}
-      <div>
         <CategoryList categories={categories} />
-      </div>
 
       {/* Filter Options */}
-      <div className="mb-4 flex flex-col gap-2">
-        <div className="flex gap-4">
-          <label className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row justify-between gap-4 my-6 items-start">
+        <div className="flex flex-col">
+          <div className="flex flex-row space-x-4">
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="productType"
+                value="all"
+                checked={filter === "all"}
+                onChange={() => setFilter("all")}
+              />
+              Alla objekt
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="productType"
+                value="bidding"
+                checked={filter === "bidding"}
+                onChange={() => setFilter("bidding")}
+              />
+              Auktion
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="productType"
+                value="lottery"
+                checked={filter === "lottery"}
+                onChange={() => setFilter("lottery")}
+              />
+              Lotteri
+            </label>
+          </div>
+
+          <label className="mt-4 flex items-center gap-2">
             <input
-              type="radio"
-              name="productType"
-              value="all"
-              checked={filter === "all"}
-              onChange={() => setFilter("all")}
+              type="checkbox"
+              checked={hideEnded}
+              onChange={() => setHideEnded((prev) => !prev)}
             />
-            Alla objekt
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name="productType"
-              value="bidding"
-              checked={filter === "bidding"}
-              onChange={() => setFilter("bidding")}
-            />
-            Auktion
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name="productType"
-              value="lottery"
-              checked={filter === "lottery"}
-              onChange={() => setFilter("lottery")}
-            />
-            Lotteri
+            Dölj avslutad auktion/lotteri
           </label>
         </div>
-
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={hideEnded}
-            onChange={() => setHideEnded((prev) => !prev)}
-          />
-          Dölj avslutad auktion/lotteri
-        </label>
+        <div className="flex items-center gap-2">
+          {/* Sort Dropdown New */}
+          {filteredProducts.length > 0 && (
+            <SortDropdownNew
+              selectedOption={sortOption}
+              onSortChange={(value) => setSortOption(value)}
+              isLotteryOnly={isLotteryOnly}
+            />
+          )}
+        </div>
       </div>
-
-      {/* Sort Dropdown New */}
-      {filteredProducts.length > 0 && (
-        <SortDropdownNew
-          selectedOption={sortOption}
-          onSortChange={(value) => setSortOption(value)}
-          isLotteryOnly={isLotteryOnly}
-        />
-      )}
 
       {currentPageProducts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

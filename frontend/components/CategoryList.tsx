@@ -21,7 +21,7 @@ export default function CategoryList({ categories }: CategoryListProps) {
   const pathname = usePathname()
 
   return (
-    <div className="flex space-x-3 my-6">
+    <div className="pt-4 pb-8 flex gap-2">
       <Link
         className={`text-blue-500 rounded-full bg-gray-100 py-1 px-5 hover:text-white hover:bg-blue-950 hover:text-white" [&.active]:bg-blue-950 [&.active]:text-white ${pathname === '/produkter' ? 'active' : ''}`}
         href="/produkter">

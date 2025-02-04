@@ -160,8 +160,9 @@ export default function ProdukterPage() {
       <CategoryList categories={categories} />
 
       {/* Filter Options */}
-      <div className="mb-4 flex flex-col gap-2">
-        <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row justify-between gap-4 my-6 items-start">
+        <div className="flex flex-col">
+        <div className="flex flex-row space-x-4">
           <label className="flex items-center gap-2">
             <input
               type="radio"
@@ -194,7 +195,7 @@ export default function ProdukterPage() {
           </label>
         </div>
 
-        <label className="flex items-center gap-2">
+        <label className="mt-4 flex items-center gap-2">
           <input
             type="checkbox"
             checked={hideEnded}
@@ -202,16 +203,19 @@ export default function ProdukterPage() {
           />
           Dölj avslutad auktion/lotteri
         </label>
-      </div>
+        </div>
 
-      {/* Sort Dropdown new component for testing */}
-      {filteredProducts.length > 0 && (
-        <SortDropdownNew
-          selectedOption={sortOption}
-          onSortChange={(value) => setSortOption(value)}
-          isLotteryOnly={isLotteryOnly}
-        />
-      )}
+        <div className="flex items-center gap-2">
+        {/* Sort Dropdown new component for testing */}
+        {filteredProducts.length > 0 && (
+          <SortDropdownNew
+            selectedOption={sortOption}
+            onSortChange={(value) => setSortOption(value)}
+            isLotteryOnly={isLotteryOnly}
+          />
+        )}
+        </div>
+      </div>
 
       {/* Product List */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">

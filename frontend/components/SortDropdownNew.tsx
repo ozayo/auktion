@@ -12,8 +12,8 @@ export default function SortDropdownNew({ selectedOption, onSortChange, isLotter
   };
 
   return (
-    <div className="flex items-center gap-2 mt-6 mb-3">
-      <label htmlFor="sort" className="text-gray-700 font-semibold">
+    <div className="flex items-center gap-2">
+      <label htmlFor="sort" className="text-gray-700">
         Sortera:
       </label>
       <select
