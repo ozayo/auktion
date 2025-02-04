@@ -88,7 +88,7 @@ const ActiveProductCard = ({ product, onFavoriteChange, }: ActiveProductCardProp
         <div className="winnerarea w-full sm:w-4/12">
           {product.type === 'bidding' ? (
             <>
-              <div className="bg-gray-100 p-2 rounded">
+              <div className="bg-gray-100 p-2 mb-2 rounded">
                 {product.userBid && product.highest_bid && product.userBid >= product.highest_bid ? (
                   <span className="text-green-600 font-semibold">
                     Du är högsta budgivare 🤘
@@ -99,13 +99,14 @@ const ActiveProductCard = ({ product, onFavoriteChange, }: ActiveProductCardProp
                   </span>
                 )}
               </div>
-              <p>Antal bud: {product.total_bids || 0}</p>
-              <p>Ledande bud: {product.highest_bid || 0} SEK</p>
-              <p>Mitt högsta bud: {product.userBid || 0} SEK</p>
+              <p className='text-gray-700 text-sm'>Ledande bud: <strong>{product.highest_bid || 0} SEK </strong></p>
+              <p className='text-gray-700 text-sm'>Mitt högsta bud: <strong>{product.userBid || 0} SEK </strong></p>
             </>
           ) : (
             <div>
-              <p className="text-green-600 font-semibold">Du har registrerats!</p>
+              <div className='bg-gray-100 p-2 mb-2 rounded'>
+                  <p className="text-green-600 font-semibold">Du har registrerats! 👍</p>
+              </div>
               <p className="text-sm text-gray-600 mt-2">
                 För att ta bort dig själv från produkten, besök produktsidan
               </p>

@@ -26,9 +26,9 @@ const BidderList: React.FC<BidderListProps> = ({ bids }) => {
       <table className="w-full border-collapse text-sm">
         <thead>
           <tr className="bg-gray-100">
-            <th className="px-4 py-2 text-left">Bid</th>
+            <th className="px-4 py-2 text-left">Bud</th>
             <th className="px-4 py-2 text-left">Datum</th>
-            <th className="px-4 py-2 text-left">User</th>
+            <th className="px-4 py-2 text-left">Budgivare</th>
           </tr>
         </thead>
         <tbody>

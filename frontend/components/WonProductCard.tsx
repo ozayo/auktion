@@ -89,7 +89,8 @@ const WonProductCard = ({ product, onFavoriteChange, }: WonProductCardProps) => 
         {/* User status info */}
         <div className="winnerarea w-full sm:w-4/12">
           {/* Winning status */}
-          <div className="mt-4">
+          <div className="mt-4 flex flex-col items-center">
+            <span className='text-4xl '>🏆</span>
             <span className="text-green-600 font-semibold">
               Du vinner
             </span>
