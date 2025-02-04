@@ -157,7 +157,7 @@ export default function ProdukterPage() {
       <h1 className="text-4xl font-bold mb-4">Produkter</h1>
 
       {/* Categories */}
-      <CategoryList categories={categories} />
+      <CategoryList />
 
       {/* Filter Options */}
       <div className="flex flex-col sm:flex-row justify-between gap-4 my-6 items-start">

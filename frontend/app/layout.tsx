@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import AuthModals from "@/components/AuthModals";
+import { CategoryProvider } from '@/contexts/CategoryContext';
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -46,23 +47,25 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
           <FavoritesProvider openLoginModal={openLoginModal}>
-            <header>
-              <div className="container mx-auto max-w-6xl px-4">
-                <Header /> 
-              </div>
-            </header>
-            <main>
-              <div className="container mx-auto max-w-6xl px-4">
-                {children}
-              </div>
-            </main>
-            <AuthModals
-              isLoginModalOpen={isLoginModalOpen}
-              closeLoginModal={closeLoginModal}
-              isSignUpModalOpen={isSignUpModalOpen}
-              closeSignUpModal={closeSignUpModal}
-              openSignUpModal={openSignUpModal}
-            />
+            <CategoryProvider>
+              <header>
+                <div className="container mx-auto max-w-6xl px-4">
+                  <Header /> 
+                </div>
+              </header>
+              <main>
+                <div className="container mx-auto max-w-6xl px-4">
+                  {children}
+                </div>
+              </main>
+              <AuthModals
+                isLoginModalOpen={isLoginModalOpen}
+                closeLoginModal={closeLoginModal}
+                isSignUpModalOpen={isSignUpModalOpen}
+                closeSignUpModal={closeSignUpModal}
+                openSignUpModal={openSignUpModal}
+              />
+            </CategoryProvider>
           </FavoritesProvider>
         </AuthProvider>
       </body>
