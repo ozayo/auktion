@@ -9,6 +9,7 @@ import CategoryList from "@/components/CategoryList";
 import SortDropdown from "@/components/SortDropdown";
 import ProductCard from "@/components/ProductCard";
 import ProductCardLot from "@/components/ProductCardLot";
+import MainHero from "@/components/MainHero";
 
 
 export default function HomePage() {
@@ -78,10 +79,14 @@ export default function HomePage() {
 
   return (
     <div className="container mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Produkter</h1>
+      
+      
 
-      {/* Categories */}
-      <CategoryList categories={categories} />
+      <MainHero/>
+
+      <CategoryList />
+
+      <h1 className="text-2xl font-bold mb-4">Produkter</h1>
 
       {/* Sort Dropdown */}
       {products.length > 0 && (
