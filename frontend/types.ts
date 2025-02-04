@@ -50,3 +50,23 @@ export interface ProductWithStatus extends Product {
   userBid?: number;         // Bidding ürünleri için
   isHighestBidder?: boolean; // Bidding ürünleri için
 }
+
+export type ProductSortingType = 
+  | 'newfirst'    // createdAt:desc
+  | 'oldfirst'    // createdAt:asc
+  | 'timeshort'   // ending_date:asc
+  | 'timelong'    // ending_date:desc
+  | 'highbid'     // highestBid:desc
+  | 'lowbid';     // highestBid:asc
+
+export type ProductType = 'lottery' | 'bidding' | 'all' | 'lotteryManual' | 'lotteryAuto';
+
+export interface ProductListProps {
+  productType?: ProductType;
+  showItems?: number;
+  sorting?: boolean | 'custom';
+  customSorting?: ProductSortingType[];
+  showImage?: boolean;
+  title?: string;
+  showOld?: boolean;  // Eski ürünleri göster/gizle
+}
