@@ -12,7 +12,7 @@ export default function HomePage() {
       <MainHero />
       <CategoryList />
       
-      {/* Açık Artırma Ürünleri */}
+      {/* Senaste auktioner */}
       <ProductList
         productType="bidding"
         showItems={3}
@@ -21,8 +21,17 @@ export default function HomePage() {
         customSorting={['newfirst', 'timeshort']}
         showOld={false}
       />
+      
+      {/* Manuella lotterier */}
+      <ProductList
+        productType="lottery"
+        showItems={3}
+        title="Alla lotterier"
+        sorting={true}
+        showOld={false}
+      />
 
-      {/* Otomatik Çekiliş Ürünleri */}
+      {/* Automatiska lotterier */}
       <ProductList
         productType="lotteryAuto"
         showItems={3}
@@ -31,7 +40,7 @@ export default function HomePage() {
         showOld={false}
       />
 
-      {/* Manuel Çekiliş Ürünleri */}
+      {/* Manuella lotterier */}
       <ProductList
         productType="lotteryManual"
         showItems={1}
@@ -39,6 +48,17 @@ export default function HomePage() {
         sorting={false}
         showOld={false}
       />
+
+      <ProductList
+        productType="bidding"
+        showItems={3}
+        title="Dator Auktioner"
+        sorting="custom"
+        customSorting={['newfirst', 'timeshort']}
+        showOld={false}
+        category="dator"  // slug of category
+      />
+
     </div>
   );
 }

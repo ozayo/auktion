@@ -6,13 +6,13 @@ export interface Bid {
     email: string;
     slug: string;
   };
-  product: Product;  // Product özelliğini ekledik
+  product: Product;
 }
 
 export interface FavoritesContextProps {
   favorites: number[];
-  addFavorite: (productId: number) => void; // No need for async here
-  removeFavorite: (productId: number) => void; // No need for async here
+  addFavorite: (productId: number) => void;
+  removeFavorite: (productId: number) => void;
   isFavorite: (productId: number) => boolean;
   userDocumentId: string | null;
   userEmail: string | null;
@@ -40,15 +40,15 @@ export interface Product {
   lottery_winner: string | null;
   manual_lottery: boolean | null;
   lottery_users?: any[];
-  bids?: Bid[];  // Bid interface'ini ekledik
+  bids?: Bid[];
 }
 
 export interface ProductWithStatus extends Product {
   type: 'bidding' | 'lottery';
-  total_bids?: number;      // Bidding ürünleri için
-  highest_bid?: number;     // Bidding ürünleri için
-  userBid?: number;         // Bidding ürünleri için
-  isHighestBidder?: boolean; // Bidding ürünleri için
+  total_bids?: number;      
+  highest_bid?: number;     
+  userBid?: number;         
+  isHighestBidder?: boolean; 
 }
 
 export type ProductSortingType = 
@@ -68,5 +68,6 @@ export interface ProductListProps {
   customSorting?: ProductSortingType[];
   showImage?: boolean;
   title?: string;
-  showOld?: boolean;  // Eski ürünleri göster/gizle
+  showOld?: boolean;  
+  category?: string;
 }

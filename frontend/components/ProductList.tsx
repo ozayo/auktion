@@ -14,7 +14,8 @@ export default function ProductList({
   customSorting,
   showImage = true,
   title,
-  showOld = false
+  showOld = false,
+  category
 }: ProductListProps) {
   const [products, setProducts] = useState<ProductWithStatus[]>([]);
   const [sortedProducts, setSortedProducts] = useState<ProductWithStatus[]>([]);
@@ -34,7 +35,7 @@ export default function ProductList({
           'populate[4]=lottery_users.biduser'
         ];
 
-        // Ürün tipi filtrelerini güncelle
+        // update product type filter
         switch (productType) {
           case 'lotteryManual':
             query.push('filters[lottery_product][$eq]=true');
@@ -50,10 +51,14 @@ export default function ProductList({
           case 'bidding':
             query.push('filters[lottery_product][$eq]=false');
             break;
-          // 'all' durumunda ek filtre eklemeye gerek yok
         }
 
-        // Eski ürünleri filtrele
+        // Filter by category use: category="dator" 
+        if (category) {
+          query.push(`filters[categories][slug][$eq]=${category}`);
+        }
+
+        // Show hide old products (ending date pass)
         if (!showOld) {
           const now = new Date().toISOString();
           query.push(`filters[ending_date][$gt]=${now}`);
@@ -81,7 +86,7 @@ export default function ProductList({
     };
 
     fetchProducts();
-  }, [productType, showOld]);
+  }, [productType, showOld, category]);
 
   // Sort products
   useEffect(() => {
