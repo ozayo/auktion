@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import AuthModals from "@/components/AuthModals";
 import { CategoryProvider } from '@/contexts/CategoryContext';
+import Footer from "@/components/Footer";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -58,6 +59,9 @@ export default function RootLayout({
                   {children}
                 </div>
               </main>
+              <footer className="container mx-auto max-w-6xl px-4">
+                <Footer />
+              </footer>
               <AuthModals
                 isLoginModalOpen={isLoginModalOpen}
                 closeLoginModal={closeLoginModal}
