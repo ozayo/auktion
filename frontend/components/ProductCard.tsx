@@ -8,7 +8,6 @@ interface ProductCardProps {
   showTotalBids?: boolean; // Toggle total bids visibility
   userBid?: number | null; // Optional user's highest bid (for my_page)
   onFavoriteChange?: () => void;
-  borderless?: boolean;
 }
 
 export default function ProductCard({
@@ -16,15 +15,13 @@ export default function ProductCard({
   showTotalBids = true,
   userBid = null,
   onFavoriteChange,
-  borderless = false,
 }: ProductCardProps) {
   if (!product) {
     console.error("Product is undefined:", product);
     return null;
   }
 
-  const { id, title, price, main_picture, categories, bids, ending_date } =
-    product;
+  const { id, title, price, main_picture, categories, bids, ending_date } = product;
 
   const imageUrl = main_picture?.url
     ? `${API_URL}${main_picture.url}`
@@ -39,11 +36,7 @@ export default function ProductCard({
   const remainingTime = calculateRemainingTime(ending_date);
 
   return (
-    <div
-      className={`product-card-wrapper relative bidding ${
-        borderless ? "" : "border"
-      } bg-white p-4 hover:bg-gray-50`}
-    >
+    <div className={`product-card-wrapper relative border bg-white hover:bg-gray-50 bidding`}>
       {/* Favorites Button */}
       <div className="absolute top-3 right-3 z-10 hover:scale-110">
         <SaveToFavoritesButton
@@ -72,7 +65,7 @@ export default function ProductCard({
       </div>
 
       {/* Product Link */}
-      <Link className="block" href={`/product/${product.documentId}`}>
+      <Link className="block p-4" href={`/product/${product.documentId}`}>
         <div className="product-card">
           {/* Product Image */}
           <div className="product-images relative">
