@@ -70,4 +70,5 @@ export interface ProductListProps {
   title?: string;
   showOld?: boolean;  
   category?: string;
+  gridClassName?: string;
 }
