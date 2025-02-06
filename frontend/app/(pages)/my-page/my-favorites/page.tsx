@@ -37,7 +37,7 @@ const Favourites: React.FC = () => {
 
         // Hämta favoriter
         const favouritesResponse = await fetch(
-          `${API_URL}/api/bidusers/${userDocumentId}?populate[favourites][populate][main_picture]=true&populate[favourites][populate][bids]=true&populate[favourites][populate][categories]=true`
+          `${API_URL}/api/bidusers/${userDocumentId}?populate[favourites][populate][main_picture]=true&populate[favourites][populate][bids]=true&populate[favourites][populate][categories]=true&populate[favourites][populate][lottery_users][populate][biduser]=true`
         );
         const favouritesData = await favouritesResponse.json();
         const favourites = favouritesData.data.favourites;
@@ -54,7 +54,6 @@ const Favourites: React.FC = () => {
         // Matcha userBids med favourites
         const enrichedProducts = favourites.map((product: any) => {
           if (product.lottery_product) {
-            // Lottery ürünü için kullanıcının kayıt durumunu kontrol et
             const isUserRegistered = product.lottery_users?.some(
               (user: any) => user.biduser?.email === userEmail
             );
