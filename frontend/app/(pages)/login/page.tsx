@@ -93,7 +93,7 @@ export default function LoginPage() {
           <a className='text-blue-600 hover:text-blue-950' href='/winners/lottery-winners'>See all lottery winners →</a>
            <a className='text-blue-600 hover:text-blue-950' href='/winners/bidding-winners'>See all bidding winners →</a>
           <button className='text-blue-600 hover:text-blue-950' onClick={handleLogout}>Admin logout →</button>
-          <a className='text-blue-600 hover:text-blue-950' href={`${process.env.NEXT_PUBLIC_API_URL}/admin`} target="_blank" rel="noopener noreferrer">Go Strapi Admin →</a>
+          <a className='text-blue-600 hover:text-blue-950' href={`${process.env.NEXT_PUBLIC_API_URL}/admin`} target="_blank" rel="noopener noreferrer">Go to Strapi admin area →</a>
         </div>
       </div>
     );
