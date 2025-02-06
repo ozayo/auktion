@@ -15,7 +15,8 @@ export default function ProductList({
   showImage = true,
   title,
   showOld = false,
-  category
+  category,
+  gridClassName = "grid grid-cols-1 md:grid-cols-3 gap-4"  // Default grid class
 }: ProductListProps) {
   const [products, setProducts] = useState<ProductWithStatus[]>([]);
   const [sortedProducts, setSortedProducts] = useState<ProductWithStatus[]>([]);
@@ -123,28 +124,29 @@ export default function ProductList({
   }
 
   return (
-    <div className="mb-8">
-      <div className="flex justify-between items-center mb-4">
-        {title && <h2 className="text-2xl font-bold">{title}</h2>}
-        
-        {sorting && sortedProducts.length > 0 && (
-          <SortDropdownNew
-            selectedOption={sortOption}
-            onSortChange={(value) => setSortOption(value)}
-            isLotteryOnly={productType === 'lottery'}
-            customOptions={customSorting}
-          />
-        )}
-      </div>
+    <div className={title || sorting ? "mb-8" : "noclass"}>
+      {(title || sorting) && (
+        <div className="flex justify-between items-center mb-4">
+          {title && <h2 className="text-2xl font-bold">{title}</h2>}
+          
+          {sorting && sortedProducts.length > 0 && (
+            <SortDropdownNew
+              selectedOption={sortOption}
+              onSortChange={(value) => setSortOption(value)}
+              isLotteryOnly={productType === 'lottery'}
+              customOptions={customSorting}
+            />
+          )}
+        </div>
+      )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className={gridClassName}>
         {sortedProducts.map((product) => (
           product.type === 'lottery' ? (
             <ProductCardLot
               key={product.id}
               product={product}
               showCategories={true}
-              colorless={false}
             />
           ) : (
             <ProductCard
