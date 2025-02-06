@@ -59,13 +59,11 @@ export default function LotteriesPage() {
     const fetchProducts = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/products?populate=*`
+          `${process.env.NEXT_PUBLIC_API_URL}/api/products?populate=*&filters[lottery_product][$eq]=true&filters[manual_lottery][$eq]=true&pagination[pageSize]=100`
         );
         const data = await res.json();
         const filteredProducts = data.data.filter((product: any) => {
           return (
-            product.lottery_product &&
-            product.manual_lottery &&
             product.lottery_winner === null
           );
         });
