@@ -59,7 +59,7 @@ cd your-repo-name
 
 In this step, we will create a new database on our computer and load the backed-up project database from the `/db` folder into this newly created database.
 
-We assume that PostgreSQL is installed on your computer and that you can use `psql` commands. If PostgreSQL is not installed, please refer to item X below.
+We assume that PostgreSQL is installed on your computer and that you can use `psql` commands.
 
 1. **Create a new PostgreSQL database:**
 
@@ -89,27 +89,27 @@ If your not sure about .env files content ask to project admin for details.
 
 Create a `.env` file in the `/backend/` directory and add the following environment variables:
 
-     ```env
-      # Server
-      HOST=0.0.0.0
-      PORT=1337
+  ```env
+  # Server
+  HOST=0.0.0.0
+  PORT=1337
 
-      # Secrets
-      APP_KEYS=<your-app-keys>
-      API_TOKEN_SALT=<your-api-token-salt>
-      ADMIN_JWT_SECRET=<your-admin-jwt-secret>
-      TRANSFER_TOKEN_SALT=<your-transfer-token-salt>
+  # Secrets
+  APP_KEYS=<your-app-keys>
+  API_TOKEN_SALT=<your-api-token-salt>
+  ADMIN_JWT_SECRET=<your-admin-jwt-secret>
+  TRANSFER_TOKEN_SALT=<your-transfer-token-salt>
 
-      # Database
-      DATABASE_CLIENT=postgres
-      DATABASE_HOST=127.0.0.1 
-      DATABASE_PORT=5432 //standart port number but make sure its correct
-      DATABASE_NAME=your_database_name
-      DATABASE_USERNAME=your_db_username
-      DATABASE_PASSWORD=your_db_password
-      DATABASE_SSL=false
-      JWT_SECRET=your-jwt-secret
-     ```
+  # Database
+  DATABASE_CLIENT=postgres
+  DATABASE_HOST=127.0.0.1 
+  DATABASE_PORT=5432 //standart port number but make sure its correct
+  DATABASE_NAME=your_database_name
+  DATABASE_USERNAME=your_db_username
+  DATABASE_PASSWORD=your_db_password
+  DATABASE_SSL=false
+  JWT_SECRET=your-jwt-secret
+  ```
 
 2. **Frontend .env.local file**
 
