@@ -69,9 +69,8 @@ Open your terminal and run the following command to create a new PostgreSQL data
   psql -U your_username -c "CREATE DATABASE your_database_name;"
   ```
 
-2. **Create a new PostgreSQL database:**
 
-## **Load Database Backup:**
+2. **Load Database Backup:**
 
 Open your terminal and run the following command to load the backup into your PostgreSQL database:
 
