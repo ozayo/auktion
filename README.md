@@ -13,21 +13,21 @@ Add/editing content in progress...
 - Category management
 - User management
 - Lottery management
--- Auto lottery (cron job)
--- Manuel lottery
+ - Auto lottery (cron job)
+ - Manuel lottery
 ....
 
 ### Frontend
 
 - User management
--- login
--- logout
--- create account
+ - login
+ - logout
+ - create account
 
 - my page (user page)
--- my products (active products list)
--- Won products (List of products won by the user)
--- favorites (user favorites product)
+ - my products (active products list)
+ - Won products (List of products won by the user)
+ - favorites (user favorites product)
 
 - Bidding products
 - Lottery products
