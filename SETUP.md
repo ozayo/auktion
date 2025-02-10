@@ -65,9 +65,9 @@ We assume that PostgreSQL is installed on your computer and that you can use `ps
 
 Open your terminal and run the following command to create a new PostgreSQL database:
 
-     ```bash
-     psql -U your_username -c "CREATE DATABASE your_database_name;"
-     ```
+  ```bash
+  psql -U your_username -c "CREATE DATABASE your_database_name;"
+  ```
 
 2. **Create a new PostgreSQL database:**
 
@@ -75,9 +75,9 @@ Open your terminal and run the following command to create a new PostgreSQL data
 
 Open your terminal and run the following command to load the backup into your PostgreSQL database:
 
-    ```bash
-    psql -U your_username -d your_database_name -f /path/to/your/db/backup.sql
-    ```
+  ```bash
+  psql -U your_username -d your_database_name -f /path/to/your/db/backup.sql
+  ```
 Replace /path/to/your/db/backup.sql with the actual path to your SQL backup file.
 
 
