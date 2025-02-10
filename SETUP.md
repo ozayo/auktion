@@ -24,7 +24,7 @@ cd your-repo-name
 ```
 
 
-## Step 1: Set Up the Frontend
+## Step 1: Set Up the Frontend (NextJS)
 
 1. **Navigate to the frontend directory:**
 
@@ -103,7 +103,7 @@ Create a `.env` file in the `/backend/` directory and add the following environm
   # Database
   DATABASE_CLIENT=postgres
   DATABASE_HOST=127.0.0.1 
-  DATABASE_PORT=5432 //standart port number but make sure its correct
+  DATABASE_PORT=5432
   DATABASE_NAME=your_database_name
   DATABASE_USERNAME=your_db_username
   DATABASE_PASSWORD=your_db_password
