@@ -29,7 +29,7 @@ cd your-repo-name
 1. **Navigate to the frontend directory:**
 
    ```bash
-   cd ../frontend
+   cd frontend
    ```
 
 2. **Install dependencies:**
@@ -85,7 +85,7 @@ Replace /path/to/your/db/backup.sql with the actual path to your SQL backup file
 
 If your not sure about .env files content ask to project admin for details.
 
-1. **Backend .env file**
+1. **/backend/.env file**
 
 Create a `.env` file in the `/backend/` directory and add the following environment variables:
 
@@ -111,7 +111,7 @@ Create a `.env` file in the `/backend/` directory and add the following environm
   JWT_SECRET=your-jwt-secret
   ```
 
-2. **Frontend .env.local file**
+2. **/frontend/.env.local file**
 
 Create a `.env.local` file in the `/frontend/` directroy and add the following;
 
