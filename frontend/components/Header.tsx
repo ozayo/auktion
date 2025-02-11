@@ -51,36 +51,21 @@ const Header: React.FC = () => {
         </div>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex grow justify-center gap-8">
-          <Link
-            href="/"
-            className="text-gray-800 dark:text-white hover:text-blue-500 font-bold"
-          >
+        <div className="hidden md:flex grow justify-end gap-8">
+          <Link href="/" className="text-gray-800 dark:text-white hover:text-blue-500 font-bold">
             Home
           </Link>
-          <Link
-            href="/produkter"
-            className="text-gray-800 dark:text-white hover:text-blue-500 font-bold"
-          >Produkter
+          <Link href="/produkter" className="text-gray-800 dark:text-white hover:text-blue-500 font-bold">
+            Produkter
           </Link>
           {isLoggedIn ? (
             <>
-              <Link
-                href="/my_page"
-                className="text-gray-800 dark:text-white hover:text-blue-500 font-bold"
-              >
+               <Link href="/my-page" className="text-gray-800 dark:text-white hover:text-blue-500 font-bold">
                 Min sida
-              </Link>
-               <Link
-                href="/my-page"
-                className="text-gray-800 dark:text-white hover:text-blue-500 font-bold"
-              >
-                New Min sida
               </Link>
               <button
                 onClick={openLogoutModal} // Directly open the logout modal
-                className="text-red-500 hover:text-red-700 font-bold"
-              >
+                className="text-red-500 hover:text-red-700 font-bold">
                 Logga ut
               </button>
             </>
@@ -92,12 +77,6 @@ const Header: React.FC = () => {
               Logga in
             </button>
           )}
-          <Link
-            href="http://localhost:3000/login"
-            className="text-blue-500 hover:text-blue-700 font-bold"
-          >
-            Admin login
-          </Link>
         </div>
 
         {/* Hamburger menu for mobile navigation */}
@@ -119,6 +98,11 @@ const Header: React.FC = () => {
                 className="text-gray-800 dark:text-white hover:text-blue-500 font-bold"
               >
                 Home
+              </Link>
+            </li>
+            <li>
+              <Link href="/produkter" className="text-gray-800 dark:text-white hover:text-blue-500 font-bold">
+              Produkter
               </Link>
             </li>
             
