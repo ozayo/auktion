@@ -20,7 +20,7 @@ git clone https://github.com/ozayo/auktion.git
 ```
 
 ```bash
-cd your-repo-name
+cd auktion
 ```
 
 
@@ -123,7 +123,7 @@ Create a `.env.local` file in the `/frontend/` directroy and add the following;
 
 If you have successfully completed all the steps above, you should be able to run the application with the commands below.
 
-1. **Make sure your DB is working**
+### 1. Make sure your DB is working
 
 You can check whether the database is working or not with the code you will write in the terminal below:
 
@@ -132,7 +132,7 @@ You can check whether the database is working or not with the code you will writ
   ```
 If you see an output like `postgresql@15 started ...` in the terminal, it means the database is running.
 
-2. **Start the backend server:**
+### 2. Start the backend server:
 
 Start the Strapi backend with
 
@@ -142,7 +142,7 @@ Start the Strapi backend with
 
   The backend should now be running on `http://localhost:1337`.
 
-3. **Start the frontend server:**
+### 3. Start the frontend server:
 
    ```bash
    npm run dev
@@ -151,6 +151,7 @@ Start the Strapi backend with
   The frontend should now be running on `http://localhost:3000`.
 
 
+**Keep in mind that the functionality of a website depends on both its backend and frontend being operational**
 
 ## Troubleshooting
 
@@ -182,34 +183,3 @@ Start the Strapi backend with
 
 You have successfully set up the project on your local machine. You can now start developing and testing the application. If you have any questions or need further assistance, feel free to reach out.
 
-
-## temp files:
-
-````
-# Server
-HOST=0.0.0.0
-PORT=1337
-
-# Secrets
-APP_KEYS=kOFgrt8m2S58NIjz6ZGWTA==,EkbaW6ekFHpsCOrxt73zDQ==,q/09g6HL2h/U7BHZuboOOQ==,fG2lI+X0cO5tr4twrdPeSg==
-API_TOKEN_SALT=fG221wMiiCAUT+RYZoEI9A==
-ADMIN_JWT_SECRET=eo1v8MN8WtnLAvc9ZXLOiw==
-TRANSFER_TOKEN_SALT=iS2qVECcGAUQSk9klb6h0Q==
-
-# Database
-DATABASE_CLIENT=postgres
-DATABASE_HOST=127.0.0.1
-DATABASE_PORT=5433
-DATABASE_NAME=strapi
-DATABASE_USERNAME=root
-DATABASE_PASSWORD=root
-DATABASE_SSL=false
-DATABASE_FILENAME=
-JWT_SECRET=jGeQnxGr26WPLmtgng0iPw==
-```
-
-env.local
-
-`````
-NEXT_PUBLIC_API_URL=http://localhost:1337
-```
