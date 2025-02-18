@@ -183,3 +183,33 @@ Start the Strapi backend with
 You have successfully set up the project on your local machine. You can now start developing and testing the application. If you have any questions or need further assistance, feel free to reach out.
 
 
+## temp files:
+
+````
+# Server
+HOST=0.0.0.0
+PORT=1337
+
+# Secrets
+APP_KEYS=kOFgrt8m2S58NIjz6ZGWTA==,EkbaW6ekFHpsCOrxt73zDQ==,q/09g6HL2h/U7BHZuboOOQ==,fG2lI+X0cO5tr4twrdPeSg==
+API_TOKEN_SALT=fG221wMiiCAUT+RYZoEI9A==
+ADMIN_JWT_SECRET=eo1v8MN8WtnLAvc9ZXLOiw==
+TRANSFER_TOKEN_SALT=iS2qVECcGAUQSk9klb6h0Q==
+
+# Database
+DATABASE_CLIENT=postgres
+DATABASE_HOST=127.0.0.1
+DATABASE_PORT=5433
+DATABASE_NAME=strapi
+DATABASE_USERNAME=root
+DATABASE_PASSWORD=root
+DATABASE_SSL=false
+DATABASE_FILENAME=
+JWT_SECRET=jGeQnxGr26WPLmtgng0iPw==
+```
+
+env.local
+
+`````
+NEXT_PUBLIC_API_URL=http://localhost:1337
+```
