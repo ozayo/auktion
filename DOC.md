@@ -21,7 +21,7 @@ It is possible to create and manage both products in a single product interface 
 
 #### Product fields & explains:
 
-- `title`* : Product name
+- `title`* : Product name.  *`*` Mandatory fields*
 - `description` : Product information and description area. *Html is not allowed.*
 - `categories` : Select a category for the product. Multiple categories can be selected.
 - `price` : Minimum price. If there is a price on the product, it determines the starting price for auction items, and for lottery items, it determines the price the user will pay even if they win the item. *It can be left blank.*
@@ -31,11 +31,26 @@ It is possible to create and manage both products in a single product interface 
 
     - **if it is an auction product:** it will stop accepting new bids and show the highest bid as the winner.
 
-    - **if it is a lottery product:** It is removed from the frontend and does not accept new registrations. When the Cron Job is ready to run, a winner is randomly and automatically selected for this product. The winning user is also saved on the database and shows in the lottery_winner field within this product.
+    - **if it is a lottery product:** It is removed from the frontend and does not accept new registrations. When the Cron Job is ready to run, a winner is randomly and automatically selected for this product. The winning user is also saved on the database and shows in the `lottery_winner` field within this product.
+
+    - *If left blank, the system will automatically add a date 10 days later from saved date&time.*
+
+- `lottery_product` : If set to true, the product will be considered a lottery product. When the product expires, one user will be randomly and automatically determined as the winner. *The default is `false`.*
+
+- `manual_lottery` : If set to true, the lottery product will not automatically select a winner. 
+*NOTE: If it is going to be set as true, make sure that lottery_product is also must set as true.*
 
 
+**The other fields below are shown for informational purposes.**
 
-`*` Mandatory fields
+- `bids` : They are records of the bids placed in auction products. By clicking on them, you can see the amount and which user placed the bid.
+
+- `biduser` : Shows relation between users and product. Does not shows any records.
+
+- `lottery_users` : In lottery products, it lists the records of users who have registered for the product. By clicking on it, you can see the users who have registered for this product.
+
+- `lottery_winner` : It shows which user won this lottery product (userid). *It is displayed as removable/changeable for testing purposes.*
+
 
 # Customizable areas
 Detailed information about customizable areas in the project. Below you can find the descriptions and related files for each one.
