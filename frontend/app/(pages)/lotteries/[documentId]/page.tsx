@@ -223,8 +223,14 @@ const saveWinner = async (winner: BidUser) => {
   }
 
   return (
-    <div>
-      <h1 className='text-3xl font-bold my-3 pt-7'>{product.title}</h1>
+    <div className='pt-8 pb-14'>
+
+      <div className='w-full flex flex-row justify-between align-middle '>
+        <h1 className='text-3xl font-bold mb-4 w-9/12'>{product.title}</h1>
+        <div className='flex align-middle justify-end items-start w-3/12'>
+          <a className='border border-gray-500 py-1 px-5 content-center rounded hover:bg-black hover:text-white' href='/lotteries'>← gå tillbaka</a>
+        </div>
+      </div>
 
       {existingWinner ? (
         <div className="existing-winner bg-gray-100 p-4 my-4">

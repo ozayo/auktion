@@ -10,6 +10,7 @@ interface Product {
   id: number;
   documentId: string;
   title: string;
+  price: number | null;
   ending_date: string;
   lottery_users: Array<any>;
   createdAt: string;
@@ -91,18 +92,25 @@ export default function LotteriesPage() {
   }
 
   return (
-    <div className='w-full mx-auto pb-14'>
-      <h1 className='text-4xl font-bold mb-4'>Lottery products</h1>
-      <p>The following products are ready for manual lottery. Only products with manual_lottery=true are listed.</p>
+    <div className='w-full mx-auto pt-8 pb-14'>
+      <div className='w-full flex flex-row justify-between align-middle '>
+        <h1 className='text-3xl font-bold mb-4 w-9/12'>Lotteriprodukter</h1>
+        <div className='flex align-middle justify-end items-start w-3/12'>
+          <a className='border border-gray-500 py-1 px-5 content-center rounded hover:bg-black hover:text-white' href='/login'>← gå tillbaka</a>
+        </div>
+      </div>
+      
+      <p>Följande produkter är redo för manuell lotteri. Endast produkter med <strong>manual_lottery=true</strong> listas..</p>
 
-      <div className='flex gap-4 mt-6 mb-4'>
+      {/* Filter area */}
+      <div className='flex gap-4 mt-6 mb-8'>
         <label className='flex items-center gap-2'>
           <input
             type="checkbox"
             checked={showExpired}
             onChange={() => setShowExpired(!showExpired)}
           />
-          Only expired products
+          Endast utgångna produkter
         </label>
         <label className='flex items-center gap-2'>
           <input
@@ -110,15 +118,17 @@ export default function LotteriesPage() {
             checked={hideNoUsers}
             onChange={() => setHideNoUsers(!hideNoUsers)}
           />
-          Hide no users product
+          Dölja produkter utan användare
         </label>
       </div>
 
+      {/* product list */}
       {filteredProducts.map((product) => (
-        <div className='bg-gray-50 mb-2 py-4 px-6' key={product.id}>
-          <h2 className='text-2xl font-bold mb-2'>{product.title}</h2>
+        <div className='border bg-white py-4 px-6 hover:bg-zinc-50 overflow-hidden mb-6' key={product.id}>
+          <h2 className='text-2xl font-bold mb-4'>{product.title}</h2>
+
           <div className='flex flex-col sm:flex-row gap-4'>
-            <div className='imagearea relative w-full sm:w-3/12 rounded-lg overflow-hidden'>
+            <div className='product-images relative w-full sm:w-3/12 min-h-48 rounded-lg overflow-hidden'>
               {product.main_picture ? (
                 <img
                   className='w-full h-48 object-cover'
@@ -129,17 +139,22 @@ export default function LotteriesPage() {
                 <img className='w-full h-48 object-cover' src="/placeholder.png" alt="Placeholder image" />
               )}
             </div>
-            <div className='infoarea flex flex-col gap-2 w-full sm:w-6/12'>
-              <p>Product ID:  <Link href={`/product/${product.documentId}`} target="_blank" className='hover:decoration-2 text-black underline decoration-pink-500'>{product.documentId}</Link></p>
-              <p>Created Date: {new Date(product.createdAt).toLocaleString()}</p>
-              <p>Ending Date: {new Date(product.ending_date).toLocaleString()}</p>
-              <p>Total Users: {product.lottery_users.length}</p>
+            <div className='infoarea flex flex-col w-full sm:w-5/12 px-4'>
+              <div className='flex flex-col gap-1 justify-between'>
+                <p className='text-gray-700 text-sm'><strong>Product ID:</strong> {product.documentId}</p>
+                <p className='text-gray-700 text-sm'><strong>Skapat datum:</strong> {new Date(product.createdAt).toLocaleString()}</p>
+                <p className='text-gray-700 text-sm'><strong>Slutdatum::</strong> {new Date(product.ending_date).toLocaleString()}</p>
+                <p className='text-gray-700 text-sm'><strong>Utgångspris:</strong> {product.price || 0} SEK</p>
+                <p className='text-gray-700 text-sm'><strong>Antal deltagare:</strong> {product.lottery_users.length}</p>
+                <div className='w-48 border-t pb-2 my-2'></div>
+                <Link href={`/product/${product.documentId}`} target="_blank" className='text-black inline-block'>Gå till produkt ↗</Link>
+              </div>
             </div>
-            <div className='buttonarea w-full sm:w-3/12'>
+            <div className='buttonarea w-full sm:w-4/12 justify-end items-end'>
               <button
-                className='bg-black text-white p-2'
+                className='bg-black text-white p-2 rounded w-full'
                 onClick={() => router.push(`/lotteries/${product.documentId}`)}>
-                Start Lottery →
+                🎲 Starta lotteri  →
               </button>
             </div>
           </div>
