@@ -87,13 +87,32 @@ export default function LoginPage() {
     return (
       <div>
         <h1 className='text-3xl font-bold my-4'>Admin Login</h1>
-        <h2 className='text-xl mt-6 mb-5'>Hello admin <span className='font-semibold '>{admin.firstname} {admin.lastname}</span></h2>
+        <h2 className='text-xl mt-6 mb-8'>Hej admin <span className='font-semibold '>{admin.firstname} {admin.lastname}!</span></h2>
         <div className='flex flex-col gap-2 justify-start items-start'>
-          <a className='text-blue-600 hover:text-blue-950' href='/lotteries'>Start lottery →</a>
-          <a className='text-blue-600 hover:text-blue-950' href='/winners/lottery-winners'>See all lottery winners →</a>
-           <a className='text-blue-600 hover:text-blue-950' href='/winners/bidding-winners'>See all bidding winners →</a>
-          <button className='text-blue-600 hover:text-blue-950' onClick={handleLogout}>Admin logout →</button>
-          <a className='text-blue-600 hover:text-blue-950' href={`${process.env.NEXT_PUBLIC_API_URL}/admin`} target="_blank" rel="noopener noreferrer">Go to Strapi admin area →</a>
+          <a className='text-blue-600 hover:text-blue-950 border border-gray-400 rounded-lg py-3 px-4 w-full mb-2' href='/lotteries'>
+           
+            Starta en ny lotteri  →
+            <span className=' block text-sm text-gray-500'>Du kan lista alla manuella lotteriprodukter och sedan starta en ny manuell lotteri.</span>
+          
+          </a>
+          <a className='text-blue-600 hover:text-blue-950 border border-gray-400 rounded-lg py-3 px-4 w-full mb-2' href='/winners/lottery-winners'>
+            Se alla lotterivinnare → 
+            <span className=' block text-sm text-gray-500'>Detta är arkivet för lotterivinnare; du kan se alla lotterivinnare från både automatiska och manuella lotterier</span>
+          </a>
+          <a className='text-blue-600 hover:text-blue-950 border border-gray-400 rounded-lg py-3 px-4 w-full mb-2'>
+            Se alla budvinnare → 
+            <span className=' block text-sm text-gray-500'>Detta är arkivet för budvinnare; du kan se alla vinnare av auktionsprodukter här.</span>
+          </a>
+          <div className='flex flex-row gap-4 w-full mt-4'>
+            <button className='text-blue-600 hover:text-blue-950 border border-gray-400 rounded-lg py-3 px-4 w-1/2 mb-2 text-left' onClick={handleLogout}>
+              Admin logga ut → 
+              <span className=' block text-sm text-gray-500'>Logga ut från frontend som Admin.</span>
+            </button>
+            <a className='text-blue-600 hover:text-blue-950 border border-gray-400 rounded-lg py-3 px-4 w-1/2 mb-2' href={`${process.env.NEXT_PUBLIC_API_URL}/admin`} target="_blank" rel="noopener noreferrer">
+              Gå till Strapi Dashboard → 
+              <span className=' block text-sm text-gray-500'>Åtkomst till Strapi adminpanel.</span>
+            </a>
+          </div>
         </div>
       </div>
     );
