@@ -33,21 +33,32 @@ body {
   /* width: 150px; */
   text-align: center;
   font-size: 16px;
-  background-color: #f3f4f6;
+  background-color: #fcf6ec;
   border-radius: 5px;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);  
-  padding: 10px;
-  border: 1px solid #ddd;
+  /* box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);   */
+  padding: 20px 0px;
+  border: 1px solid #9a9a9a;
   border-radius: 5px;
   margin: 5px;
   transition: transform 0.2s, background-color 0.2s;
 }
 
+.participant p.username {
+  font-weight: 800;
+  font-size: 18px;
+  height: 40px;
+}
+
+.participant.active p.username {
+  font-weight: 900;
+  font-size: 22px;
+}
+
 .participant.active {
-  background-color: #cb9407;
-  color: white;
-  transform: scale(1.1);
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+  background-color: #000;
+  color: #ffd462;
+  transform: scale(1.2);
+  /* box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3); */
 }
 
 .winner-modal {

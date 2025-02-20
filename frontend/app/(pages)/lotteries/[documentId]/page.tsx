@@ -1,4 +1,3 @@
-
 // app/pages/lotteries/[documentId]/page.tsx
 "use client";
 
@@ -94,8 +93,15 @@ export default function LotteryDetailPage() {
   }, [documentId, router]);
 
   const startLottery = () => {
+    if (existingWinner) {
+      const confirmMessage = "Det finns redan en vinnare för denna produkt. Om du fortsätter kommer den nuvarande vinnande användaren att tas bort och en ny användare kommer att väljas som vinnare. Är du säker på att du vill fortsätta?";
+      if (!confirm(confirmMessage)) {
+        return; // If the user does not want to continue, stop the process.
+      }
+    }
+
     if (!product || isRunning || !product.lottery_users || product.lottery_users.length === 0) {
-      alert('Kullanıcılar listesi boş veya çekiliş başlatılamıyor!');
+      alert('The user list is empty or the lottery cannot be started!');
       return;
     }
 
@@ -145,7 +151,7 @@ export default function LotteryDetailPage() {
     const selectedUser = product.lottery_users[finalIndex];
     if (!selectedUser || !selectedUser.biduser) {
       console.error('Invalid user data:', selectedUser);
-      alert('Hata: Kullanıcı verisi eksik!');
+      alert('Error: User data is missing!');
       setIsRunning(false);
       return;
     }
@@ -166,11 +172,11 @@ const saveWinner = async (winner: BidUser) => {
   try {
     if (!product) return;
 
-    // Çekilişin yapıldığı tarih ve saat
+    // The date and time when the lottery is held
     const currentDate = new Date();
     const endingDate = new Date(product.ending_date);
 
-    // Eğer ending_date gelecekteyse, çekilişin yapıldığı tarih olarak güncellenecek
+    // If the ending_date is in the future, it will be updated as the date when the lottery is held
     const shouldUpdateEndingDate = endingDate > currentDate;
 
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${documentId}`, {
@@ -189,13 +195,13 @@ const saveWinner = async (winner: BidUser) => {
     if (!response.ok) {
       const error = await response.json();
       console.error('Failed to save winner:', error);
-      alert('Kazanan kaydedilemedi. Lütfen tekrar deneyin.');
+      alert('The winner could not be recorded. Please try again.');
     } else {
-      // API'den kazanan bilgisini al ve güncelle
+      // Get the winner information from the API and update it.
       setExistingWinner(winner);
 
       if (shouldUpdateEndingDate) {
-        // ending_date'i güncelle
+        // update to ending_date
         setProduct((prev) => {
           if (!prev) return prev;
           return { ...prev, ending_date: currentDate.toISOString() };
@@ -233,21 +239,22 @@ const saveWinner = async (winner: BidUser) => {
       </div>
 
       {existingWinner ? (
-        <div className="existing-winner bg-gray-100 p-4 my-4">
-          <h2 className='text-2xl font-bold my-2'>Winner:</h2>
-          <p>{existingWinner.Name}</p>
+        <div className="existing-winner bg-black text-white py-8 my-4 items-center text-center mb-12">
+          <p className='text-6xl'>🏆</p>
+          <h2 className='text-3xl font-bold my-2'>Vinnare:</h2>
+          <p className='text-2xl'>{existingWinner.Name}</p>
           <p>{existingWinner.email}</p>
         </div>
       ) : null}
 
-      <div className="participants-list grid grid-cols-3 gap-2">
+      <div className="participants-list grid grid-cols-3 gap-2 mt-5 mb-20">
         {product.lottery_users.map((user, index) => (
           <div
             key={user.id}
             className={`participant ${activeIndex === index ? 'active' : ''}`}
           >
-            <p>{user.biduser.Name}</p>
-            <p>{user.biduser.email}</p>
+            <p className='username'>{user.biduser.Name}</p>
+            <p className='useremail'>{user.biduser.email}</p>
           </div>
         ))}
       </div>
@@ -256,18 +263,18 @@ const saveWinner = async (winner: BidUser) => {
         {isRunning
           ? 'Running...'
           : product.lottery_users.length === 1
-          ? 'Save this user as winner 💾'
-          : 'Start Lottery 🎲'}
+          ? 'Spara denna användare som vinnare 💾'
+          : 'Starta Lotteri 🎲'}
       </button>
 
       {winner && (
         <div className="winner-modal">
           <div className="modal-content">
-            <div className=" text-6xl">👑</div>
-            <h2 className='text-4xl font-bold text-amber-400'>WINNER</h2>
+            <div className=" text-6xl">🏆</div>
+            <h2 className='text-4xl font-bold text-amber-400'>VINNARE</h2>
             <p className='font-bold text-3xl'>{winner.Name}</p>
             <p>{winner.email}</p>
-            <button onClick={resetState}>Save & Close 💾</button>
+            <button onClick={resetState}>Spara & Stäng 💾</button>
           </div>
         </div>
       )}
