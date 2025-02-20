@@ -70,7 +70,7 @@ const ActiveProductCard = ({ product, onFavoriteChange, }: ActiveProductCardProp
           <div className='flex flex-col gap-1 justify-between'>
             <p className='text-gray-700 text-sm'><strong>Product ID:</strong> {product.documentId}</p>
             <p className='text-gray-700 text-sm'><strong>Kategori:</strong> {product.categories?.[0]?.category_name}</p>
-            <p className='text-gray-700 text-sm'><strong>Utgångspris:</strong> {product.price} SEK</p>
+            <p className='text-gray-700 text-sm'><strong>Utgångspris:</strong> {product.price || 0} SEK</p>
             
             {product.type === 'bidding' && (
               <p className='text-gray-700 text-sm'><strong>Antal bud:</strong> {product.total_bids || 0}</p>
