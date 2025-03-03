@@ -40,3 +40,4 @@ db/.env
 # Git
 .git/
 .gitignore
+.cursor/rules/auktion-rules.mdc
