@@ -99,7 +99,7 @@ export default function LoginPage() {
             Se alla lotterivinnare → 
             <span className='font-normal block text-sm text-gray-500'>Detta är arkivet för lotterivinnare; du kan se alla lotterivinnare från både automatiska och manuella lotterier</span>
           </a>
-          <a className='text-black hover:text-blue-600 font-bold border border-gray-400 rounded-lg py-3 px-4 w-full mb-2'>
+          <a className='text-black hover:text-blue-600 font-bold border border-gray-400 rounded-lg py-3 px-4 w-full mb-2' href='/winners/bidding-winners'>
             Se alla budvinnare → 
             <span className='font-normal block text-sm text-gray-500'>Detta är arkivet för budvinnare; du kan se alla vinnare av auktionsprodukter här.</span>
           </a>
