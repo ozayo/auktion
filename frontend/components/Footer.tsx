@@ -13,6 +13,7 @@ const Footer: React.FC = () => {
           <Link className='font-light text-xs hover:text-blue-700' href="/">Hem</Link>
           <Link className='font-light text-xs hover:text-blue-700' href="/produkter">Produkter</Link>
           <Link className='font-light text-xs hover:text-blue-700' href="/om-project">Om project</Link>
+          <Link className='font-light text-xs hover:text-blue-700' href="/my-page">Min Sida</Link>
           <Link className='font-light text-xs hover:text-blue-700' href="/my_page">Old Min Sida</Link>
           <Link className='font-light text-xs hover:text-blue-700' href="/login">Admin login</Link>
         </div>
