@@ -1,5 +1,9 @@
+// frontend/app/(pages)/winners/bidding-winners/page.tsx
+
 import { fetchAPI } from '@/lib/api';
 import { Metadata } from 'next';
+import Link from 'next/link';
+import BackButton from '@/components/BackButton';
 
 type BidUser = {
   Name: string;
@@ -20,6 +24,9 @@ type Product = {
   createdAt: string;
   lottery_product: boolean | null;
   bids: Bid[];
+  price: number | null;
+  totalBids?: number;
+  uniqueBidders?: number;
   highestBid?: {
     Amount: number;
     biduser: BidUser;
@@ -61,16 +68,45 @@ export default async function BiddingWinnersPage() {
           bid.Amount > max.Amount ? bid : max
         );
 
-        // Get user (bids) details
-        const bidResponse = await fetchAPI(`/bids/${highestBid.documentId}?populate=*`);
-        const biduser = bidResponse.data?.biduser;
+        // Fetch detailed bid information for each bid in the product
+        const detailedBids = await Promise.all(
+          bids.map(async (bid: any) => {
+            try {
+              const bidResponse = await fetchAPI(`/bids/${bid.documentId}?populate=*`);
+              return bidResponse.data;
+            } catch (error) {
+              console.error(`Error fetching bid ${bid.documentId}:`, error);
+              return null;
+            }
+          })
+        );
+
+        // Filter out any null responses
+        const validBids = detailedBids.filter(bid => bid !== null);
+
+        // Calculate unique bidders using the detailed bid information
+        const uniqueBidderIds = new Set();
+        validBids.forEach((bid: any) => {
+          if (bid && bid.biduser && bid.biduser.email) {
+            uniqueBidderIds.add(bid.biduser.email);
+          }
+        });
+
+        const uniqueBidders = uniqueBidderIds.size;
+
+        // Get user details for the highest bid
+        const highestBidDetailed = validBids.find(
+          (bid: any) => bid && bid.documentId === highestBid.documentId
+        );
 
         return {
           ...product,
-          highestBid: {
-            Amount: highestBid.Amount,
-            biduser: biduser ? biduser : { Name: 'Unknown', email: 'Unknown' },
-          },
+          totalBids: bids.length,
+          uniqueBidders,
+          highestBid: highestBidDetailed ? {
+            Amount: highestBidDetailed.Amount,
+            biduser: highestBidDetailed.biduser || { Name: 'Unknown', email: 'Unknown' },
+          } : null,
         };
       })
     );
@@ -82,60 +118,65 @@ export default async function BiddingWinnersPage() {
   }
 
   return (
-    <main className="w-full mx-auto pb-14">
-      <h1 className='text-4xl font-bold mb-4'>Bidding Winners</h1>
+    <div className='w-full mx-auto pt-8 pb-14'>
+
+      <div className='w-full flex flex-row justify-between align-middle '>
+        <h1 className='text-3xl font-bold mb-4 w-9/12'>Budvinnare arkiv</h1>
+        <div className='flex align-middle justify-end items-start w-3/12'>
+          <BackButton />
+        </div>
+      </div>
+
+      <p>Detta är arkivet för budvinnare; du kan se alla vinnare av auktionsprodukter här.</p>
+
       {error ? (
         <p className="text-red-500">{error}</p>
       ) : (
         <div className="mt-4 grid gap-6">
           {products.map((product) => (
-          <div key={product.documentId} className="bg-gray-50 mb-2 py-4 px-6">
-            <h2 className="text-2xl font-bold mb-2">{product.title}</h2>
-            <div className='flex flex-col sm:flex-row gap-4'>
-                <div className='imagearea relative w-full sm:w-3/12 rounded-lg overflow-hidden'>
+          
+          <div key={product.documentId} className="border bg-white py-4 px-6 hover:bg-zinc-50 overflow-hidden group">
+            <h2 className="text-2xl font-bold mb-4">{product.title}</h2>
+            <div className="flex flex-col sm:flex-row gap-4">
+                {/* Product Image */}
+                <div className="product-images relative w-full sm:w-3/12 min-h-48">
                   {product.main_picture && product.main_picture.url ? (
                     <img
-                      className="w-full h-48 object-cover"
+                      className="w-full h-48 object-cover rounded-lg"
                       src={`${process.env.NEXT_PUBLIC_API_URL}${product.main_picture.url}`}
                       alt={product.title}
                     />
                   ) : (
                     <img
-                      className="w-full h-48 object-cover"
+                      className="w-full h-48 object-cover rounded-lg"
                       src="/placeholder.png"
                       alt="Placeholder image"
                     />
                   )}                  
                 </div>
-                <div className='infoarea flex flex-col gap-2 w-full sm:w-5/12'>
-                  <p>
-                    <strong>Product ID:</strong> {product.documentId}
-                  </p>
-                  <p>
-                    <strong>Product Link:</strong>{' '}
-                    <a href={`http://localhost:3000/product/${product.documentId}`}
-                      className="text-blue-600 underline">View Product
-                    </a>
-                  </p>
-                  <p>
-                    <strong>Created Date:</strong> {new Date(product.createdAt).toLocaleString()}
-                  </p>
-                  <p>
-                    <strong>Ending Date:</strong> {new Date(product.ending_date).toLocaleString()}
-                  </p>                  
+
+                {/* Product Info */}
+                <div className="infoarea flex flex-col w-full sm:w-5/12 px-4">
+                  <div className='flex flex-col gap-1 justify-between'>
+                    <p className='text-gray-700 text-sm'><strong>Product ID:</strong> {product.documentId}</p>
+                    <p className='text-gray-700 text-sm'><strong>Skapat datum:</strong> {new Date(product.createdAt).toLocaleString()}</p>
+                    <p className='text-gray-700 text-sm'><strong>Slutdatum:</strong> {new Date(product.ending_date).toLocaleString()}</p>                  
+                    <p className='text-gray-700 text-sm'><strong>Utgångspris:</strong> {product.price || 0} SEK</p>
+                    <p className='text-gray-700 text-sm'><strong>Antal bud:</strong> {product.totalBids || 0}</p>
+                    <p className='text-gray-700 text-sm'><strong>Antal budgivare:</strong> {product.uniqueBidders || 0}</p>
+                    <div className='w-48 border-t pb-2 my-2'></div>
+                        <Link href={`/product/${product.documentId}`} target="_blank" className='text-black inline-block text-sm hover:text-blue-600 font-black'>Gå till produkt ↗</Link>
+                  </div>
                 </div>
-                <div className='winnerarea w-full sm:w-4/12'>
+                <div className='winnerarea w-full sm:w-4/12 group-hover:bg-white border border-zinc-200 0 p-4 rounded-lg'>
                   {product.highestBid ? (
-                    <div>
-                      <h3 className='font-bold text-xl pb-2'>Winner:</h3>
-                      <p>
-                        <strong>Highest Bid:</strong> {product.highestBid.Amount}
-                      </p>
-                      <p>
-                        <strong>Bidder:</strong> {product.highestBid.biduser.Name} (
-                        {product.highestBid.biduser.email})
-                      </p>
-                    </div>
+                    <div className='h-full flex flex-col items-center justify-center gap'>
+                        <div className=" text-4xl">🥇</div>
+                        <h2 className="text-xl font-bold text-amber-400">VINNARE</h2>
+                        <p className='font-bold'>{product.highestBid.biduser.Name}</p>
+                        <p className='text-sm'>{product.highestBid.biduser.email}</p>
+                        <p className='text-sm'>Högsta budet: {product.highestBid.Amount} SEK</p>
+                      </div>
                   ) : (
                     <p>No bids available for this product.</p>
                   )}                  
@@ -145,6 +186,6 @@ export default async function BiddingWinnersPage() {
           ))}
         </div>
       )}
-    </main>
+    </div>
   );
 }
