@@ -270,11 +270,11 @@ const saveWinner = async (winner: BidUser) => {
       {winner && (
         <div className="winner-modal">
           <div className="modal-content">
-            <div className=" text-6xl">🏆</div>
-            <h2 className='text-4xl font-bold text-amber-400'>VINNARE</h2>
-            <p className='font-bold text-3xl'>{winner.Name}</p>
-            <p>{winner.email}</p>
-            <button onClick={resetState}>Spara & Stäng 💾</button>
+              <div className=" text-6xl">🏆</div>
+              <h2 className='text-4xl font-bold text-amber-400'>VINNARE</h2>
+              <p className='font-bold text-3xl'>{winner.Name}</p>
+              <p>{winner.email}</p>
+              <button onClick={resetState}>Spara & Stäng 💾</button>
           </div>
         </div>
       )}

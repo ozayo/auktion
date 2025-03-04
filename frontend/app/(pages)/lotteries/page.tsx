@@ -128,22 +128,22 @@ export default function LotteriesPage() {
           <h2 className='text-2xl font-bold mb-4'>{product.title}</h2>
 
           <div className='flex flex-col sm:flex-row gap-4'>
-            <div className='product-images relative w-full sm:w-3/12 min-h-48 rounded-lg overflow-hidden'>
+            <div className='product-images relative w-full sm:w-3/12 min-h-48'>
               {product.main_picture ? (
                 <img
-                  className='w-full h-48 object-cover'
+                  className='w-full h-48 object-cover rounded-lg'
                   src={`${process.env.NEXT_PUBLIC_API_URL}${product.main_picture.url}`}
                   alt={product.title}
                 />
               ) : (
-                <img className='w-full h-48 object-cover' src="/placeholder.png" alt="Placeholder image" />
+                <img className='w-full h-48 object-cover rounded-lg' src="/placeholder.png" alt="Placeholder image" />
               )}
             </div>
             <div className='infoarea flex flex-col w-full sm:w-5/12 px-4'>
               <div className='flex flex-col gap-1 justify-between'>
                 <p className='text-gray-700 text-sm'><strong>Product ID:</strong> {product.documentId}</p>
                 <p className='text-gray-700 text-sm'><strong>Skapat datum:</strong> {new Date(product.createdAt).toLocaleString()}</p>
-                <p className='text-gray-700 text-sm'><strong>Slutdatum::</strong> {new Date(product.ending_date).toLocaleString()}</p>
+                <p className='text-gray-700 text-sm'><strong>Slutdatum:</strong> {new Date(product.ending_date).toLocaleString()}</p>
                 <p className='text-gray-700 text-sm'><strong>Utgångspris:</strong> {product.price || 0} SEK</p>
                 <p className='text-gray-700 text-sm'><strong>Antal deltagare:</strong> {product.lottery_users.length}</p>
                 <div className='w-48 border-t pb-2 my-2'></div>
