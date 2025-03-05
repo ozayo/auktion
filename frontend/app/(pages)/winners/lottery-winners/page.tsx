@@ -79,7 +79,7 @@ export default async function LotteryWinnersPage() {
               : null;
 
             return (
-              <div key={product.documentId} className="border border-zinc-200 bg-white py-4 px-6 hover:bg-zinc-50 overflow-hidden group">
+              <div key={product.documentId} className="border border-zinc-200 bg-white py-5 px-6 hover:bg-zinc-50 overflow-hidden group">
                 <h2 className="text-2xl font-bold mb-4">{product.title}</h2>
                 <div className="flex flex-col sm:flex-row gap-4">
                   {/* Product Image */}

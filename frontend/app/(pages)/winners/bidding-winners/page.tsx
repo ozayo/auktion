@@ -120,9 +120,9 @@ export default async function BiddingWinnersPage() {
   return (
     <div className='w-full mx-auto pt-8 pb-14'>
 
-      <div className='w-full flex flex-row justify-between align-middle '>
-        <h1 className='text-3xl font-bold mb-4 w-9/12'>Budvinnare arkiv</h1>
-        <div className='flex align-middle justify-end items-start w-3/12'>
+      <div className='w-full flex sm:flex-row flex-col justify-between align-middle '>
+        <h1 className='text-3xl font-bold order-2 sm:order-1 mb-4 w-9/12'>Budvinnare arkiv</h1>
+        <div className='flex align-middle order-1 sm:order-2 justify-end items-start w-full sm:w-3/12'>
           <BackButton />
         </div>
       </div>
@@ -135,7 +135,7 @@ export default async function BiddingWinnersPage() {
         <div className="mt-4 grid gap-6">
           {products.map((product) => (
           
-          <div key={product.documentId} className="border bg-white py-4 px-6 hover:bg-zinc-50 overflow-hidden group">
+          <div key={product.documentId} className="border bg-white py-5 px-6 hover:bg-zinc-50 overflow-hidden group">
             <h2 className="text-2xl font-bold mb-4">{product.title}</h2>
             <div className="flex flex-col sm:flex-row gap-4">
                 {/* Product Image */}
