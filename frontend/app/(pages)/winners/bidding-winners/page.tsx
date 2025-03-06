@@ -1,7 +1,7 @@
 // frontend/app/(pages)/winners/bidding-winners/page.tsx
 
-import { fetchAPI } from '@/lib/api';
 import { Metadata } from 'next';
+import { fetchAPI } from '@/lib/api';
 import Link from 'next/link';
 import BackButton from '@/components/BackButton';
 
@@ -41,12 +41,18 @@ export const metadata: Metadata = {
   description: 'List of all bidding winners.',
 };
 
-export default async function BiddingWinnersPage() {
+export default async function BiddingWinnersPage({
+  searchParams,
+}: {
+  searchParams: { sort?: string };
+}) {
   let products: Product[] = [];
   let error: string | null = null;
+  
+  // Get sort order from URL params, default to 'newest'
+  const sortOrder = searchParams.sort === 'oldest' ? 'oldest' : 'newest';
 
   try {
-    // filter products that are not lottery products and have ended
     const productResponse = await fetchAPI('/products?populate=*');
     const now = new Date();
 
@@ -112,6 +118,14 @@ export default async function BiddingWinnersPage() {
     );
 
     products = productsWithWinners.filter((product) => product !== null);
+    
+    // Sort products based on ending_date
+    products.sort((a, b) => {
+      const dateA = new Date(a.ending_date).getTime();
+      const dateB = new Date(b.ending_date).getTime();
+      return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+    });
+    
   } catch (err) {
     error = 'Failed to fetch bidding winners.';
     console.error(err);
@@ -120,14 +134,35 @@ export default async function BiddingWinnersPage() {
   return (
     <div className='w-full mx-auto pt-8 pb-14'>
 
-      <div className='w-full flex sm:flex-row flex-col justify-between align-middle '>
-        <h1 className='text-3xl font-bold order-2 sm:order-1 mb-4 w-9/12'>Budvinnare arkiv</h1>
-        <div className='flex align-middle order-1 sm:order-2 justify-end items-start w-full sm:w-3/12'>
+      <div className='w-full flex flex-row justify-between align-middle '>
+        <h1 className='text-3xl font-bold mb-4 w-9/12'>Budvinnare arkiv</h1>
+        <div className='flex align-middle justify-end items-start w-3/12'>
           <BackButton />
         </div>
       </div>
 
       <p>Detta är arkivet för budvinnare; du kan se alla vinnare av auktionsprodukter här.</p>
+
+      {/* Add sorting dropdown with links */}
+      <div className="mt-4 mb-4 flex justify-end">
+        <div className="flex items-center">
+          <span className="mr-2 text-sm font-medium">Sortera:</span>
+          <div className="border border-gray-300 rounded-md overflow-hidden flex">
+            <Link 
+              href="?sort=newest" 
+              className={`px-3 py-1 text-sm ${sortOrder === 'newest' ? 'bg-blue-100 font-medium' : 'bg-white'}`}
+            >
+              Nyaste först
+            </Link>
+            <Link 
+              href="?sort=oldest" 
+              className={`px-3 py-1 text-sm ${sortOrder === 'oldest' ? 'bg-blue-100 font-medium' : 'bg-white'}`}
+            >
+              Äldsta först
+            </Link>
+          </div>
+        </div>
+      </div>
 
       {error ? (
         <p className="text-red-500">{error}</p>
@@ -135,7 +170,7 @@ export default async function BiddingWinnersPage() {
         <div className="mt-4 grid gap-6">
           {products.map((product) => (
           
-          <div key={product.documentId} className="border bg-white py-5 px-6 hover:bg-zinc-50 overflow-hidden group">
+          <div key={product.documentId} className="border bg-white py-4 px-6 hover:bg-zinc-50 overflow-hidden group">
             <h2 className="text-2xl font-bold mb-4">{product.title}</h2>
             <div className="flex flex-col sm:flex-row gap-4">
                 {/* Product Image */}

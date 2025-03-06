@@ -31,9 +31,16 @@ export const metadata: Metadata = {
   description: 'List of all lottery winners.',
 };
 
-export default async function LotteryWinnersPage() {
+export default async function LotteryWinnersPage({
+  searchParams,
+}: {
+  searchParams: { sort?: string };
+}) {
   let products: Product[] = [];
   let error: string | null = null;
+  
+  // Get sort order from URL params, default to 'newest'
+  const sortOrder = searchParams.sort === 'oldest' ? 'oldest' : 'newest';
 
   try {
     // Fetch products with necessary filters
@@ -47,6 +54,14 @@ export default async function LotteryWinnersPage() {
     products = response.data.filter((product: Product) => {
       return new Date(product.ending_date) < now;
     });
+    
+    // Sort products based on ending_date
+    products.sort((a, b) => {
+      const dateA = new Date(a.ending_date).getTime();
+      const dateB = new Date(b.ending_date).getTime();
+      return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+    });
+    
   } catch (err) {
     error = 'Failed to fetch lottery winners.';
     console.error(err);
@@ -64,6 +79,26 @@ export default async function LotteryWinnersPage() {
 
       <p>Detta är arkivet för lotterivinnare; du kan se alla lotterivinnare från både automatiska och manuella lotterier</p>
       
+      {/* Add sorting dropdown with links */}
+      <div className="mt-4 mb-4 flex justify-end">
+        <div className="flex items-center">
+          <span className="mr-2 text-sm font-medium">Sortera:</span>
+          <div className="border border-gray-300 rounded-md overflow-hidden flex">
+            <Link 
+              href="?sort=newest" 
+              className={`px-3 py-1 text-sm ${sortOrder === 'newest' ? 'bg-blue-100 font-medium' : 'bg-white'}`}
+            >
+              Nyaste först
+            </Link>
+            <Link 
+              href="?sort=oldest" 
+              className={`px-3 py-1 text-sm ${sortOrder === 'oldest' ? 'bg-blue-100 font-medium' : 'bg-white'}`}
+            >
+              Äldsta först
+            </Link>
+          </div>
+        </div>
+      </div>
 
       {/* product list */}
       {error ? (
