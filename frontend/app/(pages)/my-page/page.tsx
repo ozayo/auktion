@@ -165,24 +165,34 @@ const MyNewPage = () => {
           </>
         )}
       </div>
-      <div className="pt-2 pb-8 flex gap-2">
+      <div className="pt-2 pb-8">
         <Link
-          className={`text-blue-500 rounded-full bg-gray-100 py-1 px-5 hover:text-white hover:bg-blue-950 hover:text-white" [&.active]:bg-blue-950 [&.active]:text-white ${pathname === '/my-page' ? 'active' : ''}`}
+          className={`text-blue-500 rounded-full bg-gray-100 py-1 px-5 mx-1 mb-1 inline-block hover:text-white hover:bg-blue-950 hover:text-white" [&.active]:bg-blue-950 [&.active]:text-white ${pathname === '/my-page' ? 'active' : ''}`}
           href="/my-page">
           Mina produkter
         </Link>
         <Link
-          className={`text-blue-500 rounded-full bg-gray-100 py-1 px-5 hover:text-white hover:bg-blue-950 hover:text-white" [&.active]:bg-blue-950 [&.active]:text-white ${pathname === '/my-page/my-win' ? 'active' : ''}`}
+          className={`text-blue-500 rounded-full bg-gray-100 py-1 px-5 mx-1 mb-1 inline-block hover:text-white hover:bg-blue-950 hover:text-white" [&.active]:bg-blue-950 [&.active]:text-white ${pathname === '/my-page/my-win' ? 'active' : ''}`}
           href="/my-page/my-win">
           Vunna produkter
         </Link>
         <Link
-          className={`text-blue-500 rounded-full bg-gray-100 py-1 px-5 hover:text-white hover:bg-blue-950 hover:text-white" [&.active]:bg-blue-950 [&.active]:text-white ${pathname === '#' ? 'active' : ''}`}
+          className={`text-blue-500 rounded-full bg-gray-100 py-1 px-5 mx-1 mb-1 inline-block hover:text-white hover:bg-blue-950 hover:text-white" [&.active]:bg-blue-950 [&.active]:text-white ${pathname === '/my-page/my-favorites' ? 'active' : ''}`}
           href="/my-page/my-favorites">
           Mina Favoriter
         </Link>
       </div>
       
+       {/* Page info text */}
+      <div className="mb-10">
+        <p className=" text-gray-800 pb-1">Följande produkter är de aktiva produkter (vars tid ännu inte har gått ut) som du har deltagit i, både i lotteri- och auktionsprodukterna.</p>
+        <p className=" text-gray-800 pb-1 mb-3">För att göra ändringar, gå till produktsidan.</p>
+        <div className="border-l border-gray-200 pl-4">
+          <p className="text-xs text-gray-600 pb-1">Du kan sortera produkterna efter olika kriterier, såsom tid kvar, högsta bud, eller skapelsedatum.</p>
+          <p className="text-xs text-gray-600">Du kan också filtrera produkterna efter typ (lotteri eller auktion), eller visa alla produkter.</p>
+        </div>
+      </div>
+
       {/* Filters */}
       <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
         <div className="space-x-4">
