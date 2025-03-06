@@ -1,9 +1,9 @@
 // frontend/app/(pages)/winners/bidding-winners/page.tsx
 
-import { Metadata } from 'next';
 import { fetchAPI } from '@/lib/api';
 import Link from 'next/link';
 import BackButton from '@/components/BackButton';
+import ProductListWithLoadMore from './ProductListWithLoadMore';
 
 type BidUser = {
   Name: string;
@@ -34,11 +34,6 @@ type Product = {
   main_picture: {
     url: string;
   };
-};
-
-export const metadata: Metadata = {
-  title: 'Bidding Winners',
-  description: 'List of all bidding winners.',
 };
 
 export default async function BiddingWinnersPage({
@@ -167,59 +162,7 @@ export default async function BiddingWinnersPage({
       {error ? (
         <p className="text-red-500">{error}</p>
       ) : (
-        <div className="mt-4 grid gap-6">
-          {products.map((product) => (
-          
-          <div key={product.documentId} className="border bg-white py-4 px-6 hover:bg-zinc-50 overflow-hidden group">
-            <h2 className="text-2xl font-bold mb-4">{product.title}</h2>
-            <div className="flex flex-col sm:flex-row gap-4">
-                {/* Product Image */}
-                <div className="product-images relative w-full sm:w-3/12 min-h-48">
-                  {product.main_picture && product.main_picture.url ? (
-                    <img
-                      className="w-full h-48 object-cover rounded-lg"
-                      src={`${process.env.NEXT_PUBLIC_API_URL}${product.main_picture.url}`}
-                      alt={product.title}
-                    />
-                  ) : (
-                    <img
-                      className="w-full h-48 object-cover rounded-lg"
-                      src="/placeholder.png"
-                      alt="Placeholder image"
-                    />
-                  )}                  
-                </div>
-
-                {/* Product Info */}
-                <div className="infoarea flex flex-col w-full sm:w-5/12 px-4">
-                  <div className='flex flex-col gap-1 justify-between'>
-                    <p className='text-gray-700 text-sm'><strong>Product ID:</strong> {product.documentId}</p>
-                    <p className='text-gray-700 text-sm'><strong>Skapat datum:</strong> {new Date(product.createdAt).toLocaleString()}</p>
-                    <p className='text-gray-700 text-sm'><strong>Slutdatum:</strong> {new Date(product.ending_date).toLocaleString()}</p>                  
-                    <p className='text-gray-700 text-sm'><strong>Utgångspris:</strong> {product.price || 0} SEK</p>
-                    <p className='text-gray-700 text-sm'><strong>Antal bud:</strong> {product.totalBids || 0}</p>
-                    <p className='text-gray-700 text-sm'><strong>Antal budgivare:</strong> {product.uniqueBidders || 0}</p>
-                    <div className='w-48 border-t pb-2 my-2'></div>
-                        <Link href={`/product/${product.documentId}`} target="_blank" className='text-black inline-block text-sm hover:text-blue-600 font-black'>Gå till produkt ↗</Link>
-                  </div>
-                </div>
-                <div className='winnerarea w-full sm:w-4/12 group-hover:bg-white border border-zinc-200 0 p-4 rounded-lg'>
-                  {product.highestBid ? (
-                    <div className='h-full flex flex-col items-center justify-center gap'>
-                        <div className=" text-4xl">🥇</div>
-                        <h2 className="text-xl font-bold text-amber-400">VINNARE</h2>
-                        <p className='font-bold'>{product.highestBid.biduser.Name}</p>
-                        <p className='text-sm'>{product.highestBid.biduser.email}</p>
-                        <p className='text-sm'>Högsta budet: {product.highestBid.Amount} SEK</p>
-                      </div>
-                  ) : (
-                    <p>No bids available for this product.</p>
-                  )}                  
-                </div>
-            </div>
-          </div>
-          ))}
-        </div>
+        <ProductListWithLoadMore products={products} />
       )}
     </div>
   );
