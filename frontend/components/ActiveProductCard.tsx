@@ -5,6 +5,10 @@ import Link from 'next/link';
 import { ProductWithStatus } from '@/types';
 import { calculateRemainingTime } from "@/utils/calculateRemainingTime";
 import SaveToFavoritesButton from './SaveToFavoritesButton';
+import { BsFillBookmarkCheckFill } from "react-icons/bs";
+import { FaArrowUpWideShort, FaArrowDownShortWide } from "react-icons/fa6";
+
+
 
 
 interface ActiveProductCardProps {
@@ -14,7 +18,7 @@ interface ActiveProductCardProps {
 
 const ActiveProductCard = ({ product, onFavoriteChange, }: ActiveProductCardProps) => {
   const remainingTime = calculateRemainingTime(product.ending_date);
-  const cardClassName = `border bg-white py-4 px-6 hover:bg-zinc-50 overflow-hidden ${
+  const cardClassName = `border border-zinc-200 bg-white sm:py-5 p-3 sm:px-6 hover:bg-zinc-50 overflow-hidden group ${
     product.type === 'lottery' ? 'lottery' : 'bidding'
   }`;
   
@@ -29,13 +33,13 @@ const ActiveProductCard = ({ product, onFavoriteChange, }: ActiveProductCardProp
       {/* Product card - 3 col Grid */}
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Product image */}
-        <div className="product-images relative w-full sm:w-3/12 min-h-48 rounded-lg overflow-hidden">
+        <div className="product-images relative w-full sm:w-3/12 min-h-48 overflow-hidden">
           <Image
             src={product.main_picture?.url || '/placeholder.png'}
             alt={product.title}
             width={800}
             height={800}
-            className="object-cover rounded h-48"
+            className="object-cover rounded-lg h-48"
           />
           {/* Categories */}
           <div className="absolute top-2 left-1 flex gap-2">
@@ -66,7 +70,7 @@ const ActiveProductCard = ({ product, onFavoriteChange, }: ActiveProductCardProp
         </div>
 
         {/* Product details */}
-        <div className="infoarea flex flex-col w-full sm:w-5/12 px-4">
+        <div className="infoarea flex flex-col w-full sm:w-5/12 sm:px-4">
           <div className='flex flex-col gap-1 justify-between'>
             <p className='text-gray-700 text-sm'><strong>Product ID:</strong> {product.documentId}</p>
             <p className='text-gray-700 text-sm'><strong>Kategori:</strong> {product.categories?.[0]?.category_name}</p>
@@ -94,41 +98,44 @@ const ActiveProductCard = ({ product, onFavoriteChange, }: ActiveProductCardProp
 
         {/* User status info */}
         <div className="winnerarea w-full sm:w-4/12">
-          {product.type === 'bidding' ? (
-            <>
-              <div className="bg-gray-100 p-2 mb-2 rounded">
-                {product.userBid && product.highest_bid && product.userBid >= product.highest_bid ? (
-                  <span className="text-green-600 font-semibold">
-                    Du är högsta budgivare 🤘
-                  </span>
-                ) : (
-                  <span className="text-yellow-600 font-semibold">
-                    Du är inte högsta budgivare
-                  </span>
-                )}
-              </div>
-              <p className='text-gray-700 text-sm'>Ledande bud: <strong>{product.highest_bid || 0} SEK </strong></p>
-              <p className='text-gray-700 text-sm'>Mitt högsta bud: <strong>{product.userBid || 0} SEK </strong></p>
-            </>
-          ) : (
-            <div>
-              <div className='bg-gray-100 p-2 mb-2 rounded'>
-                  <p className="text-green-600 font-semibold">Du har registrerats! 👍</p>
-              </div>
-              <p className="text-sm text-gray-600 mt-2">
-                För att ta bort dig själv från produkten, besök produktsidan
-              </p>
-            </div>
-          )}
-          
-          {/* Product link */}
-          <Link 
-            href={`/product/${product.documentId}`}
-            className="block w-full mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-center"
-          >
-            Gå till produkt
-          </Link>
+          <div className='flex flex-col gap-1 h-full'>
+            <div className='group-hover:bg-white border border-zinc-200 0 p-5 rounded-lg'>
+              {product.type === 'bidding' ? (
+                <>
+                  <div className="bg-gray-100 p-2 mb-2 rounded">
+                    {product.userBid && product.highest_bid && product.userBid >= product.highest_bid ? (
+                      <span className="text-green-600 font-semibold flex gap-3 items-center">
+                        <FaArrowUpWideShort /> Du är högsta budgivare
+                      </span>
+                    ) : (
+                      <span className="text-yellow-600 font-semibold flex gap-3 items-center">
+                        <FaArrowDownShortWide /> Du är inte högsta budgivare
+                      </span>
+                    )}
+                  </div>
+                  <p className='text-gray-700 text-sm'>Ledande bud: <strong>{product.highest_bid || 0} SEK </strong></p>
+                  <p className='text-gray-700 text-sm'>Mitt högsta bud: <strong>{product.userBid || 0} SEK </strong></p>
+                </>
+              ) : (
+                <div>
+                  <div className='bg-gray-100 p-2 mb-2 rounded'>
+                    <p className="text-green-600 font-semibold flex gap-3 items-center"><BsFillBookmarkCheckFill /> Du har registrerats!</p>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-2">
+                    För att ta bort dig själv från produkten, besök produktsidan
+                  </p>
+                </div>
+              )}
+            </div>          
+            {/* Product link */}
+            <Link 
+              href={`/product/${product.documentId}`}
+              className="hover:text-white rounded-lg bg-white py-2 px-5 my-3 inline-block hover:bg-blue-950 text-black border-zinc-200 hover:border-blue-950 border text-sm font-bold transition-colors">
+              Gå till produkt →
+            </Link>
+          </div>
         </div>
+
       </div>
     </div>
   );
