@@ -11,9 +11,14 @@ interface WonProductCardProps {
 }
 
 const WonProductCard = ({ product, onFavoriteChange, }: WonProductCardProps) => {
-  const cardClassName = `border bg-white py-4 px-6 hover:bg-zinc-50 overflow-hidden ${
+  const cardClassName = `border border-zinc-200 bg-white sm:py-5 p-3 sm:px-6 hover:bg-zinc-50 overflow-hidden group ${
     product.type === 'lottery' ? 'lottery' : 'bidding'
   }`;
+  
+  const totalPrice = () => {
+   const totalPrice = (product.price || 0) + (product.userBid || 0);
+   return totalPrice;
+  }
 
   const imageUrl = product.main_picture?.url 
     ? `${API_URL}${product.main_picture.url}`
@@ -29,11 +34,13 @@ const WonProductCard = ({ product, onFavoriteChange, }: WonProductCardProps) => 
       {/* Product card - 3 col Grid */}
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Product image */}
-        <div className="relative w-full sm:w-3/12 min-h-48 rounded-lg overflow-hidden">
-          <img
+        <div className="product-images relative w-full sm:w-3/12 min-h-48 overflow-hidden">
+          <Image
             src={imageUrl}
             alt={product.title}
-            className="object-cover rounded"
+            width={800}
+            height={800}
+            className="object-cover rounded-lg h-48"
           />
           {/* Categories */}
           <div className="absolute top-2 left-1 flex gap-2">
@@ -64,7 +71,7 @@ const WonProductCard = ({ product, onFavoriteChange, }: WonProductCardProps) => 
         </div>
 
         {/* Product details */}
-        <div className="infoarea flex flex-col w-full sm:w-5/12 px-4">
+        <div className="infoarea flex flex-col w-full sm:w-5/12 sm:px-4">
           <div className='flex flex-col gap-1 justify-between'>
             <p className='text-gray-700 text-sm'><strong>Kategori:</strong> {product.categories?.[0]?.category_name || 'N/A'}</p>
             <p className='text-gray-700 text-sm'><strong>Utgångspris:</strong> {product.price || '0'} SEK</p>
@@ -96,22 +103,36 @@ const WonProductCard = ({ product, onFavoriteChange, }: WonProductCardProps) => 
         
         {/* User status info */}
         <div className="winnerarea w-full sm:w-4/12">
-          {/* Winning status */}
-          <div className="mt-4 flex flex-col items-center">
-            <span className='text-4xl '>🏆</span>
-            <span className="text-green-600 font-semibold">
-              Du vinner
-            </span>
-          </div>
+          <div className='flex flex-col gap-1 h-full'>
+            {/* Winning status area */}
+            <div className='group-hover:bg-white border border-zinc-200 0 p-5 rounded-lg'>
 
-          {/* Product link */}
-          <Link 
-            href={`/product/${product.documentId}`}
-            className="block w-full mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-center"
-          >
-            Gå till produkt
-          </Link>
+              {product.type === 'bidding' ? (
+                <div className="mt-4 flex flex-col items-center">
+                  <span className='text-4xl '>🥇</span>
+                  <span className="text-xl font-bold text-amber-400">Du vinner</span>
+                  <span className="text-gray-800 text-sm">Totalt pris du betalar: <span className='font-bold'>{totalPrice()} SEK</span></span>
+                  <span className="text-gray-600 text-xs">(dit bud:{product.userBid || 0} + Utgångspris:{product.price || 0})</span>
+                </div>
+              ) : (
+                <div className="mt-4 flex flex-col items-center">
+                  <span className='text-4xl '>🏆</span>
+                  <span className="text-xl font-bold text-amber-400">Du vinner</span>
+                  <span className="text-gray-800 text-sm">Totalt pris du betalar: <span className='font-bold'>{product.price || 0} SEK</span></span>
+                  <span className="text-gray-600 text-xs">(Utgångspris:{product.price || 0})</span>
+                </div>
+              )}
+            </div>
+
+            {/* Product link */}
+            <Link 
+              href={`/product/${product.documentId}`}
+              className="hover:text-white rounded-lg bg-white py-2 px-5 my-3 inline-block hover:bg-blue-950 text-black border-zinc-200 hover:border-blue-950 border text-sm font-bold transition-colors">
+              Gå till produkt →
+            </Link>
+          </div>
         </div>
+        
       </div>
     </div>
   );

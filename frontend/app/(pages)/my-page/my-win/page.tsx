@@ -47,7 +47,7 @@ const fetchWonBiddingProducts = async (email: string): Promise<ProductWithStatus
 
 const fetchWonLotteryProducts = async (email: string): Promise<ProductWithStatus[]> => {
   try {
-    // Önce kullanıcının documentId'sini alalım
+    // first fetch user documentId
     const userResponse = await fetch(
       `${API_URL}/api/bidusers?filters[email][$eq]=${email}&fields=documentId`
     );
@@ -60,7 +60,7 @@ const fetchWonLotteryProducts = async (email: string): Promise<ProductWithStatus
 
     const userDocumentId = userData.data[0].documentId;
     
-    // Lottery ürünlerini getirelim - categories ekledik
+    // fetch lottery products
     const apiUrl = `${API_URL}/api/products?populate[main_picture][fields]=url&populate[categories][fields]=category_name&populate[lottery_users][populate]=biduser&filters[lottery_product][$eq]=true&filters[lottery_winner][$eq]=${userDocumentId}&filters[ending_date][$lt]=${new Date().toISOString()}&fields=id,documentId,title,createdAt,ending_date,manual_lottery,lottery_winner,price,description`;
     
     const response = await fetch(apiUrl);
@@ -74,8 +74,8 @@ const fetchWonLotteryProducts = async (email: string): Promise<ProductWithStatus
     return data.data.map((product: Product) => ({
       ...product,
       type: 'lottery' as const,
-      lottery_product: true, // Filtreleme için eklendi
-      categories: product.categories || [] // Kategoriler için eklendi
+      lottery_product: true,
+      categories: product.categories || []
     }));
 
   } catch (error) {
@@ -155,19 +155,19 @@ const WinnersPage = () => {
           </>
         )}
       </div>
-      <div className="pt-2 pb-8 flex gap-2">
+      <div className="pt-2 pb-8">
         <Link
-          className={`text-blue-500 rounded-full bg-gray-100 py-1 px-5 hover:text-white hover:bg-blue-950 hover:text-white" [&.active]:bg-blue-950 [&.active]:text-white ${pathname === '/my-page' ? 'active' : ''}`}
+          className={`text-blue-500 rounded-full bg-gray-100 py-1 px-5 mx-1 mb-1 inline-block hover:text-white hover:bg-blue-950 hover:text-white" [&.active]:bg-blue-950 [&.active]:text-white ${pathname === '/my-page' ? 'active' : ''}`}
           href="/my-page">
           Mina produkter
         </Link>
         <Link
-          className={`text-blue-500 rounded-full bg-gray-100 py-1 px-5 hover:text-white hover:bg-blue-950 hover:text-white" [&.active]:bg-blue-950 [&.active]:text-white ${pathname === '/my-page/my-win' ? 'active' : ''}`}
+          className={`text-blue-500 rounded-full bg-gray-100 py-1 px-5 mx-1 mb-1 inline-block hover:text-white hover:bg-blue-950 hover:text-white" [&.active]:bg-blue-950 [&.active]:text-white ${pathname === '/my-page/my-win' ? 'active' : ''}`}
           href="/my-page/my-win">
           Vunna produkter
         </Link>
         <Link
-          className={`text-blue-500 rounded-full bg-gray-100 py-1 px-5 hover:text-white hover:bg-blue-950 hover:text-white" [&.active]:bg-blue-950 [&.active]:text-white ${pathname === '#' ? 'active' : ''}`}
+          className={`text-blue-500 rounded-full bg-gray-100 py-1 px-5 mx-1 mb-1 inline-block hover:text-white hover:bg-blue-950 hover:text-white" [&.active]:bg-blue-950 [&.active]:text-white ${pathname === '/my-page/my-favorites' ? 'active' : ''}`}
           href="/my-page/my-favorites">
           Mina Favoriter
         </Link>
