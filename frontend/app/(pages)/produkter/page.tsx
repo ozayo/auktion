@@ -49,6 +49,18 @@ export default function ProdukterPage() {
     }
   };
 
+  // URL filter parameter
+  useEffect(() => {
+    const filterParam = searchParams.get("filter");
+    if (filterParam === "auktion") {
+      setFilter("bidding");
+    } else if (filterParam === "lottery") {
+      setFilter("lottery");
+    } else {
+      setFilter("all");
+    }
+  }, [searchParams]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -93,10 +105,12 @@ export default function ProdukterPage() {
     setTotalPages(computedTotalPages);
     // if current page is greater than total pages, go to first page
     if (currentPage > computedTotalPages && computedTotalPages > 0) {
-      router.push(`/produkter?page=1`);
+      const filterParam = searchParams.get("filter");
+      const filterQuery = filterParam ? `&filter=${filterParam}` : "";
+      router.push(`/produkter?page=1${filterQuery}`);
       setCurrentPage(1);
     }
-  }, [filteredProducts, currentPage, router, pageSize]);
+  }, [filteredProducts, currentPage, router, pageSize, searchParams]);
 
   // sorted logic
   useEffect(() => {
@@ -143,7 +157,23 @@ export default function ProdukterPage() {
   const currentPageProducts = sortedProducts.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const handlePageChange = (page: number) => {
-    router.push(`/produkter?page=${page}`);
+    const filterParam = searchParams.get("filter");
+    const filterQuery = filterParam ? `&filter=${filterParam}` : "";
+    router.push(`/produkter?page=${page}${filterQuery}`);
+  };
+
+  // Update URL when filter changes
+  const handleFilterChange = (newFilter: FilterType) => {
+    setFilter(newFilter);
+    
+    // Update URL with filter parameter
+    if (newFilter === "bidding") {
+      router.push("/produkter?filter=auktion");
+    } else if (newFilter === "lottery") {
+      router.push("/produkter?filter=lottery");
+    } else {
+      router.push("/produkter");
+    }
   };
 
   const isLotteryOnly = filter === "lottery";
@@ -169,7 +199,7 @@ export default function ProdukterPage() {
               name="productType"
               value="all"
               checked={filter === "all"}
-              onChange={() => setFilter("all")}
+              onChange={() => handleFilterChange("all")}
             />
             Alla objekt
           </label>
@@ -179,7 +209,7 @@ export default function ProdukterPage() {
               name="productType"
               value="bidding"
               checked={filter === "bidding"}
-              onChange={() => setFilter("bidding")}
+              onChange={() => handleFilterChange("bidding")}
             />
             Auktion
           </label>
@@ -189,7 +219,7 @@ export default function ProdukterPage() {
               name="productType"
               value="lottery"
               checked={filter === "lottery"}
-              onChange={() => setFilter("lottery")}
+              onChange={() => handleFilterChange("lottery")}
             />
             Lotteri
           </label>
