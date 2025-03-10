@@ -9,18 +9,23 @@ import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import AuthModals from "@/components/AuthModals";
 import { CategoryProvider } from '@/contexts/CategoryContext';
 import Footer from "@/components/Footer";
+import { Inter } from 'next/font/google'
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
-
+// const geistSans = localFont({
+//   src: "./fonts/GeistVF.woff",
+//   variable: "--font-geist-sans",
+//   weight: "100 900",
+// });
+// const geistMono = localFont({
+//   src: "./fonts/GeistMonoVF.woff",
+//   variable: "--font-geist-mono",
+//   weight: "100 900",
+// });
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+})
 
 
 export default function RootLayout({
@@ -39,13 +44,14 @@ export default function RootLayout({
   const closeSignUpModal = () => setSignUpModalOpen(false);
 
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable}`}>
       <head>
         <title>Bouvet Second Hand</title> 
         <meta name="description" content="Get a chance to win unused or old computers, phones, and other tech products through auctions or lottery! This sustainability-focused platform allows you to acquire valuable items while contributing to the environment." />
         {/* <meta name="description" content="Få chansen att vinna oanvända eller gamla datorer, telefoner och andra tekniska produkter genom auktioner eller lotteri! Denna hållbarhetsfokuserade plattform låter dig skaffa värdefulla föremål samtidigt som du bidrar till miljön." /> */}
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      {/* <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}> */}
+      <body>
         <AuthProvider>
           <FavoritesProvider openLoginModal={openLoginModal}>
             <CategoryProvider>

@@ -15,6 +15,9 @@ export default {
         '90': '90',
         '100': '100',
       },
+      fontFamily: {
+        sans: ['var(--font-inter)'],
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
