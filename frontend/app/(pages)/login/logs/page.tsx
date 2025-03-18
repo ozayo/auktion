@@ -98,32 +98,32 @@ export default function UserDetails() {
         <div>
           <input
             type="text"
-            placeholder="Kullanıcı email adresini giriniz"
+            placeholder="enter user email address"
             className="border rounded px-3 py-2"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <button onClick={fetchUser} className="ml-2 px-4 py-2 bg-blue-500 text-white rounded">
-            Göster
+            Show
           </button>
         </div>
         <a href="/login" className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">
-          ← Geri Dön
+          ← gå tillbaka
         </a>
       </div>
 
-      {!user && <div>Kullanıcı bulunamadı veya henüz arama yapılmadı.</div>}
+      {!user && <div>User not found or search not performed yet.</div>}
 
       {user && (
         <>
-          <h1 className="text-2xl font-bold">Kullanıcı Bilgileri</h1>
+          <h1 className="text-2xl font-bold">User Information</h1>
           <div className="mt-4">
             <p><strong>Document ID:</strong> {user.documentId}</p>
             <p>Email: {user.email}</p>
-            <p>İsim: {user.Name}</p>
-            <p>Oluşturulma: {new Date(user.createdAt).toLocaleString()}</p>
-            <p>Güncellenme: {new Date(user.updatedAt).toLocaleString()}</p>
-            <p>Aktif: {user.active ? "Evet" : "Hayır"}</p>
+            <p>Name: {user.Name}</p>
+            <p>Created: {new Date(user.createdAt).toLocaleString()}</p>
+            <p>Updated: {new Date(user.updatedAt).toLocaleString()}</p>
+            <p>Active: {user.active ? "Yes" : "No"}</p>
 
             <div className="mt-8 flex gap-4">
               <button 
@@ -164,30 +164,30 @@ export default function UserDetails() {
                       {bid.product ? `${bid.product.title} (ID: ${bid.product.documentId})` : "Ürün bilgisi bulunamadı"}
                     </h2>
                     <p>Bid ID: {bid.documentId}</p>
-                    <p>Teklif Tutarı: {bid.Amount}</p>
-                    <p>Oluşturulma: {new Date(bid.createdAt).toLocaleString()}</p>
-                    <p>Güncellenme: {new Date(bid.updatedAt).toLocaleString()}</p>
-                    <p>Yayınlanma: {new Date(bid.publishedAt).toLocaleString()}</p>
+                    <p>Bid Amount: {bid.Amount}</p>
+                    <p>Created: {new Date(bid.createdAt).toLocaleString()}</p>
+                    <p>Updated: {new Date(bid.updatedAt).toLocaleString()}</p>
+                    <p>Published: {new Date(bid.publishedAt).toLocaleString()}</p>
                   </div>
                 ))}
-                {user.bids.length === 0 && <p className="my-2">Kullanıcının teklifi bulunmamaktadır.</p>}
+                {user.bids.length === 0 && <p className="my-2">User's bid not found.</p>}
               </div>
             )}
 
             {activeTab === "lottery" && (
               <div id="lottery" className="mt-10">
-                <h2 className="text-xl font-semibold">Kullanıcının Katıldığı Piyangolar</h2>
+                <h2 className="text-xl font-semibold">User's joined lotteries</h2>
                 {user.lottery_users.map((lotteryUser) => (
                   <div key={lotteryUser.documentId} className="my-2 p-2 border rounded">
                     {lotteryUser.products.map((product) => (
                       <div key={product.documentId}>
                         <h2 className="text-lg font-medium">{product.title} (ID: {product.documentId})</h2>
-                        <p>Kayıt Tarihi: {new Date(lotteryUser.createdAt).toLocaleString()}</p>
+                        <p>Registration Date: {new Date(lotteryUser.createdAt).toLocaleString()}</p>
                       </div>
                     ))}
                   </div>
                 ))}
-                {user.lottery_users.length === 0 && <p className="my-2">Kullanıcının katıldığı piyango bulunmamaktadır.</p>}
+                {user.lottery_users.length === 0 && <p className="my-2">User's joined lotteries not found.</p>}
               </div>
             )}
           </div>
