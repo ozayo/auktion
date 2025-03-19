@@ -27,6 +27,12 @@
       "relation": "manyToOne",
       "target": "api::product.product",
       "inversedBy": "bids"
+    },
+    "user_activity": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::user-activity.user-activity",
+      "mappedBy": "bid"
     }
   }
 }

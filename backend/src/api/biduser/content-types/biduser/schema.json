@@ -41,6 +41,18 @@
       "relation": "oneToMany",
       "target": "api::lottery-user.lottery-user",
       "mappedBy": "biduser"
+    },
+    "user_activities": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::user-activity.user-activity",
+      "mappedBy": "biduser"
+    },
+    "user_sessions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::user-session.user-session",
+      "mappedBy": "biduser"
     }
   }
 }

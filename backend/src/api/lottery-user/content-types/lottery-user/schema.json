@@ -23,6 +23,12 @@
       "relation": "manyToMany",
       "target": "api::product.product",
       "inversedBy": "lottery_users"
+    },
+    "user_activity": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::user-activity.user-activity",
+      "mappedBy": "lottery_user"
     }
   }
 }

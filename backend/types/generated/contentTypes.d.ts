@@ -394,6 +394,10 @@ export interface ApiBidBid extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    user_activity: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::user-activity.user-activity'
+    >;
   };
 }
 
@@ -433,6 +437,14 @@ export interface ApiBiduserBiduser extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    user_activities: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::user-activity.user-activity'
+    >;
+    user_sessions: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::user-session.user-session'
+    >;
   };
 }
 
@@ -493,6 +505,10 @@ export interface ApiLotteryUserLotteryUser extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    user_activity: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::user-activity.user-activity'
+    >;
   };
 }
 
@@ -542,6 +558,95 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    user_activities: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::user-activity.user-activity'
+    >;
+  };
+}
+
+export interface ApiUserActivityUserActivity
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'user_activities';
+  info: {
+    displayName: 'User Activity';
+    pluralName: 'user-activities';
+    singularName: 'user-activity';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    activityDate: Schema.Attribute.DateTime & Schema.Attribute.Required;
+    activityType: Schema.Attribute.Enumeration<
+      ['bid', 'lottery_registration', 'lottery_registration_remove']
+    > &
+      Schema.Attribute.Required;
+    bid: Schema.Attribute.Relation<'oneToOne', 'api::bid.bid'>;
+    biduser: Schema.Attribute.Relation<'manyToOne', 'api::biduser.biduser'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    details: Schema.Attribute.JSON;
+    ipAddress: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::user-activity.user-activity'
+    > &
+      Schema.Attribute.Private;
+    lottery_user: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::lottery-user.lottery-user'
+    >;
+    product: Schema.Attribute.Relation<'manyToOne', 'api::product.product'>;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user_session: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::user-session.user-session'
+    >;
+    userAgent: Schema.Attribute.String;
+  };
+}
+
+export interface ApiUserSessionUserSession extends Struct.CollectionTypeSchema {
+  collectionName: 'user_sessions';
+  info: {
+    description: '';
+    displayName: 'User Session';
+    pluralName: 'user-sessions';
+    singularName: 'user-session';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    biduser: Schema.Attribute.Relation<'manyToOne', 'api::biduser.biduser'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    ipAddress: Schema.Attribute.String;
+    isActive: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::user-session.user-session'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    sessionEndDate: Schema.Attribute.DateTime;
+    sessionStartDate: Schema.Attribute.DateTime & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user_activities: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::user-activity.user-activity'
+    >;
+    userAgent: Schema.Attribute.String;
   };
 }
 
@@ -1059,6 +1164,8 @@ declare module '@strapi/strapi' {
       'api::category.category': ApiCategoryCategory;
       'api::lottery-user.lottery-user': ApiLotteryUserLotteryUser;
       'api::product.product': ApiProductProduct;
+      'api::user-activity.user-activity': ApiUserActivityUserActivity;
+      'api::user-session.user-session': ApiUserSessionUserSession;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

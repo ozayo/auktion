@@ -76,6 +76,12 @@
     "manual_lottery": {
       "type": "boolean",
       "default": false
+    },
+    "user_activities": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::user-activity.user-activity",
+      "mappedBy": "product"
     }
   }
 }
