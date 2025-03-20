@@ -36,7 +36,7 @@ export default function ProductCard({
   const remainingTime = calculateRemainingTime(ending_date);
 
   return (
-    <div className={`product-card-wrapper relative border bg-white hover:bg-gray-50 bidding`}>
+    <div className={`product-card-wrapper relative border border-gray-200 bg-white hover:bg-gray-50 bidding`}>
       {/* Favorites Button */}
       <div className="absolute top-3 right-3 z-10 hover:scale-110">
         <SaveToFavoritesButton

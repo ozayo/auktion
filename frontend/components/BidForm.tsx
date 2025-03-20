@@ -179,7 +179,7 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
             placeholder="Budbelopp:"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="border p-2 mr-2"
+            className="border border-gray-200 p-2 mr-2"
           />
           <button
             onClick={() => handleBid()}

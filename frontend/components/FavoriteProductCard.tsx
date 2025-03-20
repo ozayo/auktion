@@ -32,7 +32,7 @@ export default function FavoriteProductCard({
 
   const remainingTime = calculateRemainingTime(product.ending_date);
   const categoryName = getCategoryName(product.categories);
-  const cardClassName = `product-card-wrapper relative border bg-white hover:bg-gray-50 ${
+  const cardClassName = `product-card-wrapper relative border border-gray-200 bg-white hover:bg-gray-50 ${
     product.lottery_product ? 'lottery' : 'bidding'
   }`;
 

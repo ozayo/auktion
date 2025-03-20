@@ -33,7 +33,7 @@ const BidderList: React.FC<BidderListProps> = ({ bids }) => {
         </thead>
         <tbody>
           {bids.map((bid) => (
-          <tr key={bid.id} className="border-b py-2">
+          <tr key={bid.id} className="border-b border-gray-200 py-2">
             <td className="px-4 py-1">
               {bid.Amount} SEK
             </td>

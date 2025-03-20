@@ -47,7 +47,7 @@ const ProductImage: React.FC<ProductImageProps> = ({ mainPicture, gallery = [] }
         </div>
         {/* Main product image */}
         <div
-          className="cursor-pointer border overflow-hidden"
+          className="cursor-pointer border border-gray-200 overflow-hidden"
           onClick={() => setIsModalOpen(true)}
         >
           <Image
