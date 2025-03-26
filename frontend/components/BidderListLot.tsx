@@ -41,7 +41,7 @@ const BidderListLot: React.FC<BidderListLotProps> = ({ lotteryUsers }) => {
           </thead>
           <tbody>
             {sortedUsers.map((user) => (
-              <tr key={user.id} className="border-b py-2">
+              <tr key={user.id} className="border-b border-gray-200 py-2">
                 <td className="px-4 py-1">
                   {user.biduser?.Name || "Okänd användare"}
                 </td>

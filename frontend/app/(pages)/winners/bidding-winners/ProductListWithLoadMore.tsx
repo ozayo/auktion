@@ -64,7 +64,7 @@ export default function ProductListWithLoadMore({ products }: { products: Produc
       <div className="mt-4 mb-4 flex justify-end">
         <div className="flex items-center">
           <span className="mr-2 text-sm font-medium">Sortera:</span>
-          <div className="border border-gray-300 rounded-md overflow-hidden flex">
+          <div className="border border-gray-200 rounded-md overflow-hidden flex">
             <Link 
               href="?sort=newest" 
               className={`px-3 py-1 text-sm ${sortOrder === 'newest' ? 'bg-blue-100 font-medium' : 'bg-white'}`}
@@ -83,7 +83,7 @@ export default function ProductListWithLoadMore({ products }: { products: Produc
       
       <div className="mt-4 grid gap-6">
         {sortedProducts.slice(0, visibleProducts).map((product) => (
-          <div key={product.documentId} className="border bg-white py-4 px-6 hover:bg-zinc-50 overflow-hidden group">
+          <div key={product.documentId} className="border border-gray-200 bg-white py-4 px-6 hover:bg-zinc-50 overflow-hidden group">
             <h2 className="text-2xl font-bold mb-4">{product.title}</h2>
             <div className="flex flex-col sm:flex-row gap-4">
                 {/* Product Image */}
@@ -112,7 +112,7 @@ export default function ProductListWithLoadMore({ products }: { products: Produc
                     <p className='text-gray-700 text-sm'><strong>Utgångspris:</strong> {product.price || 0} SEK</p>
                     <p className='text-gray-700 text-sm'><strong>Antal bud:</strong> {product.totalBids || 0}</p>
                     <p className='text-gray-700 text-sm'><strong>Antal budgivare:</strong> {product.uniqueBidders || 0}</p>
-                    <div className='w-48 border-t pb-2 my-2'></div>
+                    <div className='w-48 border-t border-gray-200 pb-2 my-2'></div>
                         <Link href={`/product/${product.documentId}`} target="_blank" className='text-black inline-block text-sm hover:text-blue-600 font-black'>Gå till produkt ↗</Link>
                   </div>
                 </div>
