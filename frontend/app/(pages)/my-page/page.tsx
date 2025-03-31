@@ -9,6 +9,8 @@ import ActiveProductCard from "@/components/ActiveProductCard";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { LogoutButton } from "@/components/custom/logout-button";
+
 type ProductType = 'all' | 'auction' | 'lottery';
 type SortOption = 'createdAt:desc' | 'createdAt:asc' | 'ending_date:asc' | 
                   'ending_date:desc' | 'highestBid:desc' | 'highestBid:asc';
@@ -164,6 +166,7 @@ const MyNewPage = () => {
           </p>
           </>
         )}
+        <LogoutButton />
       </div>
       <div className="pt-2 pb-8">
         <Link
