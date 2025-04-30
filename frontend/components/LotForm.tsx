@@ -9,7 +9,7 @@ interface LotFormProps {
 }
 
 // Maksimum katılım
-const LOTTERY_LIMIT = 5;
+const LOTTERY_LIMIT = 5; // Kullanıcı başına maksimum katılım sayısı
 
 const LotForm: React.FC<LotFormProps> = ({
   productId,

@@ -30,7 +30,7 @@ export default function ProductPage({ onFavoriteChange }: ProductPageProps) {
     if (!documentId) return;
     try {
       const response = await fetchAPI(
-        `/products/${documentId}?populate[0]=bids.biduser&populate[1]=main_picture&populate[2]=gallery&populate[3]=categories&populate[4]=lottery_users.biduser`
+        `/products/${documentId}?populate[0]=bids.biduser&populate[1]=main_picture&populate[2]=gallery&populate[3]=categories&populate[4]=lottery_users.biduser&populate[5]=lottery_users.user`
       );
       const productData = response.data;
       if (productData) {
@@ -92,12 +92,12 @@ export default function ProductPage({ onFavoriteChange }: ProductPageProps) {
   let lotteryWinnerObj: { Name: string; Email: string } | null = null;
   if (isLotteryProduct && !remainingTime && lottery_winner) {
     const found = lottery_users?.find(
-      (item: any) => item.biduser?.documentId === lottery_winner
+      (item: any) => (item.biduser?.documentId === lottery_winner) || (item.user?.documentId === lottery_winner)
     );
     if (found) {
       lotteryWinnerObj = {
-        Name: found.biduser?.Name || "Okänd användare",
-        Email: found.biduser?.email || "Okänd e-post",
+        Name: found.user?.username || found.biduser?.Name || "Okänd användare",
+        Email: found.user?.email || found.biduser?.email || "Okänd e-post",
       };
     }
   }
