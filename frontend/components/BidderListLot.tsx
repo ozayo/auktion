@@ -1,13 +1,22 @@
-// components/BidderListLot.tsx
-
 import React from "react";
+
+// Yeni sistemde eğer user alanı varsa bu tipte olabilir:
+interface User {
+  id: number;
+  username?: string;
+  email?: string;
+}
+
+// Eskiden biduser alanı kullanılıyordu:
+interface BidUser {
+  Name: string;
+}
 
 interface LotteryUser {
   id: number;
   createdAt: string;
-  biduser?: {
-    Name: string;
-  };
+  biduser?: BidUser | null;
+  user?: User | null;  // Yeni kayıtlarda dolu olabilir
 }
 
 interface BidderListLotProps {
@@ -15,7 +24,7 @@ interface BidderListLotProps {
 }
 
 const BidderListLot: React.FC<BidderListLotProps> = ({ lotteryUsers }) => {
-  // Sort the users by createdAt in descending order so the newest one appears first.
+  // Kayıtları en yeni tarih en üstte olacak şekilde sıralıyoruz
   const sortedUsers = [...lotteryUsers].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
@@ -40,16 +49,24 @@ const BidderListLot: React.FC<BidderListLotProps> = ({ lotteryUsers }) => {
             </tr>
           </thead>
           <tbody>
-            {sortedUsers.map((user) => (
-              <tr key={user.id} className="border-b border-gray-200 py-2">
-                <td className="px-4 py-1">
-                  {user.biduser?.Name || "Okänd användare"}
-                </td>
-                <td className="px-4 py-1">
-                  {new Date(user.createdAt).toLocaleString()}
-                </td>
-              </tr>
-            ))}
+            {sortedUsers.map((lotUser) => {
+              // Yeni kayıtlarda lotUser.user -> username veya email
+              // Eski kayıtlarda lotUser.biduser -> Name
+              const displayName =
+                lotUser.user?.username ||
+                lotUser.user?.email ||
+                lotUser.biduser?.Name ||
+                "Okänd användare";
+
+              return (
+                <tr key={lotUser.id} className="border-b border-gray-200 py-2">
+                  <td className="px-4 py-1">{displayName}</td>
+                  <td className="px-4 py-1">
+                    {new Date(lotUser.createdAt).toLocaleString()}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

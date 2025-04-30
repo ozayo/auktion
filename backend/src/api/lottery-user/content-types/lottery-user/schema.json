@@ -29,6 +29,12 @@
       "relation": "oneToOne",
       "target": "api::user-activity.user-activity",
       "mappedBy": "lottery_user"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "lottery_users"
     }
   }
 }

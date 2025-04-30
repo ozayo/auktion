@@ -82,6 +82,12 @@
       "relation": "oneToMany",
       "target": "api::user-activity.user-activity",
       "mappedBy": "product"
+    },
+    "user_favorites": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::user-favorite.user-favorite",
+      "mappedBy": "product"
     }
   }
 }

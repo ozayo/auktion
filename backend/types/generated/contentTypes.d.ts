@@ -505,6 +505,10 @@ export interface ApiLotteryUserLotteryUser extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
     user_activity: Schema.Attribute.Relation<
       'oneToOne',
       'api::user-activity.user-activity'
@@ -562,6 +566,10 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
       'oneToMany',
       'api::user-activity.user-activity'
     >;
+    user_favorites: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::user-favorite.user-favorite'
+    >;
   };
 }
 
@@ -609,6 +617,39 @@ export interface ApiUserActivityUserActivity
       'api::user-session.user-session'
     >;
     userAgent: Schema.Attribute.String;
+  };
+}
+
+export interface ApiUserFavoriteUserFavorite
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'user_favorites';
+  info: {
+    displayName: 'User Favorite';
+    pluralName: 'user-favorites';
+    singularName: 'user-favorite';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::user-favorite.user-favorite'
+    > &
+      Schema.Attribute.Private;
+    product: Schema.Attribute.Relation<'manyToOne', 'api::product.product'>;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
   };
 }
 
@@ -1105,7 +1146,6 @@ export interface PluginUsersPermissionsUser
   };
   options: {
     draftAndPublish: false;
-    timestamps: true;
   };
   attributes: {
     blocked: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
@@ -1125,6 +1165,10 @@ export interface PluginUsersPermissionsUser
       'plugin::users-permissions.user'
     > &
       Schema.Attribute.Private;
+    lottery_users: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::lottery-user.lottery-user'
+    >;
     password: Schema.Attribute.Password &
       Schema.Attribute.Private &
       Schema.Attribute.SetMinMaxLength<{
@@ -1140,6 +1184,10 @@ export interface PluginUsersPermissionsUser
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    user_favorites: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::user-favorite.user-favorite'
+    >;
     username: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Unique &
@@ -1165,6 +1213,7 @@ declare module '@strapi/strapi' {
       'api::lottery-user.lottery-user': ApiLotteryUserLotteryUser;
       'api::product.product': ApiProductProduct;
       'api::user-activity.user-activity': ApiUserActivityUserActivity;
+      'api::user-favorite.user-favorite': ApiUserFavoriteUserFavorite;
       'api::user-session.user-session': ApiUserSessionUserSession;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

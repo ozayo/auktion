@@ -1,5 +1,10 @@
 // /utils/calculateRemainingTime.ts
 
+/**
+ * Verilen bitiş tarihine göre kalan süreyi hesaplar
+ * @param endDateStr - Bitiş tarihi string formatında
+ * @returns Kalan süre açıklaması veya null (eğer süre bitmişse)
+ */
 export const calculateRemainingTime = (endingDate: string): string | null => {
   const endDate = new Date(endingDate).getTime();
   const now = new Date().getTime();

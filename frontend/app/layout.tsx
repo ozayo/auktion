@@ -1,15 +1,10 @@
-"use client"
-
-import { useState } from "react";
 import localFont from "next/font/local";
 import "./globals.css";
 import Header from "@/components/Header";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { FavoritesProvider } from "@/contexts/FavoritesContext";
-import AuthModals from "@/components/AuthModals";
-import { CategoryProvider } from '@/contexts/CategoryContext';
 import Footer from "@/components/Footer";
 import { Inter } from 'next/font/google'
+import ClientProviders from "@/components/ClientProviders";
+import { getUserMeLoader } from "@/app/data/services/get-user-me-loader";
 
 // const geistSans = localFont({
 //   src: "./fonts/GeistVF.woff",
@@ -28,20 +23,13 @@ const inter = Inter({
 })
 
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // State and handlers for the login modal
-  const [isLoginModalOpen, setLoginModalOpen] = useState(false);
-  const [isSignUpModalOpen, setSignUpModalOpen] = useState(false);
-
-  const openLoginModal = () => setLoginModalOpen(true);
-  const closeLoginModal = () => setLoginModalOpen(false);
-
-  const openSignUpModal = () => setSignUpModalOpen(true);
-  const closeSignUpModal = () => setSignUpModalOpen(false);
+  // Server-side'da kullanıcı bilgilerini al
+  const initialUser = await getUserMeLoader();
 
   return (
     <html lang="en" className={`${inter.variable}`}>
@@ -52,32 +40,21 @@ export default function RootLayout({
       </head>
       {/* <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}> */}
       <body>
-        <AuthProvider>
-          <FavoritesProvider openLoginModal={openLoginModal}>
-            <CategoryProvider>
-              <header>
-                <div className="container mx-auto max-w-6xl px-4">
-                  <Header /> 
-                </div>
-              </header>
-              <main>
-                <div className="container mx-auto max-w-6xl px-4">
-                  {children}
-                </div>
-              </main>
-              <footer className="container mx-auto max-w-6xl px-4">
-                <Footer />
-              </footer>
-              <AuthModals
-                isLoginModalOpen={isLoginModalOpen}
-                closeLoginModal={closeLoginModal}
-                isSignUpModalOpen={isSignUpModalOpen}
-                closeSignUpModal={closeSignUpModal}
-                openSignUpModal={openSignUpModal}
-              />
-            </CategoryProvider>
-          </FavoritesProvider>
-        </AuthProvider>
+        <ClientProviders initialUser={initialUser}>
+          <header>
+            <div className="container mx-auto max-w-6xl px-4">
+              <Header /> 
+            </div>
+          </header>
+          <main>
+            <div className="container mx-auto max-w-6xl px-4">
+              {children}
+            </div>
+          </main>
+          <footer className="container mx-auto max-w-6xl px-4">
+            <Footer />
+          </footer>
+        </ClientProviders>
       </body>
     </html>
   );

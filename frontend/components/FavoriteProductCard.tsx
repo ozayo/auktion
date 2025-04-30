@@ -1,8 +1,17 @@
+"use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import SaveToFavoritesButton from "@/components/SaveToFavoritesButton";
+import LotteryRegistrationButton from "./custom/lottery-registration-button";
+import BiddingButton from "./custom/bidding-button";
+import Countdown from "./Countdown";
+import { formatCurrency } from "@/lib/utils";
 import { API_URL } from "@/lib/api";
 import { calculateRemainingTime } from "@/utils/calculateRemainingTime";
-import SaveToFavoritesButton from "./SaveToFavoritesButton";
 import { Product } from "@/types";
+import { useCategories } from "@/contexts/CategoryContext";
 
 interface FavoriteProductCardProps {
   product: Product & {
@@ -11,29 +20,87 @@ interface FavoriteProductCardProps {
     userBid?: number;
     type: 'bidding' | 'lottery';
   };
-  onFavoriteChange?: () => void;
-  
+  onFavoriteChange?: (documentId?: string) => void;
 }
 
-const getCategoryName = (categories: Product['categories']) => {
-  if (!categories || categories.length === 0) {
-    return null;
-  }
-  return categories[0]?.category_name;
-};
-
-export default function FavoriteProductCard({
+const FavoriteProductCard: React.FC<FavoriteProductCardProps> = ({
   product,
   onFavoriteChange,
-}: FavoriteProductCardProps) {
-  const imageUrl = product.main_picture?.url
-    ? `${API_URL}${product.main_picture.url}`
-    : "/placeholder.png";
+}) => {
+  const { categories: allCategories } = useCategories();
+  const {
+    id,
+    documentId,
+    title,
+    lottery_product,
+    price,
+    ending_date,
+    main_picture,
+    categories,
+    isRegistered,
+    highestBid,
+    userBid,
+    type
+  } = product;
 
-  const remainingTime = calculateRemainingTime(product.ending_date);
-  const categoryName = getCategoryName(product.categories);
+  const [loading, setLoading] = useState(false);
+  const endDate = new Date(ending_date);
+  const hasEnded = new Date() > endDate;
+  
+  // Resim URL'sini hazırla - farklı veri yapılarını ele al
+  let imageUrl = "/placeholder.jpg";
+  try {
+    if (main_picture) {
+      const mp = main_picture as any;
+      if (mp.data?.attributes?.url) {
+        imageUrl = `${API_URL}${mp.data.attributes.url}`;
+      } else if (mp.data?.attributes?.formats?.thumbnail?.url) {
+        imageUrl = `${API_URL}${mp.data.attributes.formats.thumbnail.url}`;
+      } else if (typeof mp === 'object' && 'url' in mp) {
+        imageUrl = `${API_URL}${mp.url}`;
+      } else if (typeof mp === 'string') {
+        imageUrl = mp.startsWith('http') ? mp : `${API_URL}${mp}`;
+      }
+    }
+  } catch (error) {
+    console.error("Error processing image URL:", error);
+    imageUrl = "/placeholder.jpg";
+  }
+  
+  // Kategori eşleştirme mantığı
+  let productCategories: any[] = [];
+  
+  // Debug için API'den gelen tüm ürün bilgilerini konsola yazdıralım
+  console.log("Product full data:", product);
+  console.log("Product categories raw:", product?.categories);
+  
+  try {
+    // Eğer categories bir array ise (eski format)
+    if (Array.isArray(categories) && categories.length > 0) {
+      productCategories = categories;
+    } 
+    // Eğer categories.data bir array ise (Strapi v5 format)
+    else if ((categories as any)?.data && Array.isArray((categories as any).data)) {
+      // Her bir categori için ID'yi çıkart
+      const categoryIds = (categories as any).data.map((cat: any) => cat.id);
+      // CategoryContext'ten ID'lere göre kategori bilgilerini bul
+      productCategories = allCategories.filter(cat => categoryIds.includes(cat.id));
+    }
+    
+    console.log("Matched product categories:", productCategories);
+  } catch (error) {
+    console.error("Error matching categories:", error);
+  }
+  
+  const handleFavoriteChange = () => {
+    if (typeof onFavoriteChange === "function") {
+      onFavoriteChange(documentId || String(id));
+    }
+  };
+
+  const remainingTime = calculateRemainingTime(ending_date);
   const cardClassName = `product-card-wrapper relative border border-gray-200 bg-white hover:bg-gray-50 ${
-    product.lottery_product ? 'lottery' : 'bidding'
+    lottery_product ? 'lottery' : 'bidding'
   }`;
 
   return (
@@ -41,44 +108,46 @@ export default function FavoriteProductCard({
       {/* Favorites Button */}
       <div className="absolute top-3 right-3 z-10 hover:scale-110">
         <SaveToFavoritesButton
-          productId={product.id}
-          onFavoriteChange={onFavoriteChange}
+          productId={id}
+          onFavoriteChange={handleFavoriteChange}
         />
       </div>
     
       {/* Categories */}
       <div className="absolute top-4 left-4 flex gap-2 z-10">
-        {categoryName ? (
-          <Link
-            href={`/category/${product.categories?.[0]?.slug}`}
-            className="hover:opacity-90 transition-opacity"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <span className="text-white rounded-full bg-blue-950 py-1 px-4 text-sm inline-block">
-              {categoryName}
-            </span>
-          </Link>
+        {productCategories.length > 0 ? (
+          productCategories.map((category: any) => (
+            <Link
+              href={`/category/${category.slug}`}
+              key={category.id}
+              className="hover:opacity-90 transition-opacity"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className="text-white rounded-full bg-blue-950 py-1 px-4 text-sm inline-block">
+                {category.category_name}
+              </span>
+            </Link>
+          ))
         ) : (
           <span className="text-gray-500 text-sm">No categories</span>
         )}
       </div>
 
-
       {/* Product Link */}
-      <Link className="block p-4" href={`/product/${product.documentId}`}>
+      <Link className="block p-4" href={`/product/${documentId || id}`}>
         <div className="product-card">
           {/* Product Image */}
-          <div className="product-images relative">
+          <div className="product-images relative h-48 w-full">
             <img
               src={imageUrl}
-              alt={product.title}
-              className="w-full h-48 object-cover mb-2"
+              alt={title || "Product image"}
+              className="w-full h-full object-cover mb-2"
             />
           </div>        
           <div className="product-details flex flex-col">
             {/* Product Title */}
             <div className="title min-h-16">
-              <h2 className="text-xl font-semibold">{product.title}</h2>
+              <h2 className="text-xl font-semibold">{title}</h2>
             </div>
 
             {/* Middle Section */}
@@ -88,14 +157,14 @@ export default function FavoriteProductCard({
                 <div className="flex flex-col text-center">
                   <p className="text-gray-600 text-xs">Utgångspris</p>
                   <p className="text-gray-900 font-bold text-sm">
-                    {product.price ?? 0} SEK
+                    {formatCurrency(price ?? 0)}
                   </p>
                 </div>
 
-                {product.lottery_product ? (
+                {lottery_product ? (
                   <div className="flex flex-col text-center">
                     <p className="text-gray-600 text-xs">Status</p>
-                    {product.isRegistered ? (
+                    {isRegistered ? (
                       <p className="text-green-600 font-semibold text-sm">
                         Du har registrerats!
                       </p>
@@ -110,13 +179,13 @@ export default function FavoriteProductCard({
                     <div className="flex flex-col text-center">
                       <p className="text-gray-600 text-xs">Ledande bud</p>
                       <p className="text-gray-900 font-bold text-sm">
-                        {product.highestBid ? `${product.highestBid} SEK` : "Inga bud"}
+                        {highestBid ? formatCurrency(highestBid) : "Inga bud"}
                       </p>
                     </div>
                     <div className="flex flex-col text-center">
                       <p className="text-gray-600 text-xs">Mitt högsta bud</p>
                       <p className="text-gray-900 font-bold text-sm">
-                        {product.userBid ? `${product.userBid} SEK` : "-"}
+                        {userBid ? formatCurrency(userBid) : "-"}
                       </p>
                     </div>
                   </>
@@ -128,7 +197,7 @@ export default function FavoriteProductCard({
                 {remainingTime ? (
                   <>
                     <p className="text-gray-600 text-xs">
-                      {product.lottery_product ? 'Lotteri avslutas' : 'Budgivning avslutas'}
+                      {lottery_product ? 'Lotteri avslutas' : 'Budgivning avslutas'}
                     </p>
                     <p className="text-gray-800 font-bold text-lg">
                       {remainingTime}
@@ -136,7 +205,7 @@ export default function FavoriteProductCard({
                   </>
                 ) : (
                   <p className="text-red-500">
-                    {product.lottery_product ? 'Lotteriet avslutades' : 'Budgivningen avslutades'}
+                    {lottery_product ? 'Lotteriet avslutades' : 'Budgivningen avslutades'}
                   </p>
                 )}
               </div>
@@ -146,4 +215,6 @@ export default function FavoriteProductCard({
       </Link>
     </div>
   );
-} 
+};
+
+export default FavoriteProductCard; 

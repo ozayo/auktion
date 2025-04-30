@@ -1,50 +1,87 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-  
-} from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-interface AuthContextProps {
-  isLoggedIn: boolean;
-  userEmail: string;
-  
-  userName: string | null; // Allow name to be optional
-  logIn: (email: string, name?: string) => void; // Make name optional
-  logOut: () => void;
+// Strapi kullanıcı tipi
+interface User {
+  id: number;
+  documentId: string;
+  username: string;
+  email: string;
+  // ve diğer Strapi user alanları
 }
 
-const AuthContext = createContext<AuthContextProps | undefined>(undefined);
+interface AuthContextProps {
+  user: User | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+}
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userEmail, setUserEmail] = useState("");
-  const [userName, setUserName] = useState<string | null>(null); // Allow null for name
+// Server-side'da veri gelene kadar varsayılan değerler
+const defaultAuthContext: AuthContextProps = {
+  user: null,
+  isLoading: true,
+  isAuthenticated: false
+};
 
-  const logIn = (email: string, name?: string) => {
-    setIsLoggedIn(true);
-    setUserEmail(email);
-    setUserName(name || null); // Default to null if name is not provided
+const AuthContext = createContext<AuthContextProps>(defaultAuthContext);
+
+interface AuthProviderProps {
+  children: ReactNode;
+  initialUser?: {
+    ok: boolean;
+    data: User | null;
+    error: any;
   };
+}
 
-  const logOut = () => {
-    // Clear auth state
-    setIsLoggedIn(false);
-    setUserEmail("");
-    setUserName(null);
+export const AuthProvider = ({ children, initialUser }: AuthProviderProps) => {
+  // Eğer Server Component'ten initialUser geldiyse, bu değeri kullan
+  const [user, setUser] = useState<User | null>(initialUser?.data || null);
+  const [isLoading, setIsLoading] = useState(!initialUser);
+  const [isAuthenticated, setIsAuthenticated] = useState(initialUser?.ok || false);
 
-    // Clear persistent cookie
-    document.cookie =
-      "userDocumentId=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-    console.log("Logged out: Cookie cleared");
-  };
+  useEffect(() => {
+    // Eğer initialUser zaten server-side'dan geldiyse, tekrar istek atma
+    if (initialUser) {
+      setUser(initialUser.data);
+      setIsAuthenticated(initialUser.ok);
+      setIsLoading(false);
+      return;
+    }
 
+    // Server-side'dan initialUser gelmezse client-side'da bir istek at
+    const fetchUser = async () => {
+      try {
+        const response = await fetch('/api/auth/me');
+        const data = await response.json();
+
+        if (data.ok && data.data) {
+          setUser(data.data);
+          setIsAuthenticated(true);
+        } else {
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.error("Kullanıcı bilgileri alınırken hata:", error);
+        setUser(null);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [initialUser]);
+
+  // Debug için
+  useEffect(() => {
+    console.log("AuthContext state:", { isAuthenticated, isLoading, user });
+  }, [isAuthenticated, isLoading, user]);
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, userEmail, userName, logIn, logOut }}>
+    <AuthContext.Provider value={{ user, isLoading, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );

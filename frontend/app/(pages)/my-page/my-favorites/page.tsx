@@ -1,110 +1,77 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { API_URL } from "@/lib/api";
-import { useFavorites } from "@/contexts/FavoritesContext";
-import ProductCard from "@/components/ProductCard";
+import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import FavoriteProductCard from "@/components/FavoriteProductCard";
+import { getStrapiURL } from "@/lib/utils";
 
 type ProductType = 'all' | 'auction' | 'lottery';
 type SortOption = 'createdAt:desc' | 'createdAt:asc';
 
-const Favourites: React.FC = () => {
-  const { userDocumentId, userEmail, userName } = useFavorites();
-  const [allFavoriteProducts, setAllFavoriteProducts] = useState<any[]>([]);
+const MyFavorites: React.FC = () => {
+  const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const [favoriteProducts, setFavoriteProducts] = useState<any[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [message, setMessage] = useState<string>("");
-  const pathname = usePathname()
+  const pathname = usePathname();
   const [productType, setProductType] = useState<ProductType>('all');
   const [sortBy, setSortBy] = useState<SortOption>('createdAt:desc');
   const [hideCompleted, setHideCompleted] = useState<boolean>(true);
 
   useEffect(() => {
-    const fetchFavoritesAndUserBids = async () => {
-      if (!userDocumentId || !userEmail) {
-        setAllFavoriteProducts([]);
-        setFilteredProducts([]);
-        setMessage("Du har inga favoriter just nu.");
+    const fetchFavorites = async () => {
+      if (!isAuthenticated || !user) {
+        setMessage("Du måste logga in för att se dina favoriter.");
         setLoading(false);
         return;
       }
 
       try {
         setLoading(true);
-
-        // Hämta favoriter
-        const favouritesResponse = await fetch(
-          `${API_URL}/api/bidusers/${userDocumentId}?populate[favourites][populate][main_picture]=true&populate[favourites][populate][bids]=true&populate[favourites][populate][categories]=true&populate[favourites][populate][lottery_users][populate][biduser]=true`
-        );
-        const favouritesData = await favouritesResponse.json();
-        const favourites = favouritesData.data.favourites;
-
-        // Hämta alla bud för användaren
-        const bidsResponse = await fetch(
-          `${API_URL}/api/bids?filters[biduser][email][$eq]=${encodeURIComponent(
-            userEmail
-          )}&populate=product`
-        );
-        const bidsData = await bidsResponse.json();
-        const userBids = bidsData.data;
-
-        // Matcha userBids med favourites
-        const enrichedProducts = favourites.map((product: any) => {
-          if (product.lottery_product) {
-            const isUserRegistered = product.lottery_users?.some(
-              (user: any) => user.biduser?.email === userEmail
-            );
-
-            return {
-              ...product,
-              isRegistered: isUserRegistered
-            };
-          } else {
-            // Bidding ürünü için mevcut mantık
-            const highestBid = product.bids?.reduce(
-              (max: number, bid: any) => Math.max(max, bid.Amount),
-              0
-            ) || null;
-
-            const userBidsForProduct = userBids
-              .filter((bid: any) => bid.product.id === product.id)
-              .map((bid: any) => bid.Amount);
-
-            const userBid = userBidsForProduct.length > 0
-              ? Math.max(...userBidsForProduct)
-              : null;
-
-            return {
-              ...product,
-              highestBid,
-              userBid,
-            };
-          }
-        });
-
-        setAllFavoriteProducts(enrichedProducts);
-        setFilteredProducts(enrichedProducts);
-        setMessage(
-          enrichedProducts.length === 0 ? "Du har inga favoriter just nu." : ""
-        );
+        
+        // Kullanıcı kimliği
+        const userId = user.id;
+        
+        // Doğrudan Next.js API route'unu kullanarak token sorununu atlayalım
+        const apiUrl = `/api/favorites`;
+        
+        const response = await fetch(apiUrl);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch favorites: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (!data.ok || !data.data || !Array.isArray(data.data)) {
+          throw new Error(data.error || "Unexpected API response format");
+        }
+        
+        // API'den gelen favori verilerini düzenle
+        setFavoriteProducts(data.data);
+        setFilteredProducts(data.data);
+        setMessage(data.data.length === 0 ? "Du har inga favoriter just nu." : "");
       } catch (error) {
-        console.error("Error fetching data:", error);
-        setMessage("Kunde inte hämta favoriterna.");
+        console.error("Error fetching favorites:", error);
+        setMessage("Kunde inte hämta favoriterna. " + (error instanceof Error ? error.message : ""));
       } finally {
         setLoading(false);
       }
     };
+    
+    if (!isAuthLoading) {
+      fetchFavorites();
+    }
+  }, [isAuthenticated, user, isAuthLoading]);
 
-    fetchFavoritesAndUserBids();
-  }, [userDocumentId, userEmail]);
-
+  // Filtreleme ve sıralama
   useEffect(() => {
-    if (!allFavoriteProducts.length) return;
+    if (!favoriteProducts.length) return;
 
-    let filtered = [...allFavoriteProducts];
+    let filtered = [...favoriteProducts];
 
     // Ürün tipine göre filtrele
     if (productType !== 'all') {
@@ -130,32 +97,44 @@ const Favourites: React.FC = () => {
     });
 
     setFilteredProducts(filtered);
-  }, [allFavoriteProducts, productType, sortBy, hideCompleted]);
+  }, [favoriteProducts, productType, sortBy, hideCompleted]);
 
-  const handleFavoriteChange = (productId: number) => {
-    setFilteredProducts((prevFavorites) =>
-      prevFavorites.filter((product) => product.id !== productId)
-    );
-    if (filteredProducts.length === 1) {
-      setMessage("Du har inga favoriter just nu."); // Uppdatera meddelandet om det var den sista favoriten
-    }
+  // Favori değişikliğini işle (kaldırıldığında)
+  const handleFavoriteChange = (productDocumentId: string) => {
+    // Geçici olarak ürünü kaldırıyoruz, ancak bunu hemen yapmak yerine
+    // birkaç milisaniye gecikmeli olarak yapalım, böylece animasyon ile görünüm değişimini görebiliriz
+    setTimeout(() => {
+      setFilteredProducts(prevProducts => 
+        prevProducts.filter(product => product.documentId !== productDocumentId)
+      );
+      // Favorilerden de çıkar
+      setFavoriteProducts(prevProducts => 
+        prevProducts.filter(product => product.documentId !== productDocumentId)
+      );
+      // Son favori de çıkarıldıysa mesajı güncelle
+      if (filteredProducts.length <= 1) {
+        setMessage("Du har inga favoriter just nu.");
+      }
+    }, 500);
   };
 
   return (
     <div className="py-4">
-            <div className="mb-6">
+      <div className="mb-6">
         <h1 className="text-2xl font-bold mb-4">Min Sida | favoriter</h1>
-        {userName && (
+        {user?.username && (
           <>
-          <p className="text-lg pb-1">
-            Hej {userName}, välkomna! 
-          </p>
-          <p className=" text-base ">
-            {userEmail}    
-          </p>
+            <p className="text-lg pb-1">
+              Hej {user.username}, välkomna! 
+            </p>
+            <p className="text-base">
+              {user.email}    
+            </p>
           </>
         )}
       </div>
+      
+      {/* Navigation Links */}
       <div className="pt-2 pb-8">
         <Link
           className={`text-blue-500 rounded-full bg-gray-100 py-1 px-5 mx-1 mb-1 inline-block hover:text-white hover:bg-blue-950 hover:text-white" [&.active]:bg-blue-950 [&.active]:text-white ${pathname === '/my-page' ? 'active' : ''}`}
@@ -173,6 +152,8 @@ const Favourites: React.FC = () => {
           Mina Favoriter
         </Link>
       </div>
+      
+      {/* Filters */}
       <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6 items-start">
         <div className="flex flex-col">
           <div className="flex flex-row space-x-4">
@@ -187,7 +168,6 @@ const Favourites: React.FC = () => {
               />
               <span className="ml-2">Alla objekt</span>
             </label>
-            <br />
             <label className="inline-flex items-center">
               <input
                 type="radio"
@@ -199,7 +179,6 @@ const Favourites: React.FC = () => {
               />
               <span className="ml-2">Auktion</span>
             </label>
-            <br />
             <label className="inline-flex items-center">
               <input
                 type="radio"
@@ -238,22 +217,23 @@ const Favourites: React.FC = () => {
           </select>
         </div>
       </div>
-      <div>
-        {loading && <p>Laddar...</p>}
-        {!loading && filteredProducts.length === 0 && <p>{message}</p>}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredProducts.map((product) => (
-            <FavoriteProductCard
-              key={product.id}
-              product={product}
-              onFavoriteChange={() => handleFavoriteChange(product.id)}
-            />
-          ))}
-        </div>
+      
+      {/* Loading & Messages */}
+      {loading && <p className="py-4">Laddar dina favoriter...</p>}
+      {!loading && filteredProducts.length === 0 && <p className="py-4">{message}</p>}
+      
+      {/* Product Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredProducts.map((product) => (
+          <FavoriteProductCard
+            key={product.documentId || product.id}
+            product={product}
+            onFavoriteChange={(docId) => docId && handleFavoriteChange(docId)}
+          />
+        ))}
       </div>
     </div>
   );
 };
 
-export default Favourites;
+export default MyFavorites;

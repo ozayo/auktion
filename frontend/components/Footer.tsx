@@ -14,7 +14,6 @@ const Footer: React.FC = () => {
           <Link className='font-light text-xs hover:text-blue-700 mr-1 py-1 px-2 inline-block' href="/produkter">Produkter</Link>
           <Link className='font-light text-xs hover:text-blue-700 mr-1 py-1 px-2 inline-block ' href="/om-project">Om project</Link>
           <Link className='font-light text-xs hover:text-blue-700 mr-1 py-1 px-2 inline-block ' href="/my-page">Min Sida</Link>
-          <Link className='font-light text-xs hover:text-blue-700 mr-1 py-1 px-2 inline-block ' href="/my_page">Old Min Sida</Link>
           <Link className='font-light text-xs hover:text-blue-700 mr-1 py-1 px-2 inline-block ' href="/login">Admin login</Link>
         </div>
         <div className='flex flex-row gap-3 items-center'>
