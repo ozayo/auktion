@@ -23,6 +23,13 @@ enum MessageType {
   WARNING = "warning"
 }
 
+// Teklif onay durumları için enum
+enum BidConfirmationType {
+  REASONABLE_HIGH = "reasonable_high", // Yüksek ama makul teklif (min teklif x 5)
+  ABNORMAL_HIGH = "abnormal_high",     // Anormal derecede yüksek teklif (min teklif x 10)
+  ALREADY_HIGHEST = "already_highest"  // Kullanıcı zaten en yüksek teklifi vermişse
+}
+
 const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids, currentHighestBid = 0, startingPrice = 0 }) => {
   const [amount, setAmount] = useState("");
   const [message, setMessage] = useState("");
@@ -37,6 +44,8 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids, currentHighes
   // Modal states
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [tempBidAmount, setTempBidAmount] = useState<number | null>(null);
+  const [confirmationType, setConfirmationType] = useState<BidConfirmationType>(BidConfirmationType.REASONABLE_HIGH);
+  const [minimumBid, setMinimumBid] = useState<number>(0);
 
   const { user, isAuthenticated } = useAuth();
   const isLoggedIn = isAuthenticated && !!user;
@@ -118,11 +127,34 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids, currentHighes
     }
 
     const bidAmount = parseFloat(amount);
-    if (!confirmed && bidAmount > 20000) {
-      // Threshold for unreasonably high bid
-      setTempBidAmount(bidAmount);
-      setShowConfirmationModal(true);
-      return;
+    const minRequiredBid = Math.max(highestBid + MIN_BID_INCREMENT, startingPrice);
+    setMinimumBid(minRequiredBid);
+    
+    // Eğer kullanıcı henüz onaylamamışsa ve teklif belirli eşikleri aşıyorsa onay göster
+    if (!confirmed) {
+      // Kullanıcı zaten en yüksek teklifi vermişse
+      if (userLastBid !== null && userLastBid === highestBid && bidAmount > highestBid) {
+        setConfirmationType(BidConfirmationType.ALREADY_HIGHEST);
+        setTempBidAmount(bidAmount);
+        setShowConfirmationModal(true);
+        return;
+      }
+      // Diğer onay durumları
+      // Anormal derecede yüksek teklif: minimum teklifin 10 katı veya üzeri
+      if (bidAmount >= minRequiredBid * 10) {
+        setConfirmationType(BidConfirmationType.ABNORMAL_HIGH);
+        setTempBidAmount(bidAmount);
+        setShowConfirmationModal(true);
+        return;
+      }
+      // Yüksek ama makul teklif: minimum teklif + min bid increment 5 katı veya üzeri (yani 250 kr ve uzeri)
+      else if (bidAmount >= minRequiredBid + (MIN_BID_INCREMENT*5)) {
+        setConfirmationType(BidConfirmationType.REASONABLE_HIGH);
+        setTempBidAmount(bidAmount);
+        setShowConfirmationModal(true);
+        return;
+      }
+      // Normal teklif: onay gerekmez
     }
 
     setIsSubmitting(true); // Disable button
@@ -291,8 +323,25 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids, currentHighes
           <div className="bg-white px-8 py-6 rounded-lg shadow-lg">
             <h3 className="text-lg font-bold">Bekräfta ditt bud</h3>
             <div className="mt-4">
-              <p>Är du säker på att du vill bjuda {tempBidAmount} SEK?</p>
-              <p>Din plånbok kommer tacka dig om du låter bli.</p>
+              {confirmationType === BidConfirmationType.ALREADY_HIGHEST ? (
+                <>
+                  <p className="text-orange-600 font-semibold">Du har redan det högsta budet!</p>
+                  <p>Ditt nuvarande bud är <strong>{userLastBid} SEK</strong>.</p>
+                  <p>Är du säker på att du vill lägga ett nytt bud på <strong>{tempBidAmount} SEK</strong>?</p>
+                </>
+              ) : confirmationType === BidConfirmationType.REASONABLE_HIGH ? (
+                <>
+                  <p>Du är på väg att lägga ett bud som är betydligt högre än minimum ({minimumBid} SEK).</p>
+                  <p>Är du säker på att du vill bjuda <strong>{tempBidAmount} SEK</strong>?</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-red-600 font-semibold">Varning: Extremt högt bud!</p>
+                  <p>Du är på väg att lägga ett bud som är <strong>10 gånger högre</strong> än minimum ({minimumBid} SEK).</p>
+                  <p>Är du verkligen säker på att du vill bjuda <strong>{tempBidAmount} SEK</strong>?</p>
+                  <p className="text-gray-600 italic mt-2">Din plånbok kommer tacka dig om du tänker efter en gång till.</p>
+                </>
+              )}
             </div>
             <div className="mt-6 flex justify-end space-x-4">
               <button
@@ -306,7 +355,13 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids, currentHighes
                   setShowConfirmationModal(false);
                   handleBid(true); // Proceed with bid
                 }}
-                className="px-4 py-2 bg-green-500 text-white rounded-lg"
+                className={`px-4 py-2 text-white rounded-lg ${
+                  confirmationType === BidConfirmationType.ABNORMAL_HIGH 
+                    ? 'bg-red-500 hover:bg-red-600' 
+                    : confirmationType === BidConfirmationType.ALREADY_HIGHEST
+                    ? 'bg-orange-500 hover:bg-orange-600'
+                    : 'bg-green-500 hover:bg-green-600'
+                }`}
               >
                 Bekräfta
               </button>
