@@ -76,7 +76,6 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids, currentHighes
 
   useEffect(() => {
     const suggestedBid = Math.max(currentHighestBid + MIN_BID_INCREMENT, startingPrice);
-    setAmount(suggestedBid.toString());
     setIsLoading(false);
   }, [currentHighestBid, startingPrice]);
 
@@ -206,11 +205,10 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids, currentHighes
       // Geçici başarı mesajını set et - 5 saniye sonra kaybolacak
       setTemporarySuccessMessage("Ditt bud har registrerats!");
       setUserLastBid(bidAmount);
-      setAmount("");
       
       // Successful bid - update the local highest bid and suggested amount
       setHighestBid(bidAmount);
-      setAmount((bidAmount + MIN_BID_INCREMENT).toString());
+      setAmount("");
       
       if (refreshBids) {
         // Veriler yenilenirken formu kısa süreliğine devre dışı bırak
@@ -278,7 +276,7 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids, currentHighes
             ) : (
               <input
                 type="number"
-                placeholder="Budbelopp:"
+                placeholder={`${Math.max(highestBid + MIN_BID_INCREMENT, startingPrice)} SEK eller mer`}
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 className="border border-gray-200 p-2 w-2/3"
