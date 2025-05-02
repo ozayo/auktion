@@ -76,6 +76,12 @@
       "relation": "oneToMany",
       "target": "api::lottery-user.lottery-user",
       "mappedBy": "user"
+    },
+    "bids": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::bid.bid",
+      "mappedBy": "user"
     }
   }
 }

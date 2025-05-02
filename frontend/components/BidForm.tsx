@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { fetchAPI } from "../lib/api";
 import { useAuth } from "@/contexts/AuthContext";
-import AuthModals from "./AuthModals";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface BidFormProps {
   productId: string;
@@ -13,23 +14,19 @@ interface BidFormProps {
 const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
   const [amount, setAmount] = useState("");
   const [message, setMessage] = useState("");
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   // Modal states
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [tempBidAmount, setTempBidAmount] = useState<number | null>(null);
 
-  const { isLoggedIn, userEmail, userName } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const isLoggedIn = isAuthenticated && !!user;
 
-  const openLoginModal = () => setIsLoginModalOpen(true);
-  const closeLoginModal = () => setIsLoginModalOpen(false);
-  const openSignUpModal = () => {
-    setIsLoginModalOpen(false);
-    setIsSignUpModalOpen(true);
+  const redirectToLogin = () => {
+    router.push('/signin');
   };
-  const closeSignUpModal = () => setIsSignUpModalOpen(false);
 
   useEffect(() => {
     let timeout: NodeJS.Timeout | null = null;
@@ -48,7 +45,7 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
   }, [isSubmitting]);
 
   const handleBid = async (confirmed = false) => {
-    if (!isLoggedIn) {
+    if (!isLoggedIn || !user) {
       setMessage("Du måste vara inloggad för att bjuda.");
       return;
     }
@@ -68,29 +65,6 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
     setIsSubmitting(true); // Disable button
 
     try {
-      let biduserDocumentId;
-
-      // Fetch or create the biduser
-      const bidusersData = await fetchAPI(
-        `/bidusers?filters[email][$eq]=${encodeURIComponent(userEmail)}`
-      );
-
-      if (bidusersData.data.length > 0) {
-        biduserDocumentId = bidusersData.data[0].documentId;
-      } else {
-        const newUser = await fetchAPI("/bidusers", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            data: {
-              email: userEmail,
-              Name: userName,
-            },
-          }),
-        });
-        biduserDocumentId = newUser.data.documentId;
-      }
-
       // Fetch product details
       const productLookupUrl = `/products?filters[id][$eq]=${productId}`;
       const productLookupData = await fetchAPI(productLookupUrl);
@@ -144,7 +118,7 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
         body: JSON.stringify({
           data: {
             Amount: bidAmount,
-            biduser: biduserDocumentId,
+            user: user.documentId,
             product: documentId,
           },
         }),
@@ -158,6 +132,8 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
     } catch (error) {
       console.error("Error in handleBid:", error);
       setMessage("Ett fel har uppstått.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -165,12 +141,18 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
     <div className="mt-8">
       <h2 className="text-xl font-semibold">Lägg ett bud</h2>
       {!isLoggedIn ? (
-        <button
-          onClick={openLoginModal}
-          className="bg-blue-500 text-white px-4 py-2"
-        >
-          Logga in
-        </button>
+        <div>
+          <p className="mb-2">Du måste vara inloggad för att lägga bud.</p>
+          <button
+            onClick={redirectToLogin}
+            className="bg-blue-500 text-white px-4 py-2 hover:bg-blue-600 rounded transition"
+          >
+            Logga in
+          </button>
+          <Link href="/signup" className="ml-4 text-blue-500 hover:underline">
+            Skapa konto
+          </Link>
+        </div>
       ) : (
         <div>
           <p>Budbelopp:</p>
@@ -222,14 +204,6 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
           </div>
         </div>
       )}
-
-      <AuthModals
-        isLoginModalOpen={isLoginModalOpen}
-        closeLoginModal={closeLoginModal}
-        isSignUpModalOpen={isSignUpModalOpen}
-        closeSignUpModal={closeSignUpModal}
-        openSignUpModal={openSignUpModal}
-      />
     </div>
   );
 };

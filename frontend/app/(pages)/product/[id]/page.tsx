@@ -30,7 +30,7 @@ export default function ProductPage({ onFavoriteChange }: ProductPageProps) {
     if (!documentId) return;
     try {
       const response = await fetchAPI(
-        `/products/${documentId}?populate[0]=bids.biduser&populate[1]=main_picture&populate[2]=gallery&populate[3]=categories&populate[4]=lottery_users.biduser&populate[5]=lottery_users.user`
+        `/products/${documentId}?populate[0]=bids.biduser&populate[1]=main_picture&populate[2]=gallery&populate[3]=categories&populate[4]=lottery_users.biduser&populate[5]=lottery_users.user&populate[6]=bids.user`
       );
       const productData = response.data;
       if (productData) {
@@ -78,7 +78,9 @@ export default function ProductPage({ onFavoriteChange }: ProductPageProps) {
 
   const totalBids = sortedBids.length;
   const highestBid = sortedBids.length > 0 ? sortedBids[0].Amount : null;
-  const highestBidder = sortedBids.length > 0 ? sortedBids[0].biduser?.Name : "Unknown";
+  const highestBidder = sortedBids.length > 0 
+    ? sortedBids[0].user?.username || sortedBids[0].biduser?.Name || "Unknown" 
+    : "Unknown";
 
   const remainingTime = calculateRemainingTime(ending_date);
   const formattedEndingDate = dateFormatShort(ending_date);

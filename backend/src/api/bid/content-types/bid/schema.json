@@ -33,6 +33,12 @@
       "relation": "oneToOne",
       "target": "api::user-activity.user-activity",
       "mappedBy": "bid"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "bids"
     }
   }
 }
