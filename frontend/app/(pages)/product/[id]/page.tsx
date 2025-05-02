@@ -192,7 +192,12 @@ export default function ProductPage({ onFavoriteChange }: ProductPageProps) {
           isLotteryProduct ? (
             <LotForm productId={product.documentId} onUpdate={handleImmediateUpdate} />
           ) : (
-            <BidForm productId={product.id} />
+            <BidForm 
+              productId={product.id} 
+              refreshBids={fetchProductData} 
+              currentHighestBid={highestBid || 0} 
+              startingPrice={price || 0} 
+            />
           )
         ) : isLotteryProduct ? (
           // Passing the lotteryWinnerObj to EndInfoLot

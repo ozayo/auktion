@@ -9,12 +9,19 @@ import Link from "next/link";
 interface BidFormProps {
   productId: string;
   refreshBids?: () => void;
+  currentHighestBid?: number;
+  startingPrice?: number;
 }
 
-const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
+// Minimum bid increment
+const MIN_BID_INCREMENT = 50;
+
+const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids, currentHighestBid = 0, startingPrice = 0 }) => {
   const [amount, setAmount] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [highestBid, setHighestBid] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   // Modal states
@@ -43,6 +50,16 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
       }
     };
   }, [isSubmitting]);
+
+  useEffect(() => {
+    setHighestBid(currentHighestBid);
+  }, [currentHighestBid]);
+
+  useEffect(() => {
+    const suggestedBid = Math.max(currentHighestBid + MIN_BID_INCREMENT, startingPrice);
+    setAmount(suggestedBid.toString());
+    setIsLoading(false);
+  }, [currentHighestBid, startingPrice]);
 
   const handleBid = async (confirmed = false) => {
     if (!isLoggedIn || !user) {
@@ -76,34 +93,18 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
 
       const documentId = productLookupData.data[0].documentId;
 
-      // Fetch the starting price and highest bid
-      const productUrl = `/products/${documentId}`;
-      const productData = await fetchAPI(productUrl);
-
-      const startingPrice = productData.data?.price || 0;
-
-      const bidsUrl = `/bids?filters[product][documentId][$eq]=${documentId}&sort=Amount:desc&pagination[limit]=1`;
-      const bidsData = await fetchAPI(bidsUrl);
-      const highestBid = bidsData.data.length > 0 ? bidsData.data[0].Amount : 0;
-
       // Validate bid
       if (isNaN(bidAmount) || bidAmount <= 0) {
         setMessage("Ditt bud måste vara ett positivt tal.");
         return;
       }
-      if (bidAmount < highestBid + 50) {
+      if (bidAmount < highestBid + MIN_BID_INCREMENT) {
         setMessage(
-          `Ditt bud måste vara minst 50 kronor högre än det senaste budet.`
+          `Ditt bud måste vara minst ${MIN_BID_INCREMENT} kronor högre än det senaste budet.`
         );
         return;
       }
 
-      if (bidAmount <= highestBid) {
-        setMessage(
-          `Ditt bud måste vara högre än det senaste budet (${highestBid}).`
-        );
-        return;
-      }
       if (bidAmount < startingPrice) {
         setMessage(
           `Ditt bud måste vara minst lika med utgångspriset (${startingPrice} SEK).`
@@ -126,8 +127,19 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
 
       setMessage("Ditt bud har registrerats!");
       setAmount("");
+      
+      // Successful bid - update the local highest bid and suggested amount
+      setHighestBid(bidAmount);
+      setAmount((bidAmount + MIN_BID_INCREMENT).toString());
+      
       if (refreshBids) {
+        // Veriler yenilenirken formu kısa süreliğine devre dışı bırak
+        setIsLoading(true);
         refreshBids();
+        // Kısa bir gecikme sonrası formu tekrar aktif hale getir
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1000); // 1 saniyelik gecikme
       }
     } catch (error) {
       console.error("Error in handleBid:", error);
@@ -155,35 +167,46 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids }) => {
         </div>
       ) : (
         <div>
-          <p>Budbelopp:</p>
-          <input
-            type="number"
-            placeholder="Budbelopp:"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="border border-gray-200 p-2 mr-2"
-          />
-          <button
-            onClick={() => handleBid()}
-            disabled={isSubmitting}
-            className={`mt-2 ${
-              isSubmitting ? "bg-gray-500" : "bg-green-500"
-            } text-white px-4 py-2`}
-          >
-            Lägg ett bud
-          </button>
+          <p className="mb-2">
+            Budbelopp (minst {highestBid > 0 ? `${highestBid + MIN_BID_INCREMENT} SEK` : `${startingPrice} SEK`}):
+          </p>
+          <div className="flex gap-2 items-center w-full">
+            {isLoading ? (
+              <div className="animate-pulse h-10 w-full max-w-xs bg-gray-200 rounded"></div>
+            ) : (
+              <input
+                type="number"
+                placeholder="Budbelopp:"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="border border-gray-200 p-2 w-2/3"
+                min={Math.max(highestBid + MIN_BID_INCREMENT, startingPrice)}
+                step={MIN_BID_INCREMENT}
+              />
+            )}
+            <button
+              onClick={() => handleBid()}
+              disabled={isSubmitting || isLoading}
+              className={`${
+                isSubmitting || isLoading ? "bg-gray-500" : "bg-green-500 border border-green-500 hover:bg-green-600 hover:border-green-600 cursor-pointer w-1/3"
+              } text-white px-4 py-2`}
+            >
+              {isLoading ? "Uppdaterar..." : "Lägg ett bud"}
+            </button>
+          </div>
         </div>
       )}
       {message && <p className="mt-2">{message}</p>}
 
       {/* Confirmation Modal */}
       {showConfirmationModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-10">
+          <div className="bg-white px-8 py-6 rounded-lg shadow-lg">
             <h3 className="text-lg font-bold">Bekräfta ditt bud</h3>
-            <p className="mt-4">
-              Är du säker på att du vill bjuda {tempBidAmount} SEK? Din plånbok kommer tacka dig om du låter bli.
-            </p>
+            <div className="mt-4">
+              <p>Är du säker på att du vill bjuda {tempBidAmount} SEK?</p>
+              <p>Din plånbok kommer tacka dig om du låter bli.</p>
+            </div>
             <div className="mt-6 flex justify-end space-x-4">
               <button
                 onClick={() => setShowConfirmationModal(false)}
