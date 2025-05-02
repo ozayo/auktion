@@ -16,12 +16,22 @@ interface BidFormProps {
 // Minimum bid increment
 const MIN_BID_INCREMENT = 50;
 
+// Mesaj tipi için enum tanımlayalım
+enum MessageType {
+  SUCCESS = "success",
+  INFO = "info",
+  WARNING = "warning"
+}
+
 const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids, currentHighestBid = 0, startingPrice = 0 }) => {
   const [amount, setAmount] = useState("");
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState<MessageType>(MessageType.INFO);
+  const [temporarySuccessMessage, setTemporarySuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [highestBid, setHighestBid] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [userLastBid, setUserLastBid] = useState<number | null>(null);
   const router = useRouter();
 
   // Modal states
@@ -60,6 +70,42 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids, currentHighes
     setAmount(suggestedBid.toString());
     setIsLoading(false);
   }, [currentHighestBid, startingPrice]);
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout | null = null;
+    
+    if (temporarySuccessMessage) {
+      timeout = setTimeout(() => {
+        setTemporarySuccessMessage("");
+      }, 5000);
+    }
+    
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    };
+  }, [temporarySuccessMessage]);
+
+  useEffect(() => {
+    // Teklif vermediyse kullanıcı
+    if (userLastBid === null) {
+      setMessage("Du har inte lagt något bud på denna produkt ännu.");
+      setMessageType(MessageType.INFO);
+      return;
+    }
+    
+    // Kullanıcının teklifi en yüksek teklif mi?
+    if (userLastBid === currentHighestBid) {
+      setMessage("Du har det högsta budet.");
+      setMessageType(MessageType.SUCCESS);
+    } 
+    // Kullanıcının teklifi en yüksek değilse ve teklif verdiyse
+    else if (userLastBid > 0 && userLastBid < currentHighestBid) {
+      setMessage("Ditt bud har överträffats av en annan användare.");
+      setMessageType(MessageType.WARNING);
+    }
+  }, [currentHighestBid, userLastBid]);
 
   const handleBid = async (confirmed = false) => {
     if (!isLoggedIn || !user) {
@@ -125,7 +171,9 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids, currentHighes
         }),
       });
 
-      setMessage("Ditt bud har registrerats!");
+      // Geçici başarı mesajını set et - 5 saniye sonra kaybolacak
+      setTemporarySuccessMessage("Ditt bud har registrerats!");
+      setUserLastBid(bidAmount);
       setAmount("");
       
       // Successful bid - update the local highest bid and suggested amount
@@ -144,10 +192,32 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids, currentHighes
     } catch (error) {
       console.error("Error in handleBid:", error);
       setMessage("Ett fel har uppstått.");
+      setMessageType(MessageType.WARNING);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    const checkUserBids = async () => {
+      if (!isLoggedIn || !user) return;
+      
+      try {
+        // Kullanıcının bu ürün için yaptığı tüm teklifleri getir
+        const bidsUrl = `/bids?filters[user][documentId][$eq]=${user.documentId}&filters[product][id][$eq]=${productId}&sort=Amount:desc&pagination[limit]=1`;
+        const bidsData = await fetchAPI(bidsUrl);
+        
+        // Kullanıcının teklifi varsa, en yüksek teklifini kaydet
+        if (bidsData.data.length > 0) {
+          setUserLastBid(bidsData.data[0].Amount);
+        }
+      } catch (error) {
+        console.error("Error checking user bids:", error);
+      }
+    };
+    
+    checkUserBids();
+  }, [isLoggedIn, user, productId]);
 
   return (
     <div className="mt-8">
@@ -196,7 +266,24 @@ const BidForm: React.FC<BidFormProps> = ({ productId, refreshBids, currentHighes
           </div>
         </div>
       )}
-      {message && <p className="mt-2">{message}</p>}
+      
+      {/* Geçici başarı mesajı - 5 saniye sonra kaybolacak */}
+      {temporarySuccessMessage && (
+        <div className="mt-2 p-2 rounded bg-green-100 text-green-800 border border-green-200">
+          {temporarySuccessMessage}
+        </div>
+      )}
+      
+      {/* Kalıcı durum mesajı */}
+      {message && (
+        <div className={`mt-2 p-2 rounded ${
+          messageType === MessageType.SUCCESS ? 'bg-green-100 text-green-800 border border-green-200' :
+          messageType === MessageType.WARNING ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' :
+          'bg-blue-100 text-blue-800 border border-blue-200'
+        }`}>
+          {message}
+        </div>
+      )}
 
       {/* Confirmation Modal */}
       {showConfirmationModal && (
