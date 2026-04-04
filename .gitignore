@@ -41,3 +41,4 @@ db/.env
 .git/
 .gitignore
 .cursor/rules/auktion-rules.mdc
+analiz.md
