@@ -15,10 +15,6 @@ const WonProductCard = ({ product, onFavoriteChange, }: WonProductCardProps) => 
     product.type === 'lottery' ? 'lottery' : 'bidding'
   }`;
   
-  const totalPrice = () => {
-   const totalPrice = (product.price || 0) + (product.userBid || 0);
-   return totalPrice;
-  }
 
   const imageUrl = product.main_picture?.url 
     ? `${API_URL}${product.main_picture.url}`
@@ -111,15 +107,15 @@ const WonProductCard = ({ product, onFavoriteChange, }: WonProductCardProps) => 
                 <div className="mt-4 flex flex-col items-center">
                   <span className='text-4xl '>🥇</span>
                   <span className="text-xl font-bold text-amber-400">Du vinner</span>
-                  <span className="text-gray-800 text-sm">Totalt pris du betalar: <span className='font-bold'>{totalPrice()} SEK</span></span>
-                  <span className="text-gray-600 text-xs">(dit bud:{product.userBid || 0} + Utgångspris:{product.price || 0})</span>
+                  <span className="text-gray-800 text-sm">Pris du betalar: <span className='font-bold'>{product.userBid || 0} SEK</span></span>
+                  <span className="text-gray-600 text-xs">Utgångspris:{product.price || 0}</span>
                 </div>
               ) : (
                 <div className="mt-4 flex flex-col items-center">
                   <span className='text-4xl '>🏆</span>
                   <span className="text-xl font-bold text-amber-400">Du vinner</span>
-                  <span className="text-gray-800 text-sm">Totalt pris du betalar: <span className='font-bold'>{product.price || 0} SEK</span></span>
-                  <span className="text-gray-600 text-xs">(Utgångspris:{product.price || 0})</span>
+                  <span className="text-gray-800 text-sm">Pris du betalar: <span className='font-bold'>{product.price || 0} SEK</span></span>
+                  <span className="text-gray-600 text-xs">Utgångspris:{product.price || 0}</span>
                 </div>
               )}
             </div>
